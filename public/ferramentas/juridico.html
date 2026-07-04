@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Base Jurídica · Campos Pillar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:      #0f172a;
+    --surface: #1e293b;
+    --surface2:#0f172a;
+    --border:  #334155;
+    --gold:    #f0b429;
+    --gold-dim:rgba(240,180,41,0.12);
+    --text:    #f1f5f9;
+    --text2:   #94a3b8;
+    --text3:   #64748b;
+    --green:   #4ade80;
+    --green-dim:rgba(74,222,128,0.12);
+    --red:     #f87171;
+    --red-dim: rgba(248,113,113,0.12);
+    --blue:    #60a5fa;
+    --blue-dim:rgba(96,165,250,0.12);
+    --yellow:  #fbbf24;
+    --yellow-dim:rgba(251,191,36,0.12);
+    --purple:  #a78bfa;
+    --font:    'Inter', sans-serif;
+    --mono:    'Fira Code', monospace;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; -webkit-font-smoothing: antialiased; line-height: 1.6; min-height: 100vh; display: flex; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 220px; min-height: 100vh; background: var(--surface);
+    border-right: 1px solid var(--border); display: flex; flex-direction: column;
+    padding: 20px 12px; gap: 2px; flex-shrink: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; padding: 4px 8px 20px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+  .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--gold-dim); border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 11px; color: var(--gold); font-weight: 600; flex-shrink: 0; }
+  .logo-name { font-size: 13px; font-weight: 700; color: var(--text); }
+  .logo-sub { font-size: 10px; color: var(--text3); font-family: var(--mono); }
+  .nav-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text3); padding: 4px 8px 6px; margin-top: 4px; }
+  .nav-btn {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 9px 12px; border-radius: 8px; border: none; background: transparent;
+    color: var(--text2); font-size: 13px; font-family: var(--font); cursor: pointer;
+    transition: background .15s, color .15s; text-align: left;
+  }
+  .nav-btn:hover { background: var(--surface2); color: var(--text); }
+  .nav-btn.active { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(212,160,23,.2); }
+  .nav-btn .nav-icon { font-size: 16px; flex-shrink: 0; }
+
+  /* ── MAIN ── */
+  .main { flex: 1; padding: 32px 40px; overflow-y: auto; max-width: 960px; }
+
+  /* ── PAGES ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── BANNER ── */
+  .banner { display: flex; align-items: flex-start; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 28px; }
+  .banner h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .banner p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  /* ── SECTION LABELS ── */
+  .sec-label { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--text3); margin: 24px 0 12px; display: flex; align-items: center; gap: 8px; }
+  .sec-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── CARDS ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 12px; }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .card-body { font-size: 13px; color: var(--text2); line-height: 1.7; }
+
+  /* ── ALERTS ── */
+  .alert { border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; display: flex; gap: 12px; font-size: 13px; }
+  .alert-icon { font-size: 15px; flex-shrink: 0; padding-top: 1px; }
+  .alert-body { color: var(--text2); line-height: 1.6; }
+  .alert-body strong { color: var(--text); }
+  .alert-gold { background: var(--gold-dim); border: 1px solid rgba(212,160,23,.2); }
+  .alert-green { background: var(--green-dim); border: 1px solid rgba(76,175,125,.2); }
+  .alert-red { background: var(--red-dim); border: 1px solid rgba(224,90,90,.2); }
+  .alert-blue { background: var(--blue-dim); border: 1px solid rgba(94,159,224,.2); }
+
+  /* ── TABLES ── */
+  .tbl-wrap { overflow-x: auto; margin-bottom: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: var(--surface2); color: var(--text3); font-family: var(--mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+  .ok { color: var(--green); font-weight: 600; }
+  .no { color: var(--red); font-weight: 600; }
+  .warn { color: var(--yellow); font-weight: 600; }
+  .hl { color: var(--text); font-weight: 500; }
+
+  /* ── CHECKLIST ── */
+  .chk { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .chk li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .ci { width: 18px; height: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; margin-top: 1px; }
+  .ci-ok { background: var(--green-dim); color: var(--green); border: 1px solid rgba(76,175,125,.3); }
+  .ci-no { background: var(--red-dim); color: var(--red); border: 1px solid rgba(224,90,90,.3); }
+  .ci-warn { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(212,168,67,.3); }
+
+  /* ── PILLS ── */
+  .pill { display: inline-flex; align-items: center; gap: 4px; font-family: var(--mono); font-size: 10px; font-weight: 500; border-radius: 4px; padding: 2px 8px; }
+  .pill-gold { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(212,160,23,.25); }
+  .pill-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(76,175,125,.25); }
+  .pill-red { background: var(--red-dim); color: var(--red); border: 1px solid rgba(224,90,90,.25); }
+  .pill-blue { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(94,159,224,.25); }
+
+  /* ── GRID STATS ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .stat-label { font-size: 10px; font-family: var(--mono); color: var(--text3); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
+  .stat-val { font-size: 20px; font-weight: 700; }
+  .stat-desc { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+  /* ── FLOW ── */
+  .flow { display: flex; flex-direction: column; }
+  .flow-step { display: flex; gap: 14px; padding-bottom: 18px; }
+  .flow-step:last-child { padding-bottom: 0; }
+  .flow-line { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+  .flow-dot { width: 26px; height: 26px; border-radius: 50%; background: var(--surface2); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 10px; color: var(--text3); flex-shrink: 0; }
+  .flow-dot.act { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+  .flow-conn { width: 1px; flex: 1; background: var(--border); min-height: 14px; margin: 2px 0; }
+  .flow-content { padding-top: 3px; flex: 1; }
+  .flow-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .flow-body { font-size: 12px; color: var(--text2); line-height: 1.6; }
+
+  /* ── PERÍCIA TABS ── */
+  .ptabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+  .ptab { padding: 7px 14px; border-radius: 7px; border: 1px solid var(--border); background: transparent; color: var(--text2); font-size: 12px; font-family: var(--font); cursor: pointer; transition: all .15s; }
+  .ptab:hover { background: var(--surface2); color: var(--text); }
+  .ptab.active { background: var(--gold-dim); border-color: rgba(212,160,23,.3); color: var(--gold); }
+  .ppanel { display: none; }
+  .ppanel.active { display: block; }
+
+  /* ── QUAL MATRIX ── */
+  .qual-matrix { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .qual-row { display: grid; grid-template-columns: 2fr 1fr 3fr; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); gap: 10px; font-size: 13px; }
+  .qual-row:last-child { border-bottom: none; }
+  .qual-row.hdr { background: var(--surface2); font-family: var(--mono); font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
+  .qual-q { color: var(--text2); }
+  .qual-r { font-weight: 600; }
+  .qual-note { color: var(--text3); font-size: 12px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 680px) {
+    body { flex-direction: column; }
+    .sidebar { width: 100%; min-height: auto; height: auto; position: static; flex-direction: row; flex-wrap: wrap; padding: 12px; border-right: none; border-bottom: 1px solid var(--border); }
+    .logo { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .main { padding: 20px 16px; }
+    .qual-row { grid-template-columns: 1fr 1fr; }
+    .qual-note { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">CP</div>
+    <div>
+      <div class="logo-name">Campos Pillar</div>
+      <div class="logo-sub">Base Jurídica</div>
+    </div>
+  </div>
+  <div class="nav-label">JURÍDICO</div>
+  <button class="nav-btn active" onclick="go('qualificacao',this)">
+    <span class="nav-icon">⚖️</span> Qualificação Jurídica
+  </button>
+  <button class="nav-btn" onclick="go('docs',this)">
+    <span class="nav-icon">📂</span> Documentação
+  </button>
+  <button class="nav-btn" onclick="go('pericia',this)">
+    <span class="nav-icon">🏥</span> Perícia
+  </button>
+</nav>
+
+<main class="main">
+
+<!-- ═══ QUALIFICAÇÃO JURÍDICA ═══ -->
+<div id="pg-qualificacao" class="page active">
+  <div class="banner">
+    <div style="font-size:28px">⚖️</div>
+    <div>
+      <h3>Qualificação Jurídica — Auxílio-Acidente</h3>
+      <p>Regras legais completas para triagem de leads. Baseado na Lei 8.213/91, Decreto 3.048/99 e jurisprudência consolidada do STJ e TNU vigente em 2026.</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Valor do benefício</div><div class="stat-val" style="color:var(--gold)">50%</div><div class="stat-desc">do salário de benefício</div></div>
+    <div class="stat-card"><div class="stat-label">Piso 2026</div><div class="stat-val" style="color:var(--green)">R$ 810,50</div><div class="stat-desc">50% do salário mínimo</div></div>
+    <div class="stat-card"><div class="stat-label">Teto 2026</div><div class="stat-val" style="color:var(--blue)">R$ 4.237,78</div><div class="stat-desc">50% do teto INSS</div></div>
+    <div class="stat-card"><div class="stat-label">Prescrição</div><div class="stat-val" style="color:var(--yellow)">5 anos</div><div class="stat-desc">Súmula 85 STJ</div></div>
+  </div>
+
+  <!-- Critérios J1–J5 -->
+  <div class="sec-label">Critérios obrigatórios — todos devem ser preenchidos</div>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot act">J1</div><div class="flow-conn"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Qualidade de segurado na data do acidente</div>
+        <div class="flow-body">CLT, rural, doméstico, avulso. <strong>NÃO</strong> autônomo, MEI ou facultativo (CJF Tema 206). Período de graça: 12 a 36 meses após última contribuição.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot act">J2</div><div class="flow-conn"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Acidente de qualquer natureza</div>
+        <div class="flow-body">Trabalho, trânsito, doméstico, lazer ou doença ocupacional equiparada (LER, DORT, PAIR, hérnias profissionais, burnout irreversível).</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot act">J3</div><div class="flow-conn"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Sequela permanente consolidada</div>
+        <div class="flow-body">Qualquer redução, ainda que mínima — <strong>Tema 416 STJ e Súmula 88 TNU</strong>. Não precisa ser incapacidade total. Dor crônica, limitação de movimento, perda auditiva parcial, etc.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot act">J4</div><div class="flow-conn"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Não aposentado por invalidez pelo mesmo acidente</div>
+        <div class="flow-body">Se já aposentado por invalidez pela mesma causa, não qualifica. Verificar se é o mesmo acidente/doença.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot act">J5</div></div>
+      <div class="flow-content">
+        <div class="flow-title">Dentro do prazo de prescrição — 5 anos</div>
+        <div class="flow-body">Súmula 85 STJ: parcelas vencidas nos 5 anos anteriores ao ajuizamento. Se houve auxílio-doença, a DIB retroage ao dia seguinte da cessação (Tema 862 STJ).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quem TEM e NÃO TEM direito -->
+  <div class="sec-label">Quem tem — e quem não tem direito</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Categoria</th><th>Direito?</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td class="hl">Empregado CLT (urbano)</td><td class="ok">✓ SIM</td><td>Caso mais comum. Cobertura plena.</td></tr>
+        <tr><td class="hl">Empregado rural (CLT rural)</td><td class="ok">✓ SIM</td><td>Incluído na categoria de empregado.</td></tr>
+        <tr><td class="hl">Empregado doméstico</td><td class="ok">✓ SIM</td><td>Desde EC 72/2013.</td></tr>
+        <tr><td class="hl">Trabalhador avulso</td><td class="ok">✓ SIM</td><td>Estivadores, portuários, etc.</td></tr>
+        <tr><td class="hl">Segurado especial (rural)</td><td class="ok">✓ SIM</td><td>Agricultor familiar, pescador artesanal.</td></tr>
+        <tr><td class="hl">Contribuinte individual (autônomo)</td><td class="no">✗ NÃO</td><td>Excluído pelo art. 18, §1º — CJF Tema 206.</td></tr>
+        <tr><td class="hl">MEI</td><td class="no">✗ NÃO</td><td>MEI é contribuinte individual.</td></tr>
+        <tr><td class="hl">Segurado facultativo</td><td class="no">✗ NÃO</td><td>Excluído expressamente pela lei.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Matriz de qualificação -->
+  <div class="sec-label">Matriz de triagem — 8 perguntas</div>
+  <div class="qual-matrix">
+    <div class="qual-row hdr"><div>Pergunta</div><div>Ideal</div><div>Lógica jurídica</div></div>
+    <div class="qual-row"><div class="qual-q">Q1 — Trabalhava com carteira assinada (CLT) quando se acidentou?</div><div class="qual-r ok">SIM</div><div class="qual-note">Exclui MEI, autônomo, facultativo.</div></div>
+    <div class="qual-row"><div class="qual-q">Q2 — Acidente há menos de 5 anos? (ou teve auxílio-doença por ele?)</div><div class="qual-r ok">SIM</div><div class="qual-note">Prescrição 5 anos. Com B-31 anterior, DIB retroage.</div></div>
+    <div class="qual-row"><div class="qual-q">Q3 — Ficou com sequela permanente? (dor, limitação, dificuldade)</div><div class="qual-r ok">SIM</div><div class="qual-note">Mínima já basta — Tema 416 STJ.</div></div>
+    <div class="qual-row"><div class="qual-q">Q4 — Essa sequela dificulta o trabalho habitual?</div><div class="qual-r ok">SIM</div><div class="qual-note">Mais esforço ou mais tempo já configura redução.</div></div>
+    <div class="qual-row"><div class="qual-q">Q5 — Tem alguma documentação do acidente?</div><div class="qual-r warn">ALGUMA</div><div class="qual-note">BO ou prontuário já abre o processo. CAT obrigatória para B-94.</div></div>
+    <div class="qual-row"><div class="qual-q">Q6 — Já está aposentado pelo INSS?</div><div class="qual-r no">NÃO</div><div class="qual-note">Aposentadoria cessa o B-94 automaticamente.</div></div>
+    <div class="qual-row"><div class="qual-q">Q7 — Qual foi o tipo de acidente?</div><div class="qual-r" style="color:var(--blue)">QUALQUER</div><div class="qual-note">Qualquer natureza. Verificar CAT se laboral.</div></div>
+    <div class="qual-row"><div class="qual-q">Q8 — Na época do acidente, estava em dia com o INSS?</div><div class="qual-r ok">SIM</div><div class="qual-note">Ou dentro do período de graça (12–36 meses).</div></div>
+  </div>
+
+  <!-- Classificação -->
+  <div class="sec-label">Classificação do lead pós-triagem</div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+    <div style="display:flex;gap:12px;align-items:flex-start;background:var(--green-dim);border:1px solid rgba(76,175,125,.2);border-radius:10px;padding:14px 16px">
+      <span class="pill pill-green" style="font-size:11px;white-space:nowrap;padding:4px 12px">APROVADO</span>
+      <span style="font-size:13px;color:var(--text2)">Q1 SIM + Q3 SIM + Q4 SIM + Q6 NÃO + alguma documentação. Encaminhar para análise jurídica.</span>
+    </div>
+    <div style="display:flex;gap:12px;align-items:flex-start;background:var(--yellow-dim);border:1px solid rgba(212,168,67,.2);border-radius:10px;padding:14px 16px">
+      <span class="pill pill-gold" style="font-size:11px;white-space:nowrap;padding:4px 12px">EM ANÁLISE</span>
+      <span style="font-size:13px;color:var(--text2)">Q1 SIM mas Q5 fraco, acidente antigo, vínculo no momento do acidente não claro. Pedir documentação antes.</span>
+    </div>
+    <div style="display:flex;gap:12px;align-items:flex-start;background:var(--red-dim);border:1px solid rgba(224,90,90,.2);border-radius:10px;padding:14px 16px">
+      <span class="pill pill-red" style="font-size:11px;white-space:nowrap;padding:4px 12px">DESQUALIFICADO</span>
+      <span style="font-size:13px;color:var(--text2)">Q1 NÃO (MEI/autônomo), Q6 SIM (aposentado), acidente há mais de 5 anos sem processo ou B-31 no período.</span>
+    </div>
+  </div>
+
+  <!-- Jurisprudência -->
+  <div class="sec-label">Jurisprudência vinculante</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Precedente</th><th>Tese</th><th>Impacto prático</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill pill-gold">Tema 416 STJ</span></td><td style="color:var(--text2)">Qualquer redução, ainda que mínima, é suficiente.</td><td style="color:var(--text2)">Derruba negativas por "lesão leve demais".</td></tr>
+        <tr><td><span class="pill pill-gold">Tema 862 STJ</span></td><td style="color:var(--text2)">DIB = dia seguinte à cessação do auxílio-doença.</td><td style="color:var(--text2)">Fundamenta retroação e atrasados.</td></tr>
+        <tr><td><span class="pill pill-gold">Tema 315 TNU</span></td><td style="color:var(--text2)">Uniformiza DIB nos JEFs.</td><td style="color:var(--text2)">Evita disparidade entre regiões.</td></tr>
+        <tr><td><span class="pill pill-blue">Súmula 88 TNU</span></td><td style="color:var(--text2)">Limitação leve já enseja concessão.</td><td style="color:var(--text2)">Fundamento adicional para sequela mínima.</td></tr>
+        <tr><td><span class="pill pill-blue">Súmula 85 STJ</span></td><td style="color:var(--text2)">Prescrição quinquenal das parcelas.</td><td style="color:var(--text2)">Define horizonte de atrasados recuperáveis.</td></tr>
+        <tr><td><span class="pill pill-green">Tema 322 TNU</span></td><td style="color:var(--text2)">B-94 compõe PBC da aposentadoria rural.</td><td style="color:var(--text2)">Aumenta aposentadoria do segurado especial.</td></tr>
+        <tr><td><span class="pill pill-red">CJF Tema 206</span></td><td style="color:var(--text2)">MEI/autônomo/facultativo sem direito.</td><td style="color:var(--text2)">Confirm exclusão expressa pela lei.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ DOCUMENTAÇÃO ═══ -->
+<div id="pg-docs" class="page">
+  <div class="banner">
+    <div style="font-size:28px">📂</div>
+    <div>
+      <h3>Documentação necessária por modalidade</h3>
+      <p>Os requisitos diferem entre <strong>B-36</strong> (acidente não-laboral, sem CAT) e <strong>B-94</strong> (acidente de trabalho, com CAT). O laudo médico com CID é bloqueante absoluto em ambas.</p>
+    </div>
+  </div>
+
+  <div class="sec-label">Documentos universais — obrigatórios em ambas</div>
+  <ul class="chk">
+    <li><div class="ci ci-ok">✓</div><span><strong>RG ou CNH</strong> (frente e verso) — documento de identidade com foto</span></li>
+    <li><div class="ci ci-ok">✓</div><span><strong>CPF</strong></span></li>
+    <li><div class="ci ci-ok">✓</div><span><strong>Comprovante de residência</strong> (últimos 3 meses)</span></li>
+    <li><div class="ci ci-ok">✓</div><span><strong>Extrato CNIS</strong> — app Meu INSS ou tel. 135 (confirmar vínculos e contribuições)</span></li>
+  </ul>
+
+  <div class="sec-label">B-94 — Acidente de trabalho ou doença ocupacional</div>
+  <div class="alert alert-red"><div class="alert-icon">🚨</div><div class="alert-body">Sem a <strong>CAT</strong> (Comunicação de Acidente de Trabalho), o INSS converte automaticamente para B-36, perdendo os direitos trabalhistas adicionais (estabilidade 12 meses + FGTS durante afastamento).</div></div>
+  <ul class="chk">
+    <li><div class="ci ci-no">!</div><span><strong>CAT — Comunicação de Acidente de Trabalho</strong> 🔴 BLOQUEANTE — obrigatória para manter o B-94</span></li>
+    <li><div class="ci ci-no">!</div><span><strong>PPP — Perfil Profissiográfico Previdenciário</strong> 🔴 BLOQUEANTE — empregador tem 15 dias para fornecer</span></li>
+    <li><div class="ci ci-no">!</div><span><strong>Laudo médico com CID e descrição da sequela</strong> 🔴 BLOQUEANTE — sem CID o INSS nega na perícia</span></li>
+    <li><div class="ci ci-ok">✓</div><span><strong>CTPS — Carteira de Trabalho</strong> (confirmar vínculo CLT na data do acidente)</span></li>
+    <li><div class="ci ci-ok">✓</div><span><strong>Atestados e prontuário</strong> do período de afastamento</span></li>
+  </ul>
+
+  <div class="sec-label">B-36 — Acidente de qualquer natureza (não-laboral)</div>
+  <ul class="chk">
+    <li><div class="ci ci-no">!</div><span><strong>Laudo médico com CID e sequela permanente descrita</strong> 🔴 BLOQUEANTE — deve descrever limitação funcional</span></li>
+    <li><div class="ci ci-ok">✓</div><span><strong>Exames de imagem com laudo do radiologista</strong> (RX, ressonância, tomografia pós-acidente)</span></li>
+    <li><div class="ci ci-ok">✓</div><span><strong>Prontuário hospitalar</strong> do atendimento de emergência ou cirurgia</span></li>
+    <li><div class="ci ci-warn">!</div><span><strong>Boletim de Ocorrência</strong> — obrigatório para acidentes de trânsito, recomendado para outros</span></li>
+  </ul>
+
+  <div class="sec-label">Situações especiais e substitutos</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Situação</th><th>Solução</th></tr></thead>
+      <tbody>
+        <tr><td class="hl">Laudo sem CID</td><td style="color:var(--text2)">Pedir ao médico que refaça mencionando o CID e descrevendo a sequela funcional. Laudos com +90 dias podem ser rejeitados.</td></tr>
+        <tr><td class="hl">CAT não emitida pelo empregador</td><td style="color:var(--text2)">BO + prontuário hospitalar + testemunhas. Pode-se pedir CAT por via judicial ou sindicato.</td></tr>
+        <tr><td class="hl">PPP não fornecido</td><td style="color:var(--text2)">Empregador tem 15 dias legais. Notificar formalmente. Se recusar, requerer judicialmente.</td></tr>
+        <tr><td class="hl">CNIS vazio</td><td style="color:var(--text2)">Verificar contribuições como MEI anterior (não qualifica B-94), avulso ou rural. Pedir extrato na agência.</td></tr>
+        <tr><td class="hl">Acidente há mais de 90 dias sem documentação médica recente</td><td style="color:var(--text2)">Solicitar nova consulta médica especializada para laudo atualizado com sequela atual.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="alert alert-gold"><div class="alert-icon">⚖️</div><div class="alert-body"><strong>Sequelas aceitas pelo STJ e Judiciário:</strong> Fraturas com limitação, amputações, LER/DORT, PAIR (perda auditiva), hérnia de disco profissional, lesão de ombro/coluna/joelho, visão monocular, PTSD pós-acidente, burnout irreversível, doenças respiratórias ocupacionais.</div></div>
+</div>
+
+<!-- ═══ PERÍCIA ═══ -->
+<div id="pg-pericia" class="page">
+  <div class="banner">
+    <div style="font-size:28px">🏥</div>
+    <div>
+      <h3>Perícia Médica — Guia Completo 2026</h3>
+      <p>Atualizado conforme Portaria Conjunta MPS/INSS nº 13/2026 e Portaria SGD/MGI nº 2.907/2026.</p>
+    </div>
+  </div>
+
+  <!-- Tabs de perícia -->
+  <div class="ptabs">
+    <button class="ptab active" onclick="ptab('como',this)">Como funciona</button>
+    <button class="ptab" onclick="ptab('prep',this)">Preparação</button>
+    <button class="ptab" onclick="ptab('perito',this)">Na consulta</button>
+    <button class="ptab" onclick="ptab('fluxo',this)">Fluxo judicial</button>
+    <button class="ptab" onclick="ptab('recurso',this)">Recurso</button>
+  </div>
+
+  <div id="pt-como" class="ppanel active">
+    <div class="sec-label">Via administrativa (INSS)</div>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-line"><div class="flow-dot act">1</div><div class="flow-conn"></div></div><div class="flow-content"><div class="flow-title">Protocolo do requerimento</div><div class="flow-body">Presencial na agência INSS ou pelo Meu Previdência (agendamento pelo 135 ou app). O escritório protocola pelo procurador.</div></div></div>
+      <div class="flow-step"><div class="flow-line"><div class="flow-dot act">2</div><div class="flow-conn"></div></div><div class="flow-content"><div class="flow-title">Agendamento da perícia</div><div class="flow-body">INSS agenda automaticamente após protocolo. Prazo médio: 15–45 dias. Data enviada por SMS/app Meu INSS.</div></div></div>
+      <div class="flow-step"><div class="flow-line"><div class="flow-dot act">3</div><div class="flow-conn"></div></div><div class="flow-content"><div class="flow-title">Perícia médica presencial</div><div class="flow-body">Perito do INSS avalia a sequela. Duração: 10–20 min. Levar toda documentação médica original + cópias.</div></div></div>
+      <div class="flow-step"><div class="flow-line"><div class="flow-dot act">4</div><div class="flow-conn"></div></div><div class="flow-content"><div class="flow-title">Resultado — prazo legal: 45 dias</div><div class="flow-body">Disponível no Meu INSS. Se deferido: início do benefício. Se negado: recurso ou ação judicial.</div></div></div>
+    </div>
+    <div class="alert alert-blue"><div class="alert-icon">💡</div><div class="alert-body"><strong>Atestmed (perícia online):</strong> disponível para afastamentos até 90 dias em 2026. Para auxílio-acidente (B-94), a perícia presencial ainda é necessária na maioria dos casos.</div></div>
+  </div>
+
+  <div id="pt-prep" class="ppanel">
+    <div class="sec-label">Orientação 7 dias antes da perícia</div>
+    <ul class="chk">
+      <li><div class="ci ci-ok">✓</div><span>Reunir <strong>todos os laudos médicos originais</strong> com CID — mais recentes primeiro</span></li>
+      <li><div class="ci ci-ok">✓</div><span>Separar <strong>exames de imagem</strong> com laudos do radiologista</span></li>
+      <li><div class="ci ci-ok">✓</div><span>Levar <strong>CAT</strong> (se B-94) e PPP</span></li>
+      <li><div class="ci ci-ok">✓</div><span>Confirmar endereço e horário da agência 2 dias antes</span></li>
+      <li><div class="ci ci-ok">✓</div><span>Orientar o cliente a relatar as dificuldades <strong>no pior dia</strong>, não no dia bom</span></li>
+      <li><div class="ci ci-ok">✓</div><span>Se necessário: solicitar acompanhante (familiar ou assistente de saúde)</span></li>
+    </ul>
+    <div class="sec-label">O que o cliente deve dizer ao perito</div>
+    <div class="card">
+      <div class="card-title">💬 Roteiro de relato</div>
+      <div class="card-body">
+        <strong>1. Descrever o acidente</strong> — quando, como, o que aconteceu.<br><br>
+        <strong>2. Relatar a sequela atual</strong> — "Sinto dor constante ao levantar o braço", "Não consigo ficar em pé por mais de 30 minutos", "Perdi força na mão direita".<br><br>
+        <strong>3. Mostrar impacto no trabalho</strong> — "Antes carregava peso, agora não consigo", "Digitava o dia todo, agora dói após 20 minutos".<br><br>
+        <strong>⚠️ Não exagerar nem minimizar</strong> — descrever o estado real. A perícia é técnica.
+      </div>
+    </div>
+  </div>
+
+  <div id="pt-perito" class="ppanel">
+    <div class="sec-label">Na consulta com o perito</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Situação</th><th>Como agir</th></tr></thead>
+        <tbody>
+          <tr><td class="hl">Perito não examina a sequela</td><td style="color:var(--text2)">Mencionar claramente: "Doutor, minha sequela principal é [...]". Mostrar os laudos.</td></tr>
+          <tr><td class="hl">Consulta muito rápida (&lt;5 min)</td><td style="color:var(--text2)">Pedir registro em prontuário. Reportar ao escritório para recurso.</td></tr>
+          <tr><td class="hl">Perito pede documento que não tem</td><td style="color:var(--text2)">Informar ao escritório antes de sair — pode gerar exigência ou negativa.</td></tr>
+          <tr><td class="hl">Resultado "capacidade preservada"</td><td style="color:var(--text2)">Recurso imediato ou ação judicial. Tema 416 STJ: qualquer redução já basta.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="alert alert-gold"><div class="alert-icon">⚠️</div><div class="alert-body">O resultado da perícia administrativa <strong>não é definitivo</strong>. A via judicial tem peritos médicos independentes e não está vinculada ao parecer do INSS. Negativas administrativas são frequentemente revertidas judicialmente.</div></div>
+  </div>
+
+  <div id="pt-fluxo" class="ppanel">
+    <div class="sec-label">Fluxo quando vai a juízo</div>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-line"><div class="flow-dot act">1</div><div class="flow-conn"></div></div><div class="flow-content"><div class="flow-title">Negativa administrativa confirmada</div><div class="flow-body">Após recurso negado no INSS ou opção direta pela via judicial.</div></div></div>
+      <div class="flow-step"><div class="flow-line"><div class="flow-dot act">2</div><div class="flow-conn"></div></div><div class="flow-content"><div class="flow-title">Ajuizamento no JEF (Juizado Especial Federal)</div><div class="flow-body">Causas até 60 salários mínimos (R$97.260 em 2026) sem advogado obrigatório, mas recomendado. Escritório protocola a ação.</div></div></div>
+      <div class="flow-step"><div class="flow-line"><div class="flow-dot act">3</div><div class="flow-conn"></div></div><div class="flow-content"><div class="flow-title">Perícia judicial</div><div class="flow-body">Perito nomeado pelo juiz — independente do INSS. Avalia a sequela com base nos laudos e exame físico. Prazo médio: 60–120 dias.</div></div></div>
+      <div class="flow-step"><div class="flow-line"><div class="flow-dot act">4</div><div class="flow-conn"></div></div><div class="flow-content"><div class="flow-title">Sentença e RPV</div><div class="flow-body">Deferido: pagamento por RPV (até 60 salários mínimos) em 30–60 dias ou precatório se acima. DIB retroage conforme Tema 862 STJ.</div></div></div>
+    </div>
+  </div>
+
+  <div id="pt-recurso" class="ppanel">
+    <div class="sec-label">Recurso administrativo — prazo 30 dias</div>
+    <div class="card">
+      <div class="card-title">📋 Quando e como recorrer</div>
+      <div class="card-body">
+        <strong>Prazo:</strong> 30 dias após a notificação da negativa.<br><br>
+        <strong>Onde:</strong> CRPS — Conselho de Recursos da Previdência Social (online pelo Meu INSS).<br><br>
+        <strong>Documentos adicionais:</strong> laudo médico mais detalhado descrevendo sequela e impacto no trabalho habitual.<br><br>
+        <strong>Taxa de reversão:</strong> baixa via CRPS. Recomendável já iniciar ação judicial simultaneamente para preservar o prazo prescricional.
+      </div>
+    </div>
+    <div class="alert alert-red"><div class="alert-icon">⚡</div><div class="alert-body"><strong>Armadilha comum:</strong> aguardar o resultado do recurso administrativo perdendo prazo prescricional. O correto é ajuizar a ação judicial dentro dos 5 anos, mesmo com recurso administrativo em andamento.</div></div>
+  </div>
+</div>
+
+</main>
+
+<script>
+function go(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('pg-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+function ptab(id, btn) {
+  document.querySelectorAll('.ppanel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+  document.getElementById('pt-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

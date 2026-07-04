@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora · Auxílio-Acidente INSS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:     #0f172a;
+  --s:      #1e293b;
+  --s2:     #0f172a;
+  --bd:     #334155;
+  --bd2:    #475569;
+  --gold:   #d4a017;
+  --gold-d: rgba(212,160,23,0.12);
+  --grn:    #4ade80;
+  --grn-d:  rgba(74,222,128,0.1);
+  --red:    #f87171;
+  --red-d:  rgba(248,113,113,0.1);
+  --blu:    #60a5fa;
+  --blu-d:  rgba(96,165,250,0.1);
+  --ylw:    #fbbf24;
+  --ylw-d:  rgba(251,191,36,0.1);
+  --txt:    #e2e8f0;
+  --t2:     #cbd5e1;
+  --t3:     #64748b;
+  --fn:     'Inter', sans-serif;
+  --mo:     'Fira Code', monospace;
+}
+body { font-family: var(--fn); background: var(--bg); color: var(--txt); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+/* HEADER */
+header { background: var(--s); border-bottom: 1px solid var(--bd); padding: 16px 24px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 50; }
+.logo-mark { width: 32px; height: 32px; background: var(--gold-d); border: 1px solid rgba(212,160,23,0.4); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(--mo); font-size: 11px; color: var(--gold); font-weight: 600; }
+.logo-t { font-size: 13px; font-weight: 700; color: var(--txt); }
+.logo-s { font-size: 11px; color: var(--t3); }
+.badge { margin-left: auto; font-family: var(--mo); font-size: 10px; color: var(--gold); background: var(--gold-d); border: 1px solid rgba(212,160,23,0.3); border-radius: 6px; padding: 3px 10px; }
+
+/* LAYOUT */
+.wrap { max-width: 820px; margin: 0 auto; padding: 28px 20px 80px; }
+
+/* HERO */
+.hero { margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid var(--bd); }
+.hero-ey { font-family: var(--mo); font-size: 10px; color: var(--gold); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 10px; }
+.hero h1 { font-size: 24px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 8px; }
+.hero h1 span { color: var(--gold); }
+.hero p { font-size: 13px; color: var(--t2); max-width: 520px; }
+
+/* STEPS */
+.step { background: var(--s); border: 1px solid var(--bd); border-radius: 12px; padding: 20px; margin-bottom: 12px; transition: border-color .2s; }
+.step:hover { border-color: var(--bd2); }
+.step.active { border-color: rgba(212,160,23,0.4); }
+.step-h { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--s2); border: 2px solid var(--bd2); display: flex; align-items: center; justify-content: center; font-family: var(--mo); font-size: 10px; color: var(--t3); flex-shrink: 0; }
+.step.active .step-num { border-color: var(--gold); color: var(--gold); background: var(--gold-d); }
+.step.done .step-num { border-color: var(--grn); color: var(--grn); background: var(--grn-d); }
+.step-title { font-size: 13px; font-weight: 600; color: var(--txt); }
+.step-sub { font-size: 11px; color: var(--t3); margin-top: 2px; }
+
+/* OPTIONS */
+.opts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.opt { padding: 8px 14px; border: 1.5px solid var(--bd); border-radius: 8px; background: var(--s2); cursor: pointer; transition: all .15s; font-size: 12px; color: var(--t2); font-family: var(--fn); }
+.opt:hover { border-color: var(--gold); color: var(--txt); }
+.opt.sel { border-color: var(--gold); background: var(--gold-d); color: var(--gold); font-weight: 600; }
+.opt.no  { border-color: var(--red);  background: var(--red-d);  color: var(--red); }
+
+/* ALERTS */
+.alert { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-radius: 8px; font-size: 12px; line-height: 1.5; margin-top: 8px; }
+.alert-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.a-red  { background: var(--red-d);  border: 1px solid rgba(248,113,113,0.2); color: var(--t2); }
+.a-grn  { background: var(--grn-d);  border: 1px solid rgba(74,222,128,0.2);  color: var(--t2); }
+.a-gold { background: var(--gold-d); border: 1px solid rgba(212,160,23,0.2);  color: var(--t2); }
+.a-blu  { background: var(--blu-d);  border: 1px solid rgba(96,165,250,0.2);   color: var(--t2); }
+.alert strong { color: var(--txt); }
+
+/* FIELDS */
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 11px; font-weight: 600; color: var(--t2); margin-bottom: 6px; letter-spacing: .02em; }
+.field select, .field input[type="number"], .field input[type="date"], .field input[type="text"] {
+  width: 100%; padding: 9px 12px; border: 1.5px solid var(--bd); border-radius: 8px;
+  background: var(--s2); color: var(--txt); font-size: 13px; font-family: var(--fn);
+  outline: none; transition: border .15s;
+}
+.field select:focus, .field input:focus { border-color: var(--gold); }
+.field .hint { font-size: 11px; color: var(--t3); margin-top: 4px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* RESULTADO */
+.result { background: var(--s); border: 2px solid var(--gold); border-radius: 14px; overflow: hidden; margin-top: 24px; display: none; }
+.result.show { display: block; }
+.res-head { background: var(--gold-d); padding: 18px 22px; border-bottom: 1px solid var(--bd); }
+.res-head h2 { font-size: 16px; font-weight: 800; letter-spacing: -.02em; }
+.res-head p { font-size: 11px; color: var(--t2); margin-top: 3px; }
+.res-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+.res-card { padding: 18px 22px; border-bottom: 1px solid var(--bd); border-right: 1px solid var(--bd); }
+.res-card:nth-child(3n) { border-right: none; }
+.res-label { font-size: 10px; font-weight: 600; color: var(--t3); text-transform: uppercase; letter-spacing: .04em; font-family: var(--mo); margin-bottom: 4px; }
+.res-val { font-size: 20px; font-weight: 800; font-family: var(--mo); color: var(--gold); }
+.res-note { font-size: 11px; color: var(--t2); margin-top: 3px; }
+.res-class { padding: 16px 22px; border-bottom: 1px solid var(--bd); display: flex; align-items: center; gap: 14px; }
+.res-pill { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; font-family: var(--mo); }
+.pill-grn { background: var(--grn-d); color: var(--grn); border: 1px solid rgba(74,222,128,.3); }
+.pill-ylw { background: var(--ylw-d); color: var(--ylw); border: 1px solid rgba(251,191,36,.3); }
+.pill-red { background: var(--red-d);  color: var(--red);  border: 1px solid rgba(248,113,113,.3); }
+.res-detail { padding: 16px 22px; border-bottom: 1px solid var(--bd); }
+.res-detail h4 { font-size: 11px; font-weight: 600; color: var(--t3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; font-family: var(--mo); }
+.res-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(51,65,85,.5); font-size: 12px; }
+.res-row:last-child { border-bottom: none; }
+.res-row-l { color: var(--t2); }
+.res-row-v { font-family: var(--mo); font-weight: 600; color: var(--txt); }
+.res-legal { padding: 14px 22px; background: rgba(0,0,0,.2); font-size: 11px; color: var(--t3); line-height: 1.7; }
+
+/* BUTTON */
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border-radius: 10px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--fn); transition: all .15s; }
+.btn-gold { background: var(--gold); color: #0f172a; }
+.btn-gold:hover { opacity: .85; }
+.btn-ghost { background: transparent; border: 1.5px solid var(--bd); color: var(--t2); }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+.cta { display: flex; gap: 12px; align-items: center; margin-top: 20px; }
+
+footer { border-top: 1px solid var(--bd); padding: 16px; text-align: center; font-size: 11px; color: var(--t3); font-family: var(--mo); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">NF</div>
+  <div>
+    <div class="logo-t">Calculadora Auxílio-Acidente</div>
+    <div class="logo-s">INSS 2026 · B-36 e B-94</div>
+  </div>
+  <span class="badge">v2026.1</span>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-ey">Ferramenta Jurídica · Auxílio-Acidente INSS</div>
+    <h1>Calcule o <span>Benefício</span> do Seu Cliente</h1>
+    <p>Preencha as etapas abaixo para calcular o valor mensal, retroativos e classificar a viabilidade do caso.</p>
+  </div>
+
+  <!-- ETAPA 1 -->
+  <div class="step active">
+    <div class="step-h">
+      <div class="step-num">1</div>
+      <div><div class="step-title">Vínculo na data do acidente</div><div class="step-sub">Art. 18, §1º — quem tem direito</div></div>
+    </div>
+    <div class="opts">
+      <div class="opt" data-v="clt" onclick="setOpt('vinculo',this)">CLT (urbano/rural)</div>
+      <div class="opt" data-v="domestico" onclick="setOpt('vinculo',this)">Doméstico</div>
+      <div class="opt" data-v="avulso" onclick="setOpt('vinculo',this)">Avulso</div>
+      <div class="opt" data-v="especial" onclick="setOpt('vinculo',this)">Segurado especial</div>
+      <div class="opt" data-v="mei" onclick="setOpt('vinculo',this)">MEI</div>
+      <div class="opt" data-v="autonomo" onclick="setOpt('vinculo',this)">Autônomo / PJ</div>
+      <div class="opt" data-v="facultativo" onclick="setOpt('vinculo',this)">Facultativo</div>
+      <div class="opt" data-v="desempregado" onclick="setOpt('vinculo',this)">Desempregado</div>
+    </div>
+    <div id="vinculo-alert"></div>
+  </div>
+
+  <!-- ETAPA 2 -->
+  <div class="step">
+    <div class="step-h">
+      <div class="step-num">2</div>
+      <div><div class="step-title">Tipo de acidente</div><div class="step-sub">Define B-36 ou B-94 e o rito judicial</div></div>
+    </div>
+    <div class="opts">
+      <div class="opt" data-v="trabalho" onclick="setOpt('tipo',this)">No trabalho / trajeto</div>
+      <div class="opt" data-v="doenca" onclick="setOpt('tipo',this)">Doença ocupacional</div>
+      <div class="opt" data-v="transito" onclick="setOpt('tipo',this)">Trânsito (fora trajeto)</div>
+      <div class="opt" data-v="queda" onclick="setOpt('tipo',this)">Queda / doméstico</div>
+      <div class="opt" data-v="outros" onclick="setOpt('tipo',this)">Outros</div>
+    </div>
+    <div id="tipo-alert"></div>
+  </div>
+
+  <!-- ETAPA 3 -->
+  <div class="step">
+    <div class="step-h">
+      <div class="step-num">3</div>
+      <div><div class="step-title">Sequela permanente</div><div class="step-sub">Art. 86 — condição essencial</div></div>
+    </div>
+    <div class="opts">
+      <div class="opt" data-v="sim" onclick="setOpt('sequela',this)">Sim, com laudo médico</div>
+      <div class="opt" data-v="parcial" onclick="setOpt('sequela',this)">Sim, sem laudo ainda</div>
+      <div class="opt" data-v="nao" onclick="setOpt('sequela',this)">Não há sequela</div>
+    </div>
+    <div id="sequela-alert"></div>
+  </div>
+
+  <!-- ETAPA 4 -->
+  <div class="step">
+    <div class="step-h">
+      <div class="step-num">4</div>
+      <div><div class="step-title">Recebeu auxílio-doença?</div><div class="step-sub">DIB e Tema 862 STJ</div></div>
+    </div>
+    <div class="opts">
+      <div class="opt" data-v="sim" onclick="setOpt('auxdoenca',this)">Sim</div>
+      <div class="opt" data-v="nao" onclick="setOpt('auxdoenca',this)">Não</div>
+    </div>
+    <div id="auxdoenca-alert"></div>
+    <div id="field-cessacao" style="display:none;margin-top:12px">
+      <div class="field">
+        <label>Data de cessação do auxílio-doença</label>
+        <input type="date" id="inp-cessacao">
+      </div>
+    </div>
+  </div>
+
+  <!-- ETAPA 5 -->
+  <div class="step">
+    <div class="step-h">
+      <div class="step-num">5</div>
+      <div><div class="step-title">Está aposentado?</div><div class="step-sub">Art. 86, §2º — impede cumulação</div></div>
+    </div>
+    <div class="opts">
+      <div class="opt" data-v="nao" onclick="setOpt('aposentado',this)">Não</div>
+      <div class="opt" data-v="sim" onclick="setOpt('aposentado',this)">Sim, já aposentado</div>
+    </div>
+    <div id="aposentado-alert"></div>
+  </div>
+
+  <!-- ETAPA 6 — Dados numéricos -->
+  <div class="step">
+    <div class="step-h">
+      <div class="step-num">6</div>
+      <div><div class="step-title">Dados financeiros e datas</div><div class="step-sub">Para cálculo do benefício e retroativos</div></div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Média salarial (últimos 12 meses) *</label>
+        <input type="text" id="inp-salario" placeholder="R$ 0,00" inputmode="numeric">
+        <div class="hint">Usar média do CNIS — limitado ao teto INSS (R$ 8.475,55)</div>
+      </div>
+      <div class="field">
+        <label>Data do acidente *</label>
+        <input type="date" id="inp-data">
+        <div class="hint">Prazo de 5 anos para requerer (Súmula 85 STJ)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTÃO -->
+  <div class="cta">
+    <button class="btn btn-gold" onclick="calcular()">⚡ Calcular benefício</button>
+    <button class="btn btn-ghost" onclick="resetForm()">↺ Limpar</button>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="result" id="resultado">
+    <div class="res-head">
+      <h2>📊 Resultado da Análise</h2>
+      <p>Valores estimados com base nos dados informados · Teto INSS 2026 · Tabela vigente</p>
+    </div>
+    <div class="res-grid">
+      <div class="res-card">
+        <div class="res-label">Mensal estimado</div>
+        <div class="res-val" id="res-mensal">—</div>
+        <div class="res-note">50% do salário de benefício</div>
+      </div>
+      <div class="res-card">
+        <div class="res-label">Retroativos estimados</div>
+        <div class="res-val" id="res-atrasados">—</div>
+        <div class="res-note" id="res-atrasados-note">Máx. 5 anos (prescrição)</div>
+      </div>
+      <div class="res-card">
+        <div class="res-label">Projeção 5 anos</div>
+        <div class="res-val" id="res-5anos">—</div>
+        <div class="res-note">Valor futuro acumulado</div>
+      </div>
+    </div>
+    <div class="res-class" id="res-class"></div>
+    <div class="res-detail">
+      <h4>Detalhamento do cálculo</h4>
+      <div class="res-row"><span class="res-row-l">Salário de benefício (SB)</span><span class="res-row-v" id="rd-sb">—</span></div>
+      <div class="res-row"><span class="res-row-l">Meses de retroativos</span><span class="res-row-v" id="rd-meses">—</span></div>
+      <div class="res-row"><span class="res-row-l">DIB estimada</span><span class="res-row-v" id="rd-dib">—</span></div>
+      <div class="res-row"><span class="res-row-l">Tipo de benefício</span><span class="res-row-v" id="res-tipo">—</span></div>
+      <div class="res-row"><span class="res-row-l">Competência judicial</span><span class="res-row-v" id="res-justica">—</span></div>
+      <div class="res-row"><span class="res-row-l">Elegível para RPV</span><span class="res-row-v" id="rd-rpv">—</span></div>
+    </div>
+    <div class="res-legal">
+      ⚠️ Estimativa informativa. Valores sujeitos à perícia médica e análise jurídica do caso. Jurisprudência: Tema 416 STJ · Tema 862 STJ · TNU Súmula 88 · IN PRES/INSS 128/2022.
+    </div>
+    <div style="padding:16px 22px;display:flex;gap:12px;border-top:1px solid var(--bd);">
+      <button class="btn btn-ghost" onclick="location.reload()" style="flex:1">↺ Nova análise</button>
+      <button class="btn" onclick="enviarWhatsApp()" style="flex:2;background:#25D366;color:#fff;font-size:13px;">
+        📲 Enviar análise via WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
+<footer>NexusFlow · Ferramenta interna · Campos Pillar Advocacia · 2026</footer>
+
+<script>
+
+var state = { vinculo: null, tipo: null, sequela: null, auxdoenca: null, aposentado: null };
+
+/* ── MÁSCARA SALARIAL ── */
+(function() {
+  var inp = document.getElementById('inp-salario');
+  if (!inp) return;
+  inp.addEventListener('input', function() {
+    var raw = this.value.replace(/\D/g, '');
+    if (!raw) { this.value = ''; return; }
+    var num = parseInt(raw, 10);
+    var cents = (num / 100).toFixed(2);
+    var parts = cents.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    this.value = 'R$ ' + parts[0] + ',' + parts[1];
+  });
+})();
+
+function parseSalario() {
+  var v = document.getElementById('inp-salario').value;
+  if (!v) return 0;
+  return parseFloat(v.replace(/R\$\s?/g,'').replace(/\./g,'').replace(',','.')) || 0;
+}
+
+function setOpt(group, el) {
+  var val = el.dataset.v;
+  state[group] = val;
+
+  // Visual
+  el.parentElement.querySelectorAll('.opt').forEach(function(o) { o.classList.remove('sel','no'); });
+  el.classList.add('sel');
+
+  // Alerts
+  if (group === 'vinculo') {
+    var alertEl = document.getElementById('vinculo-alert');
+    if (['mei','autonomo','facultativo'].indexOf(val) >= 0) {
+      alertEl.innerHTML = '<div class="alert a-red"><span class="alert-icon">🚫</span><div><strong>Sem direito ao auxílio-acidente.</strong> ' +
+        (val === 'mei' ? 'MEI é contribuinte individual — excluído pelo art. 18, §1º. CJF Tema 206 confirmou.' :
+         val === 'autonomo' ? 'Contribuinte individual / PJ — excluído expressamente pela lei.' :
+         'Segurado facultativo — excluído pela lei.') + '</div></div>';
+      el.classList.remove('sel'); el.classList.add('no');
+    } else if (val === 'desempregado') {
+      alertEl.innerHTML = '<div class="alert a-gold"><span class="alert-icon">⚠️</span><div><strong>Depende do período de graça.</strong> Se a última contribuição/demissão foi há menos de 12 meses (até 36m com histórico), pode ter direito. Verificar CNIS.</div></div>';
+    } else {
+      alertEl.innerHTML = '<div class="alert a-grn"><span class="alert-icon">✅</span><div><strong>Categoria elegível.</strong> ' +
+        (val === 'clt' ? 'Empregado CLT — caso mais comum. Cobertura plena.' :
+         val === 'domestico' ? 'Desde EC 72/2013 e LC 150/2015.' :
+         val === 'avulso' ? 'Estivadores, portuários — cobertura plena.' :
+         'Agricultor familiar, pescador artesanal, indígena.') + '</div></div>';
+    }
+  }
+
+  if (group === 'tipo') {
+    var alertEl = document.getElementById('tipo-alert');
+    var isTrabalho = (val === 'trabalho' || val === 'doenca');
+    alertEl.innerHTML = '<div class="alert ' + (isTrabalho ? 'a-blu' : 'a-gold') + '"><span class="alert-icon">' + (isTrabalho ? '🏭' : '🚗') + '</span><div><strong>' +
+      (isTrabalho ? 'B-94 (Acidentário)' : 'B-36 (Previdenciário)') + '</strong> — ' +
+      (isTrabalho ? 'Acidente de trabalho / doença ocupacional. Justiça Estadual. Estabilidade de 12 meses. CAT recomendada.' : 'Acidente de qualquer natureza. Justiça Federal (JEF). Sem estabilidade empregat.') +
+      '</div></div>';
+  }
+
+  if (group === 'sequela') {
+    var alertEl = document.getElementById('sequela-alert');
+    if (val === 'nao') {
+      alertEl.innerHTML = '<div class="alert a-red"><span class="alert-icon">🚫</span><div><strong>Sem sequela permanente = sem direito.</strong> O auxílio-acidente exige redução da capacidade para o trabalho habitual (art. 86). Recuperação total encerra a possibilidade.</div></div>';
+      el.classList.remove('sel'); el.classList.add('no');
+    } else if (val === 'parcial') {
+      alertEl.innerHTML = '<div class="alert a-gold"><span class="alert-icon">⚠️</span><div><strong>Sequela sem laudo = caso viável mas precisa de documentação.</strong> Orientar busca de laudo médico com CID em UBS ou especialista. Sem laudo, o caso não avança.</div></div>';
+    } else {
+      alertEl.innerHTML = '<div class="alert a-grn"><span class="alert-icon">✅</span><div><strong>Sequela com laudo = caso forte.</strong> Tema 416 STJ: qualquer redução, ainda que mínima, é suficiente.</div></div>';
+    }
+  }
+
+  if (group === 'auxdoenca') {
+    var alertEl = document.getElementById('auxdoenca-alert');
+    document.getElementById('field-cessacao').style.display = val === 'sim' ? 'block' : 'none';
+    if (val === 'sim') {
+      alertEl.innerHTML = '<div class="alert a-blu"><span class="alert-icon">📋</span><div><strong>Bom sinal — fortalece o caso.</strong> O auxílio-doença prévio demonstra que o INSS já reconheceu a incapacidade temporária. A DIB do auxílio-acidente será o dia seguinte à cessação (Tema 862 STJ). Solicitar a carta de cessação e o CNIS atualizado.</div></div>';
+    } else {
+      alertEl.innerHTML = '<div class="alert a-gold"><span class="alert-icon">📌</span><div><strong>Atenção — orientar o cliente.</strong> Não ter recebido auxílio-doença NÃO impede o auxílio-acidente. O benefício pode ser solicitado diretamente se houver sequela permanente. Porém, sem o auxílio-doença prévio, a DIB será a data do acidente e o cliente precisará de:<br>' +
+        '• <strong>Laudo médico com CID</strong> atestando a sequela<br>' +
+        '• <strong>Exames complementares</strong> (raio-x, ressonância, etc.)<br>' +
+        '• <strong>Prontuários</strong> do atendimento na época do acidente<br>' +
+        'Perguntar: "Você foi ao médico na época do acidente? Tem algum documento?"</div></div>';
+    }
+  }
+
+  if (group === 'aposentado') {
+    var alertEl = document.getElementById('aposentado-alert');
+    if (val === 'sim') {
+      alertEl.innerHTML = '<div class="alert a-red"><span class="alert-icon">🚫</span><div><strong>Aposentadoria impede cumulação.</strong> Art. 86, §2º — o auxílio-acidente cessa na data da aposentadoria. Se a aposentadoria já foi concedida, o benefício é inelegível. Exceção: se o acidente ocorreu antes da aposentadoria e nunca foi requerido, pode haver direito a parcelas retroativas até a data da aposentadoria.</div></div>';
+      el.classList.remove('sel'); el.classList.add('no');
+    } else {
+      alertEl.innerHTML = '<div class="alert a-grn"><span class="alert-icon">✅</span><div><strong>Sem impedimento.</strong> O auxílio-acidente é mantido até a véspera da aposentadoria e integra o cálculo do salário de benefício da aposentadoria futura.</div></div>';
+    }
+  }
+}
+
+function calcular() {
+  var salario = parseSalario();
+  var dataAcidente = document.getElementById('inp-data').value;
+  var dataCessacao = document.getElementById('inp-cessacao').value;
+
+  // Validação
+  var erros = [];
+  if (!state.vinculo) erros.push('Selecione o vínculo (etapa 1)');
+  if (!state.tipo) erros.push('Selecione o tipo de acidente (etapa 2)');
+  if (!state.sequela) erros.push('Selecione a sequela (etapa 3)');
+  if (!dataAcidente) erros.push('Preencha a data do acidente');
+  if (!salario) erros.push('Preencha a média salarial');
+  if (state.auxdoenca === null) erros.push('Informe se recebeu auxílio-doença');
+  if (state.aposentado === null) erros.push('Informe se está aposentado');
+
+  if (erros.length > 0) {
+    var resultado = document.getElementById('resultado');
+    resultado.classList.add('show');
+    resultado.innerHTML = '<div style="padding:24px"><div class="alert a-red"><span class="alert-icon">⚠️</span><div><strong>Preencha todos os campos antes de calcular:</strong><br>' + erros.join('<br>') + '</div></div></div>';
+    resultado.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+
+  // Restaurar HTML do resultado se estava mostrando erros
+  restaurarResultadoHTML();
+
+  // Limites 2026
+  var TETO_INSS = 8475.55;
+  var PISO_MENSAL = 810.50;
+  var TETO_MENSAL = 4237.78;
+  var RPV_LIMITE = 97260.00;
+
+  // Salário de benefício (limitado ao teto)
+  var sb = Math.min(salario, TETO_INSS);
+  var mensal = Math.max(PISO_MENSAL, Math.min(sb * 0.50, TETO_MENSAL));
+
+  // DIB e meses de atrasado
+  var hoje = new Date();
+  var dib;
+  if (state.auxdoenca === 'sim' && dataCessacao) {
+    var cess = new Date(dataCessacao);
+    dib = new Date(cess.getTime() + 86400000);
+  } else {
+    dib = new Date(dataAcidente);
+  }
+
+  // Prescrição: máximo 5 anos de atrasados
+  var limite5 = new Date(hoje);
+  limite5.setFullYear(limite5.getFullYear() - 5);
+  var dibEfetiva = dib < limite5 ? limite5 : dib;
+
+  var meses = Math.max(0, Math.round((hoje - dibEfetiva) / (30.44 * 86400000)));
+  var atrasados = mensal * meses;
+  var valor5anos = mensal * 60;
+
+  // Tipo benefício
+  var isTrabalho = (state.tipo === 'trabalho' || state.tipo === 'doenca');
+  var tipoBen = isTrabalho ? 'B-94 (Acidentário)' : 'B-36 (Previdenciário)';
+  var justica = isTrabalho ? '⚖️ Justiça Estadual' : '⚖️ Justiça Federal (JEF)';
+
+  // Classificação
+  var elegivel = ['clt','domestico','avulso','especial','desempregado'].indexOf(state.vinculo) >= 0;
+  var temSequela = state.sequela === 'sim' || state.sequela === 'parcial';
+  var aposentado = state.aposentado === 'sim';
+  var anos = (hoje - new Date(dataAcidente)) / (365.25 * 86400000);
+
+  var classif, classLabel, classPill;
+  if (!elegivel || !temSequela || aposentado) {
+    classif = 'red'; classLabel = 'DESQUALIFICADO'; classPill = 'pill-red';
+  } else if (state.sequela === 'parcial' || state.vinculo === 'desempregado' || anos > 5) {
+    classif = 'ylw'; classLabel = 'ANÁLISE NECESSÁRIA'; classPill = 'pill-ylw';
+  } else {
+    classif = 'grn'; classLabel = 'CASO VIÁVEL'; classPill = 'pill-grn';
+  }
+
+  // Render
+  var resultado = document.getElementById('resultado');
+  resultado.classList.add('show');
+
+  document.getElementById('res-mensal').textContent = fmtR(mensal);
+  document.getElementById('res-atrasados').textContent = fmtR(atrasados);
+  document.getElementById('res-atrasados-note').textContent = meses + ' meses de retroativos estimados';
+  document.getElementById('res-5anos').textContent = fmtR(valor5anos);
+  document.getElementById('res-tipo').textContent = tipoBen;
+  document.getElementById('res-justica').textContent = justica;
+
+  document.getElementById('rd-sb').textContent = fmtR(sb);
+  document.getElementById('rd-meses').textContent = meses + ' meses';
+  document.getElementById('rd-dib').textContent = fmtDate(dibEfetiva);
+  document.getElementById('rd-rpv').textContent = atrasados <= RPV_LIMITE ? '✓ SIM — recebe em ~60 dias' : '✗ NÃO — vai para precatório';
+  document.getElementById('rd-rpv').style.color = atrasados <= RPV_LIMITE ? '#4ade80' : '#f87171';
+
+  var classEl = document.getElementById('res-class');
+  classEl.innerHTML = '<div class="res-pill ' + classPill + '">' + classLabel + '</div><div style="font-size:13px;color:var(--t2)">' +
+    (classif === 'grn' ? 'Todos os critérios atendidos. Encaminhar para análise jurídica.' :
+     classif === 'ylw' ? 'Caso precisa de documentação complementar ou análise de período de graça.' :
+     'Um ou mais critérios impeditivos. Verificar antes de prosseguir.') + '</div>';
+
+  resultado.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+var _resultadoHTML = '';
+function restaurarResultadoHTML() {
+  var el = document.getElementById('resultado');
+  if (!_resultadoHTML) {
+    _resultadoHTML = el.innerHTML;
+  } else if (!el.querySelector('.res-head')) {
+    el.innerHTML = _resultadoHTML;
+  }
+}
+// Salvar HTML original do resultado na carga
+document.addEventListener('DOMContentLoaded', function() {
+  var el = document.getElementById('resultado');
+  if (el) _resultadoHTML = el.innerHTML;
+});
+
+function fmtR(v) {
+  return 'R$ ' + v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.').replace('.', '_').replace(/\./, ',').replace('_', '.');
+}
+
+function fmtDate(d) {
+  return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+}
+
+function limpar() {
+  state = { vinculo: null, tipo: null, sequela: null, auxdoenca: null, aposentado: null };
+  document.querySelectorAll('.opt').forEach(function(o) { o.classList.remove('sel','no'); });
+  document.querySelectorAll('[id$="-alert"]').forEach(function(el) { el.innerHTML = ''; });
+  document.getElementById('inp-salario').value = '';
+  document.getElementById('inp-data').value = '';
+  document.getElementById('inp-cessacao').value = '';
+  document.getElementById('field-cessacao').style.display = 'none';
+  var r = document.getElementById('resultado');
+  r.classList.remove('show');
+  if (_resultadoHTML) r.innerHTML = _resultadoHTML;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+function fmtR(v) {
+  return 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  return d.toLocaleDateString('pt-BR');
+}
+function restaurarResultadoHTML() {}
+function resetForm() { location.reload(); }
+
+function enviarWhatsApp() {
+  var mensal   = document.getElementById('res-mensal')?.textContent || '—';
+  var atrasados= document.getElementById('res-atrasados')?.textContent || '—';
+  var cinco    = document.getElementById('res-5anos')?.textContent || '—';
+  var tipo     = document.getElementById('res-tipo')?.textContent || '—';
+  var dib      = document.getElementById('rd-dib')?.textContent || '—';
+  var meses    = document.getElementById('rd-meses')?.textContent || '—';
+  var rpv      = document.getElementById('rd-rpv')?.textContent || '—';
+
+  var texto = '🏥 *ANÁLISE DE AUXÍLIO-ACIDENTE INSS*\n' +
+    '━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+    '📋 *Tipo de benefício:* ' + tipo + '\n' +
+    '📅 *DIB estimada:* ' + dib + '\n\n' +
+    '💰 *VALORES ESTIMADOS*\n' +
+    '• Mensal: *' + mensal + '*\n' +
+    '• Retroativos (' + meses + '): *' + atrasados + '*\n' +
+    '• Projeção 5 anos: *' + cinco + '*\n\n' +
+    '🏦 *Elegível para RPV:* ' + rpv + '\n\n' +
+    '⚠️ _Estimativa informativa. Sujeita a análise jurídica e perícia médica._\n' +
+    '📞 _Para mais informações, entre em contato conosco._';
+
+  var url = 'https://wa.me/?text=' + encodeURIComponent(texto);
+  window.open(url, '_blank');
+}
+
+</script>
+</body>
+</html>

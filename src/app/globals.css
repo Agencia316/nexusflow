@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-dark: #0f172a;
+  --brand-gold: #d4a017;
+  --brand-gold-light: #f0c040;
+}
+
+* { box-sizing: border-box; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #1e293b; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* ── PROSE NEXUS — Markdown completo ── */
+.prose-nexus h1 { @apply text-2xl font-bold text-white mb-4 mt-0 leading-tight; }
+.prose-nexus h2 { @apply text-xl font-semibold text-slate-100 mb-3 mt-8 pb-2 border-b border-slate-700; }
+.prose-nexus h3 { @apply text-base font-semibold text-amber-400 mb-2 mt-5; }
+.prose-nexus h4 { @apply text-sm font-semibold text-slate-300 mb-1.5 mt-4; }
+.prose-nexus p  { @apply text-slate-300 mb-3 leading-relaxed; }
+.prose-nexus ul { @apply list-disc list-outside pl-5 text-slate-300 mb-3 space-y-1; }
+.prose-nexus ol { @apply list-decimal list-outside pl-5 text-slate-300 mb-3 space-y-1; }
+.prose-nexus li { @apply text-slate-300 leading-relaxed; }
+.prose-nexus li > ul { @apply mt-1 mb-0; }
+.prose-nexus strong { @apply text-white font-semibold; }
+.prose-nexus em { @apply italic text-slate-300; }
+.prose-nexus blockquote { @apply border-l-4 border-amber-500 pl-4 italic text-slate-400 my-4 bg-amber-500/5 py-2 pr-3 rounded-r-lg; }
+.prose-nexus code { @apply font-mono text-amber-300 bg-slate-800 px-1.5 py-0.5 rounded text-[13px]; }
+.prose-nexus pre { @apply bg-slate-800 rounded-xl p-4 overflow-x-auto mb-4 border border-slate-700; }
+.prose-nexus pre code { @apply bg-transparent p-0 text-slate-300; }
+.prose-nexus a { @apply text-amber-400 underline hover:text-amber-300 transition; }
+.prose-nexus hr { @apply border-slate-700 my-6; }
+.prose-nexus input[type="checkbox"] { @apply mr-2 accent-amber-500 w-4 h-4 cursor-default; }
+
+/* Tabelas */
+.prose-nexus table {
+  @apply w-full border-collapse mb-6 text-sm rounded-xl overflow-hidden;
+}
+.prose-nexus thead {
+  @apply bg-slate-800;
+}
+.prose-nexus thead th {
+  @apply text-left text-xs font-semibold text-slate-300 uppercase tracking-wider px-4 py-3 border-b border-slate-700;
+}
+.prose-nexus tbody tr {
+  @apply border-b border-slate-800 transition;
+}
+.prose-nexus tbody tr:hover {
+  @apply bg-slate-800/40;
+}
+.prose-nexus tbody tr:last-child {
+  @apply border-b-0;
+}
+.prose-nexus tbody td {
+  @apply text-slate-300 px-4 py-3 align-top leading-relaxed;
+}
+.prose-nexus tbody td:first-child {
+  @apply font-medium text-white;
+}

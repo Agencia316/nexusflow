@@ -1,0 +1,324 @@
+'use client'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import {
+  BookOpen, Building2, User, Mail, Lock, ChevronRight,
+  Loader2, CheckCircle2, AlertCircle, Scale, Sun,
+  Calculator, Users, Eye, EyeOff, Sparkles
+} from 'lucide-react'
+
+const SEGMENTS = [
+  {
+    id: 'advocacia',
+    label: 'Advocacia Previdenciária',
+    icon: Scale,
+    color: 'border-blue-500/40 bg-blue-500/5 text-blue-400',
+    activeColor: 'border-blue-500 bg-blue-500/15 text-blue-300',
+    desc: 'Scripts, qualificação J1–J5, checklist INSS, trilhas para SDR e Closer',
+    items: ['Fluxo captação → protocolo INSS', 'Scripts WhatsApp prontos', 'Qualificação jurídica B-36/B-94', 'Trilhas para SDR e Closer', 'Checklist de documentação'],
+  },
+  {
+    id: 'solar',
+    label: 'Energia Solar',
+    icon: Sun,
+    color: 'border-amber-500/40 bg-amber-500/5 text-amber-400',
+    activeColor: 'border-amber-500 bg-amber-500/15 text-amber-300',
+    desc: 'Processo de venda, visita técnica, instalação, garantia e pós-venda',
+    items: ['Fluxo completo de vendas', 'Script de abordagem de leads', 'Checklist de visita técnica', 'Processo de instalação ABNT', 'Política de garantia'],
+  },
+  {
+    id: 'contabilidade',
+    label: 'Contabilidade',
+    icon: Calculator,
+    color: 'border-green-500/40 bg-green-500/5 text-green-400',
+    activeColor: 'border-green-500 bg-green-500/15 text-green-300',
+    desc: 'Em breve — templates e trilhas para escritórios contábeis',
+    items: ['Em desenvolvimento'],
+    disabled: true,
+  },
+  {
+    id: 'rh',
+    label: 'RH e Gestão de Pessoas',
+    icon: Users,
+    color: 'border-purple-500/40 bg-purple-500/5 text-purple-400',
+    activeColor: 'border-purple-500 bg-purple-500/15 text-purple-300',
+    desc: 'Em breve — templates de onboarding, avaliação e treinamento',
+    items: ['Em desenvolvimento'],
+    disabled: true,
+  },
+]
+
+type Step = 'segment' | 'info' | 'success'
+
+export default function CadastroPage() {
+  const router = useRouter()
+  const [step, setStep] = useState<Step>('segment')
+  const [segment, setSegment] = useState('')
+  const [firmName, setFirmName] = useState('')
+  const [adminName, setAdminName] = useState('')
+  const [adminEmail, setAdminEmail] = useState('')
+  const [adminPassword, setAdminPassword] = useState('')
+  const [showPass, setShowPass] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [result, setResult] = useState<any>(null)
+
+  async function handleSubmit() {
+    if (!firmName.trim() || !adminName.trim() || !adminEmail.trim() || !adminPassword.trim()) {
+      setError('Preencha todos os campos.')
+      return
+    }
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firmName, segment, adminName, adminEmail, adminPassword }),
+      })
+      const data = await res.json()
+      if (!res.ok || data.error) {
+        setError(data.error || 'Erro ao criar empresa.')
+        setLoading(false)
+        return
+      }
+      setResult(data)
+      setStep('success')
+    } catch {
+      setError('Erro de conexão. Tente novamente.')
+    }
+    setLoading(false)
+  }
+
+  const selectedSegment = SEGMENTS.find(s => s.id === segment)
+
+  return (
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-4 py-12">
+      {/* Grid background */}
+      <div className="fixed inset-0 bg-[linear-gradient(rgba(212,160,23,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(212,160,23,0.03)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none"/>
+
+      <div className="relative w-full max-w-2xl">
+        {/* Logo */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
+              <BookOpen className="w-6 h-6 text-slate-950"/>
+            </div>
+            <div className="text-left">
+              <h1 className="text-2xl font-bold text-white tracking-tight">NexusFlow</h1>
+              <p className="text-xs text-amber-400 font-mono">Documente e treine com IA</p>
+            </div>
+          </div>
+          <p className="text-slate-400 text-sm">Crie sua empresa e comece com tudo configurado para o seu segmento.</p>
+        </div>
+
+        {/* Steps indicator */}
+        <div className="flex items-center justify-center gap-2 mb-8">
+          {['segment','info','success'].map((s, i) => (
+            <div key={s} className="flex items-center gap-2">
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition ${
+                step === s ? 'bg-amber-500 text-slate-950' :
+                (i < ['segment','info','success'].indexOf(step)) ? 'bg-green-500 text-white' :
+                'bg-slate-800 text-slate-500'
+              }`}>
+                {i < ['segment','info','success'].indexOf(step) ? '✓' : i + 1}
+              </div>
+              {i < 2 && <div className={`w-12 h-0.5 ${i < ['segment','info','success'].indexOf(step) ? 'bg-green-500' : 'bg-slate-800'}`}/>}
+            </div>
+          ))}
+        </div>
+
+        {/* Step 1 — Escolher segmento */}
+        {step === 'segment' && (
+          <div>
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-bold text-white">Qual é o segmento da sua empresa?</h2>
+              <p className="text-slate-400 text-sm mt-1">Vamos configurar tudo automaticamente para o seu setor.</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              {SEGMENTS.map(seg => {
+                const Icon = seg.icon
+                const isActive = segment === seg.id
+                return (
+                  <button key={seg.id} onClick={() => !seg.disabled && setSegment(seg.id)}
+                    disabled={seg.disabled}
+                    className={`p-4 rounded-xl border text-left transition relative ${
+                      seg.disabled ? 'opacity-40 cursor-not-allowed border-slate-800 bg-slate-900/50' :
+                      isActive ? seg.activeColor : seg.color + ' hover:opacity-90'
+                    }`}>
+                    {seg.disabled && (
+                      <span className="absolute top-2 right-2 text-[10px] bg-slate-700 text-slate-400 px-1.5 py-0.5 rounded-full">Em breve</span>
+                    )}
+                    <Icon className="w-6 h-6 mb-2"/>
+                    <p className="font-semibold text-white text-sm mb-1">{seg.label}</p>
+                    <p className="text-[11px] opacity-70 leading-snug">{seg.desc}</p>
+                    {isActive && (
+                      <div className="mt-3 space-y-1">
+                        {seg.items.map(item => (
+                          <div key={item} className="flex items-center gap-1.5 text-[11px] text-green-400">
+                            <CheckCircle2 className="w-3 h-3 shrink-0"/>
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+
+            {segment && (
+              <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 mb-4 flex items-start gap-3">
+                <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5"/>
+                <div>
+                  <p className="text-sm text-amber-400 font-medium">Configuração automática para {selectedSegment?.label}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Ao criar sua empresa, o sistema vai popular automaticamente: categorias, documentos, trilhas de treinamento e quizzes específicos para o seu segmento.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <button onClick={() => setStep('info')} disabled={!segment}
+              className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-slate-950 font-semibold py-3 rounded-xl transition">
+              Continuar <ChevronRight className="w-4 h-4"/>
+            </button>
+          </div>
+        )}
+
+        {/* Step 2 — Dados da empresa */}
+        {step === 'info' && (
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8">
+            <button onClick={() => setStep('segment')} className="text-xs text-slate-500 hover:text-slate-300 transition mb-6 flex items-center gap-1">
+              ← Voltar
+            </button>
+            <h2 className="text-xl font-bold text-white mb-1">Dados da empresa</h2>
+            <p className="text-slate-400 text-sm mb-6">
+              Segmento: <span className="text-amber-400 font-medium">{selectedSegment?.label}</span>
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-medium text-slate-400 block mb-1.5">Nome da empresa *</label>
+                <div className="relative">
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"/>
+                  <input value={firmName} onChange={e => setFirmName(e.target.value)}
+                    placeholder="Ex: Climadek Energia Solar"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-800 pt-4">
+                <p className="text-xs font-medium text-slate-400 mb-3">Conta do administrador</p>
+                <div className="space-y-3">
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"/>
+                    <input value={adminName} onChange={e => setAdminName(e.target.value)}
+                      placeholder="Seu nome completo"
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+                  </div>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"/>
+                    <input type="email" value={adminEmail} onChange={e => setAdminEmail(e.target.value)}
+                      placeholder="seu@email.com"
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"/>
+                    <input type={showPass ? 'text' : 'password'} value={adminPassword} onChange={e => setAdminPassword(e.target.value)}
+                      placeholder="Senha (mínimo 6 caracteres)"
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-10 pr-10 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+                    <button type="button" onClick={() => setShowPass(!showPass)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
+                      {showPass ? <EyeOff className="w-4 h-4"/> : <Eye className="w-4 h-4"/>}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {error && (
+                <div className="flex items-center gap-2 text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-lg px-3 py-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0"/> {error}
+                </div>
+              )}
+
+              <button onClick={handleSubmit} disabled={loading}
+                className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-semibold py-3 rounded-xl transition">
+                {loading ? <><Loader2 className="w-4 h-4 animate-spin"/> Criando empresa e configurando...</>
+                : <><Sparkles className="w-4 h-4"/> Criar empresa com configuração automática</>}
+              </button>
+              <p className="text-center text-xs text-slate-600">
+                Plano Trial — 14 dias grátis, sem cartão de crédito
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3 — Sucesso */}
+        {step === 'success' && result && (
+          <div className="bg-slate-900 border border-green-500/30 rounded-2xl p-8 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-green-500/15 border border-green-500/30 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8 text-green-400"/>
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">Empresa criada!</h2>
+            <p className="text-slate-400 text-sm mb-2">
+              <span className="text-white font-medium">{firmName}</span> foi configurada automaticamente com:
+            </p>
+
+            <div className="grid grid-cols-3 gap-3 my-6">
+              {[
+                { label: 'Categorias', value: result.created?.categories || 0 },
+                { label: 'Documentos', value: result.created?.documents || 0 },
+                { label: 'Trilhas', value: result.created?.training_paths || 0 },
+              ].map(s => (
+                <div key={s.label} className="bg-slate-800 rounded-xl p-3">
+                  <p className="text-2xl font-bold text-amber-400">{s.value}</p>
+                  <p className="text-xs text-slate-400">{s.label}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-slate-800 rounded-xl p-4 mb-6 text-left">
+              <p className="text-xs text-slate-400 mb-2 font-medium">Dados de acesso</p>
+              <p className="text-sm text-white"><span className="text-slate-400">E-mail:</span> {adminEmail}</p>
+              <p className="text-sm text-white mt-1"><span className="text-slate-400">Senha:</span> ••••••</p>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => {
+                  // Login automático — salvar sessão e ir pro dashboard
+                  const user = {
+                    id: result.userId || '',
+                    name: adminName,
+                    email: adminEmail,
+                    role: 'admin',
+                    firm_id: result.firmId,
+                    firm_name: firmName,
+                    firm_segment: segment,
+                  }
+                  localStorage.setItem('nf_user', JSON.stringify(user))
+                  localStorage.setItem('nf_login_ts', Date.now().toString())
+                  localStorage.setItem('nf_firm_id', result.firmId)
+                  localStorage.setItem('nf_firm_slug', result.slug)
+                  router.push('/app/dashboard')
+                }}
+                className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold py-3 rounded-xl transition">
+                Acessar minha empresa <ChevronRight className="w-4 h-4"/>
+              </button>
+              <p className="text-xs text-slate-600">
+                Próximos acessos: <span className="text-slate-500 font-mono">nexusflow-plataforma.vercel.app/{result.slug}</span>
+              </p>
+            </div>
+          </div>
+        )}
+
+        <p className="text-center text-xs text-slate-600 mt-6">
+          Já tem uma conta? <button onClick={() => router.push('/')} className="text-amber-500 hover:underline">Fazer login</button>
+        </p>
+      </div>
+    </div>
+  )
+}
