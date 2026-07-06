@@ -100,7 +100,13 @@ export function FirmProvider({ children }: { children: React.ReactNode }) {
   const setActiveFirm = useCallback((id: string) => {
     if (typeof window !== 'undefined') localStorage.setItem('nf_firm_id', id)
     setFirmId(id)
-  }, [])
+    // Auditoria: registra quando o super-admin passa a operar como outra firma.
+    if (user?.is_super_admin && user.firm_id && id !== user.firm_id) {
+      supabase.from('nf_impersonation_log')
+        .insert({ super_user_id: user.id, firm_id: id })
+        .then(() => {}, () => {})
+    }
+  }, [user])
 
   const resetFirm = useCallback(() => {
     const original = user?.firm_id || FALLBACK_FIRM_ID

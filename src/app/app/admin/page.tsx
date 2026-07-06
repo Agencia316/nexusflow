@@ -42,6 +42,7 @@ export default function AdminPage() {
   const { setActiveFirm } = useFirm()
 
   const [firms, setFirms] = useState<FirmRow[]>([])
+  const [logs, setLogs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [busy, setBusy] = useState<string | null>(null)
@@ -59,11 +60,13 @@ export default function AdminPage() {
 
   async function load() {
     setLoading(true)
-    const [firmsRes, usersRes, docsRes] = await Promise.all([
+    const [firmsRes, usersRes, docsRes, logsRes] = await Promise.all([
       supabase.from('nf_firms').select('id,name,slug,segment,plan,status,created_at').order('created_at'),
       supabase.from('nf_users').select('firm_id,is_active'),
       supabase.from('nf_documents').select('firm_id'),
+      supabase.from('nf_impersonation_log').select('firm_id,created_at').order('created_at', { ascending: false }).limit(10),
     ])
+    setLogs(logsRes.data || [])
 
     const userCount: Record<string, number> = {}
     const activeCount: Record<string, number> = {}
@@ -237,6 +240,29 @@ export default function AdminPage() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Trilha de acessos (impersonation) */}
+      {logs.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <LogIn className="w-3.5 h-3.5" /> Acessos recentes a clientes
+          </h2>
+          <div className="bg-slate-900 border border-slate-800 rounded-xl divide-y divide-slate-800">
+            {logs.map((l, i) => {
+              const f = firms.find(x => x.id === l.firm_id)
+              return (
+                <div key={i} className="flex items-center gap-3 px-4 py-2.5 text-xs">
+                  <span className="text-lg shrink-0">{segIcon(f?.segment || '')}</span>
+                  <span className="text-slate-300 flex-1 truncate">{f?.name || l.firm_id}</span>
+                  <span className="text-slate-500 shrink-0">
+                    {new Date(l.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
 

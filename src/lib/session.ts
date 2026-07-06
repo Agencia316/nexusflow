@@ -26,3 +26,22 @@ export function clearToken() {
   if (typeof window === 'undefined') return
   localStorage.removeItem(TOKEN_KEY)
 }
+
+/** Decodifica o `exp` do JWT (sem validar assinatura — só p/ saber se venceu). */
+export function tokenExp(): number | null {
+  const t = getToken()
+  if (!t) return null
+  try {
+    const payload = JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+    return typeof payload.exp === 'number' ? payload.exp : null
+  } catch { return null }
+}
+
+/** true quando há sessão RLS ligada e o token está ausente ou vencido. */
+export function isSessionExpired(): boolean {
+  // Só relevante quando o isolamento por tenant está ativo.
+  if (process.env.NEXT_PUBLIC_RLS_ENFORCED !== 'true') return false
+  const exp = tokenExp()
+  if (exp === null) return true // RLS ligado sem token => sessão inválida
+  return Date.now() / 1000 >= exp
+}

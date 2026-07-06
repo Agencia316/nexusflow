@@ -1,7 +1,8 @@
 'use client'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { getUser } from '@/lib/auth'
+import { getUser, logout } from '@/lib/auth'
+import { isSessionExpired } from '@/lib/session'
 import { FirmProvider } from '@/lib/firm-context'
 import Sidebar from '@/components/Sidebar'
 
@@ -9,8 +10,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
 
   useEffect(() => {
-    const user = getUser()
-    if (!user) router.push('/')
+    // Sessão sem usuário, ou token vencido/ausente (com RLS ligado): força login.
+    function check() {
+      if (!getUser() || isSessionExpired()) {
+        logout()
+        router.push('/')
+      }
+    }
+    check()
+    const id = setInterval(check, 60_000) // pega expiração no meio da sessão
+    return () => clearInterval(id)
   }, [router])
 
   return (
