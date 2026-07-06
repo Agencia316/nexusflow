@@ -61,6 +61,7 @@ export default function SlugLoginPage() {
       id: row.id, name: row.name, email: row.email,
       role: row.role, firm_id: row.firm_id,
       firm_name: firm.name, firm_segment: firm.segment,
+      is_super_admin: !!row.is_super_admin,
     }
 
     localStorage.setItem('nf_user', JSON.stringify(user))
