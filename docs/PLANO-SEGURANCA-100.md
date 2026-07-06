@@ -145,9 +145,15 @@ Passos:
 - [ ] Tabela `nf_impersonation_log (super_user_id, firm_id, started_at)` + registro a cada entrada.
 
 ### Fase 4 — Produção e credenciais
-- [ ] Vercel: configurar **todas** as envs (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-      `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`, `OPENAI_API_KEY` global opcional, `RESEND_API_KEY`).
-- [ ] Garantir que `SUPABASE_SERVICE_ROLE_KEY` e `SUPABASE_JWT_SECRET` **nunca** têm prefixo `NEXT_PUBLIC`.
+- [x] **Build de produção validado localmente** (`npm run build` → 28 rotas, exit 0).
+- [x] **Checklist de deploy pronto**: `docs/DEPLOY-VERCEL.md` (envs, ordem, smoke test).
+- [x] Confirmado que TODAS as rotas `/api/*` que tocam tenant usam service role
+      (`supabaseAdmin`); só `/api/session/login` usa anon (correto — chama `nf_login`).
+- [ ] Vercel: configurar as envs conforme `docs/DEPLOY-VERCEL.md` — segredos
+      (`SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`, `OPENAI_API_KEY`,
+      `RESEND_API_KEY`) **sem** prefixo `NEXT_PUBLIC`; públicas com `NEXT_PUBLIC`.
+      **(ação do usuário — precisa de login na Vercel)**
+- [ ] Deploy + smoke test (seção 4 do `DEPLOY-VERCEL.md`).
 - [ ] Cada firma cadastra a própria chave de IA em Configurações (já isolada no servidor).
 - [ ] E-mail transacional (Resend) validado (alertas/onboarding).
 
