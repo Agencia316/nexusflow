@@ -152,8 +152,9 @@ Passos:
 - [ ] E-mail transacional (Resend) validado (alertas/onboarding).
 
 ### Fase 5 — Limpeza e pontas soltas
-- [ ] Remover código morto: `auth.ts login()`, o `FIRM_ID` estático depreciado em `supabase.ts`.
-- [ ] `configuracoes` → usar `useFirm()` (reativo) em vez de `getFirmId()`.
+- [x] Remover código morto: `auth.ts login()` (já removido antes), `FIRM_ID` estático
+      em `supabase.ts` e `getFirmId()` em `auth.ts` (eram órfãos). `tsc --noEmit` verde.
+- [x] `configuracoes` → usa `useFirm().firmId` (reativo) em vez de `getFirmId()`.
 - [ ] Revisar `/cadastro` e `/api/setup-firm` para criarem firma já no novo modelo.
 - [ ] Afinar contraste do tema claro nos poucos pontos restantes (badges de status).
 

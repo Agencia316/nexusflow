@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { getUser, getFirmId } from '@/lib/auth'
+import { getUser } from '@/lib/auth'
+import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
 import {
   Settings, Key, Brain, Save, Eye, EyeOff,
@@ -18,7 +19,9 @@ const MODELS = [
 export default function ConfiguracoesPage() {
   const user = getUser()
   const router = useRouter()
-  const firmId = getFirmId()
+  // firmId reativo: segue o "entrar como cliente" do super-admin (useFirm),
+  // em vez do snapshot estático do localStorage (antigo getFirmId).
+  const { firmId } = useFirm()
 
   const [settings, setSettings] = useState<any>(null)
   const [firm, setFirm] = useState<any>(null)

@@ -34,11 +34,6 @@ export function getUser(): User | null {
   try { return JSON.parse(raw) } catch { return null }
 }
 
-export function getFirmId(): string {
-  if (typeof window === 'undefined') return process.env.NEXT_PUBLIC_FIRM_ID || ''
-  return localStorage.getItem('nf_firm_id') || process.env.NEXT_PUBLIC_FIRM_ID || ''
-}
-
 export function logout() {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('nf_user')
