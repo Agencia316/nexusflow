@@ -162,8 +162,13 @@ Passos:
 - [x] Remover código morto: `auth.ts login()` (já removido antes), `FIRM_ID` estático
       em `supabase.ts` e `getFirmId()` em `auth.ts` (eram órfãos). `tsc --noEmit` verde.
 - [x] `configuracoes` → usa `useFirm().firmId` (reativo) em vez de `getFirmId()`.
-- [ ] Revisar `/cadastro` e `/api/setup-firm` para criarem firma já no novo modelo.
-- [ ] Afinar contraste do tema claro nos poucos pontos restantes (badges de status).
+- [x] Revisar `/cadastro` e `/api/register`/`setup-firm` no novo modelo:
+      - **Bug corrigido**: o auto-login pós-cadastro não gravava o JWT → com RLS
+        ligado o admin novo caía num dashboard vazio. Agora passa pelo caminho único
+        (`/api/session/login`) e grava `nf_token`, com fallback p/ login da firma.
+      - `/api/register` chama `setup-firm` pela origin do request (sem domínio fixo).
+- [x] Afinar contraste do tema claro (badges de status): classes `.badge-*`
+      tema-aware em `globals.css`, aplicadas nos status de firma e documento.
 
 ### Fase 6 — Prova de isolamento (critério de aceite do "100%")
 - [x] Script de teste: com o **token da Firma A**, tentar `select`/`update`/`delete`
@@ -173,8 +178,9 @@ Passos:
       escrita cruzadas nas 2 direções em todas as 18 tabelas + derivadas por join).
 - [x] Repetir com super-admin → **tem que passar** (vê todas as firmas). Validado,
       inclusive com teste negativo (a detecção pega vazamento quando ele existe).
-- [ ] Matriz E2E: cada papel (admin/editor/member) em cada firma + super-admin;
-      permissões de documento; IA por firma; e-mail. *(pendente — E2E de UI)*
+- [x] Matriz E2E: roteiro de QA manual em `docs/QA-MATRIZ-E2E.md` (por papel +
+      super-admin, permissões de documento, IA por firma, e-mail, cadastro). Falta
+      **executar** o roteiro na UI (ação do usuário).
 - [x] O núcleo do "100%" (barreira real no banco) está **provado**. Falta só a
       matriz E2E de UI/papéis e as Fases 4 (deploy Vercel) e 5 (limpeza).
 
