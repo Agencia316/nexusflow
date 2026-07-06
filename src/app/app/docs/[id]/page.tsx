@@ -9,7 +9,7 @@ import remarkGfm from 'remark-gfm'
 import {
   ArrowLeft, CheckCircle2, PenLine, Download, Share2,
   Tag, Eye, Loader2, MessageCircle, Send, Trash2,
-  History, Video, Link as LinkIcon
+  History, Video, Link as LinkIcon, Lock
 } from 'lucide-react'
 
 // Componente de embed de vídeo — detecta YouTube, Vimeo ou URL direta
@@ -81,6 +81,7 @@ export default function DocPage() {
   const [signing, setSigning] = useState(false)
   const [signName, setSignName] = useState('')
   const [loading, setLoading] = useState(true)
+  const [denied, setDenied] = useState(false)
   const [signed, setSigned] = useState(false)
   const [read, setRead] = useState(false)
   const [savingComment, setSavingComment] = useState(false)
@@ -89,14 +90,20 @@ export default function DocPage() {
   const [copied, setCopied] = useState(false)
 
   async function loadAll() {
-    const [docRes, progRes, commentsRes, usersRes] = await Promise.all([
+    const [docRes, progRes, commentsRes, usersRes, permRes] = await Promise.all([
       supabase.from('nf_documents').select('*').eq('id', id).single(),
       user ? supabase.from('nf_user_progress').select('*').eq('user_id', user.id).eq('document_id', id).maybeSingle() : null,
       supabase.from('nf_comments').select('*').eq('document_id', id).order('created_at'),
       supabase.from('nf_users').select('id,name').eq('firm_id', firmId),
+      user ? supabase.from('nf_document_permissions').select('document_id').eq('user_id', user.id).eq('document_id', id).maybeSingle() : null,
     ])
 
     if (docRes.data) {
+      // Controle de acesso: admin, ou cargo permitido, ou permissão individual.
+      const roles = docRes.data.allowed_roles || ['admin','editor','member']
+      const allowed = user?.role === 'admin' || roles.includes(user?.role || '') || !!permRes?.data
+      if (!allowed) { setDenied(true); setLoading(false); return }
+
       setDoc(docRes.data)
       if (docRes.data.category_id) {
         const catRes = await supabase.from('nf_categories').select('*').eq('id', docRes.data.category_id).single()
@@ -211,6 +218,20 @@ export default function DocPage() {
   if (loading) return (
     <div className="flex items-center justify-center h-full py-20">
       <Loader2 className="w-6 h-6 animate-spin text-amber-400"/>
+    </div>
+  )
+
+  if (denied) return (
+    <div className="flex flex-col items-center justify-center h-full py-20 px-6 text-center">
+      <div className="w-14 h-14 rounded-2xl bg-red-400/10 border border-red-400/20 flex items-center justify-center mb-4">
+        <Lock className="w-6 h-6 text-red-400"/>
+      </div>
+      <h1 className="text-lg font-bold text-white mb-1">Acesso restrito</h1>
+      <p className="text-sm text-slate-400 max-w-sm">Você não tem permissão para ver este documento. Fale com um administrador se precisar de acesso.</p>
+      <button onClick={() => router.push('/app/docs')}
+        className="mt-5 px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-sm transition">
+        ← Voltar à base
+      </button>
     </div>
   )
 

@@ -32,14 +32,18 @@ export default function DocsPage() {
   useEffect(() => {
     async function load() {
       const user = getUser()
-      const [docsRes, catsRes] = await Promise.all([
+      const [docsRes, catsRes, permsRes] = await Promise.all([
         supabase.from('nf_documents').select('*').eq('firm_id', firmId).order('updated_at', { ascending: false }),
         supabase.from('nf_categories').select('*').eq('firm_id', firmId).order('sort_order'),
+        // Permissões individuais deste usuário (somam-se ao acesso por cargo).
+        user ? supabase.from('nf_document_permissions').select('document_id').eq('user_id', user.id) : { data: [] },
       ])
       const allDocs = docsRes.data || []
+      const granted = new Set((permsRes.data || []).map((p: any) => p.document_id))
       const visible = allDocs.filter((d: any) => {
+        if (user?.role === 'admin') return true
         const roles = d.allowed_roles || ['admin','editor','member']
-        return user?.role === 'admin' || roles.includes(user?.role || '')
+        return roles.includes(user?.role || '') || granted.has(d.id)
       })
       setDocs(visible)
       setCategories(catsRes.data || [])

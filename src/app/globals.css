@@ -45,8 +45,8 @@
     --c-slate-200: 30 41 59;
     --c-slate-300: 51 65 85;  /* corpo de texto */
     --c-slate-400: 71 85 105; /* texto secundário */
-    --c-slate-500: 100 116 139;
-    --c-slate-600: 148 163 184;
+    --c-slate-500: 90 103 122;
+    --c-slate-600: 113 128 150; /* dicas apagadas — escurecido p/ contraste no claro */
     --c-slate-700: 203 213 225; /* bordas */
     --c-slate-800: 226 232 240; /* chips / inputs / hover */
     --c-slate-900: 255 255 255; /* cards -> branco */
@@ -63,8 +63,8 @@
   --c-slate-200: 30 41 59;
   --c-slate-300: 51 65 85;
   --c-slate-400: 71 85 105;
-  --c-slate-500: 100 116 139;
-  --c-slate-600: 148 163 184;
+  --c-slate-500: 90 103 122;
+  --c-slate-600: 113 128 150;
   --c-slate-700: 203 213 225;
   --c-slate-800: 226 232 240;
   --c-slate-900: 255 255 255;
