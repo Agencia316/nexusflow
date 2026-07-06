@@ -31,6 +31,7 @@ export default function ConfiguracoesPage() {
   // Campos de IA
   const [apiKey, setApiKey] = useState('')
   const [showKey, setShowKey] = useState(false)
+  const [hasKey, setHasKey] = useState(false) // chave salva? (nunca lemos o valor)
   const [model, setModel] = useState('gpt-4o')
   const [aiEnabled, setAiEnabled] = useState(false)
 
@@ -44,16 +45,19 @@ export default function ConfiguracoesPage() {
   }, [])
 
   async function load() {
-    const [settingsRes, firmRes] = await Promise.all([
-      supabase.from('nf_firm_settings').select('*').eq('firm_id', firmId).single(),
+    const [settingsRes, firmRes, hasKeyRes] = await Promise.all([
+      // A chave (openai_api_key) NÃO é mais legível pelo cliente — só colunas públicas.
+      supabase.from('nf_firm_settings').select('ai_model, ai_enabled, brand_color').eq('firm_id', firmId).single(),
       supabase.from('nf_firms').select('*').eq('id', firmId).single(),
+      supabase.rpc('nf_has_ai_key', { p_firm_id: firmId }),
     ])
     const s = settingsRes.data
     const f = firmRes.data
     setSettings(s)
     setFirm(f)
+    setHasKey(!!hasKeyRes.data)
+    setApiKey('') // campo sempre começa vazio; a chave nunca vem do banco
     if (s) {
-      setApiKey(s.openai_api_key ? '••••••••••••••••' + s.openai_api_key.slice(-4) : '')
       setModel(s.ai_model || 'gpt-4o')
       setAiEnabled(s.ai_enabled || false)
       setBrandColor(s.brand_color || '#d4a017')
@@ -77,8 +81,8 @@ export default function ConfiguracoesPage() {
       ai_enabled: aiEnabled,
       brand_color: brandColor,
     }
-    // Só atualizar chave se não for máscara
-    if (apiKey && !apiKey.startsWith('••••')) {
+    // Só grava a chave se o usuário digitou uma nova (campo começa vazio).
+    if (apiKey.trim()) {
       aiUpdates.openai_api_key = apiKey.trim()
     }
 
@@ -107,8 +111,8 @@ export default function ConfiguracoesPage() {
   }
 
   async function testApiKey() {
-    const keyToTest = apiKey.startsWith('••••') ? null : apiKey.trim()
-    if (!keyToTest && !settings?.openai_api_key) {
+    const keyToTest = apiKey.trim() || null
+    if (!keyToTest && !hasKey) {
       setTestResult('error')
       return
     }
@@ -206,6 +210,11 @@ export default function ConfiguracoesPage() {
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs text-slate-400 flex items-center gap-1.5">
                   <Key className="w-3 h-3"/> Chave da OpenAI
+                  {hasKey && (
+                    <span className="flex items-center gap-1 text-[10px] text-green-400">
+                      <CheckCircle2 className="w-3 h-3"/> configurada
+                    </span>
+                  )}
                 </label>
                 <a href="https://platform.openai.com/api-keys" target="_blank"
                   className="text-[10px] text-amber-400 hover:underline flex items-center gap-1">
@@ -215,7 +224,7 @@ export default function ConfiguracoesPage() {
               <div className="relative">
                 <input type={showKey ? 'text' : 'password'} value={apiKey}
                   onChange={e => setApiKey(e.target.value)}
-                  placeholder="sk-proj-..."
+                  placeholder={hasKey ? 'Chave salva — preencha para substituir' : 'sk-proj-...'}
                   className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 pr-10 text-sm text-white placeholder-slate-500 font-mono focus:outline-none focus:border-amber-500 transition"/>
                 <button onClick={() => setShowKey(!showKey)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
