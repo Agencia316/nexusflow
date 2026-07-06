@@ -295,7 +295,7 @@ export default function TrainingDetailPage() {
                 {/* Ícone de status */}
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
                   isCompleted ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                  : isActive ? 'bg-amber-500 text-slate-950'
+                  : isActive ? 'bg-amber-500 text-onaccent'
                   : isLocked ? 'bg-slate-800 text-slate-600 border border-slate-700'
                   : 'bg-slate-800 text-slate-400 border border-slate-700'
                 }`}>
@@ -342,7 +342,7 @@ export default function TrainingDetailPage() {
           <div className="max-w-3xl mx-auto px-6 py-6">
             {/* Header do step */}
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-slate-950 font-bold text-sm shrink-0">
+              <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-onaccent font-bold text-sm shrink-0">
                 {activeStep + 1}
               </div>
               <div className="flex-1">
@@ -393,7 +393,7 @@ export default function TrainingDetailPage() {
                 {/* Botão de ação */}
                 {!currentProgress?.completed_at ? (
                   <button onClick={markRead} disabled={saving}
-                    className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-bold py-4 rounded-xl transition text-sm shadow-lg shadow-amber-500/20">
+                    className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-bold py-4 rounded-xl transition text-sm shadow-lg shadow-amber-500/20">
                     {saving ? <Loader2 className="w-4 h-4 animate-spin"/> : <CheckCircle2 className="w-4 h-4"/>}
                     {quiz?.questions?.length > 0
                       ? 'Confirmar leitura e ir para o Quiz →'
@@ -451,7 +451,7 @@ export default function TrainingDetailPage() {
                                 : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-600'
                             }`}>
                             <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 text-xs font-bold ${
-                              isSelected ? 'border-amber-400 bg-amber-400 text-slate-950' : 'border-slate-600 text-slate-500'
+                              isSelected ? 'border-amber-400 bg-amber-400 text-onaccent' : 'border-slate-600 text-slate-500'
                             }`}>
                               {String.fromCharCode(65 + oi)}
                             </div>

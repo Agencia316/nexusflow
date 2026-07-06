@@ -170,7 +170,7 @@ export default function TeamPage() {
           <p className="text-slate-400 text-sm mt-1">{users.length} membro{users.length!==1?'s':''} cadastrado{users.length!==1?'s':''}</p>
         </div>
         <button onClick={openAdd}
-          className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-4 py-2 rounded-xl text-sm transition">
+          className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-onaccent font-semibold px-4 py-2 rounded-xl text-sm transition">
           <Plus className="w-4 h-4"/> Adicionar membro
         </button>
       </div>
@@ -361,7 +361,7 @@ export default function TeamPage() {
                 Cancelar
               </button>
               <button onClick={saveUser} disabled={saving}
-                className="flex-1 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-semibold py-2.5 rounded-xl text-sm transition">
+                className="flex-1 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold py-2.5 rounded-xl text-sm transition">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin"/> : <Save className="w-4 h-4"/>}
                 {editingUser ? 'Salvar' : 'Criar membro'}
               </button>

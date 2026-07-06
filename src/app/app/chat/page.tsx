@@ -232,7 +232,7 @@ export default function ChatPage() {
             />
           </div>
           <button onClick={() => send()} disabled={loading || !input.trim()}
-            className="w-11 h-11 flex items-center justify-center rounded-xl text-slate-950 font-semibold transition disabled:opacity-40 shrink-0"
+            className="w-11 h-11 flex items-center justify-center rounded-xl text-onaccent font-semibold transition disabled:opacity-40 shrink-0"
             style={{ background: input.trim() && !loading ? accent : '#64748b' }}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin text-white"/> : <Send className="w-4 h-4"/>}
           </button>

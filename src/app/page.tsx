@@ -27,7 +27,7 @@ export default function RootPage() {
     <div className="min-h-screen bg-slate-950 flex items-center justify-center">
       <div className="text-center">
         <div className="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center mx-auto mb-4">
-          <BookOpen className="w-6 h-6 text-slate-950"/>
+          <BookOpen className="w-6 h-6 text-onaccent"/>
         </div>
         <Loader2 className="w-5 h-5 animate-spin text-amber-400 mx-auto"/>
       </div>

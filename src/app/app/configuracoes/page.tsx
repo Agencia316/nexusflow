@@ -283,7 +283,7 @@ export default function ConfiguracoesPage() {
 
       {/* Salvar */}
       <button onClick={saveSettings} disabled={saving}
-        className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-semibold py-3 rounded-xl transition">
+        className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold py-3 rounded-xl transition">
         {saving ? <Loader2 className="w-4 h-4 animate-spin"/> :
          saved ? <><CheckCircle2 className="w-4 h-4"/> Salvo!</> :
          <><Save className="w-4 h-4"/> Salvar configurações</>}

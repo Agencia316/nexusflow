@@ -17,7 +17,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <FirmProvider>
       <div className="flex min-h-screen bg-slate-950">
         <Sidebar />
-        <main className="flex-1 overflow-auto">
+        {/* pt-14 no mobile reserva espaço para a barra superior fixa do Sidebar */}
+        <main className="flex-1 min-w-0 overflow-auto pt-14 md:pt-0">
           {children}
         </main>
       </div>

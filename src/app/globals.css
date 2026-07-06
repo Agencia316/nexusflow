@@ -2,18 +2,102 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ──────────────────────────────────────────────────────────────
+   SISTEMA DE CORES — claro / escuro / conforme o dispositivo
+
+   As classes slate-* e white do Tailwind apontam para estas variáveis
+   (ver tailwind.config.js). Trocamos apenas os valores aqui e o app
+   inteiro re-tematiza. Os números são triplas RGB (sem vírgula) para
+   funcionarem com opacidade: rgb(var(--c-slate-900) / .5).
+
+   Regra de mapeamento no tema claro: superfícies (900/950) clareiam,
+   texto (white/100/300/400) escurece — preservando o papel semântico
+   de cada shade usado no código.
+   ────────────────────────────────────────────────────────────── */
 :root {
   --brand-dark: #0f172a;
   --brand-gold: #d4a017;
   --brand-gold-light: #f0c040;
+
+  /* Tema ESCURO (padrão) — igual à aparência original */
+  --c-white: 255 255 255;
+  --c-slate-50: 248 250 252;
+  --c-slate-100: 241 245 249;
+  --c-slate-200: 226 232 240;
+  --c-slate-300: 203 213 225;
+  --c-slate-400: 148 163 184;
+  --c-slate-500: 100 116 139;
+  --c-slate-600: 71 85 105;
+  --c-slate-700: 51 65 85;
+  --c-slate-800: 30 41 59;
+  --c-slate-900: 15 23 42;
+  --c-slate-950: 2 6 23;
+  color-scheme: dark;
 }
+
+/* Tema CLARO — aplicado quando o dispositivo prefere claro E o usuário
+   não forçou um tema manualmente. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --c-white: 15 23 42;      /* texto primário -> quase preto */
+    --c-slate-50: 2 6 23;
+    --c-slate-100: 15 23 42;  /* títulos */
+    --c-slate-200: 30 41 59;
+    --c-slate-300: 51 65 85;  /* corpo de texto */
+    --c-slate-400: 71 85 105; /* texto secundário */
+    --c-slate-500: 100 116 139;
+    --c-slate-600: 148 163 184;
+    --c-slate-700: 203 213 225; /* bordas */
+    --c-slate-800: 226 232 240; /* chips / inputs / hover */
+    --c-slate-900: 255 255 255; /* cards -> branco */
+    --c-slate-950: 241 245 249; /* fundo da página -> cinza claro */
+    color-scheme: light;
+  }
+}
+
+/* Override manual (botão de tema) — vence a preferência do SO. */
+:root[data-theme='light'] {
+  --c-white: 15 23 42;
+  --c-slate-50: 2 6 23;
+  --c-slate-100: 15 23 42;
+  --c-slate-200: 30 41 59;
+  --c-slate-300: 51 65 85;
+  --c-slate-400: 71 85 105;
+  --c-slate-500: 100 116 139;
+  --c-slate-600: 148 163 184;
+  --c-slate-700: 203 213 225;
+  --c-slate-800: 226 232 240;
+  --c-slate-900: 255 255 255;
+  --c-slate-950: 241 245 249;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --c-white: 255 255 255;
+  --c-slate-50: 248 250 252;
+  --c-slate-100: 241 245 249;
+  --c-slate-200: 226 232 240;
+  --c-slate-300: 203 213 225;
+  --c-slate-400: 148 163 184;
+  --c-slate-500: 100 116 139;
+  --c-slate-600: 71 85 105;
+  --c-slate-700: 51 65 85;
+  --c-slate-800: 30 41 59;
+  --c-slate-900: 15 23 42;
+  --c-slate-950: 2 6 23;
+  color-scheme: dark;
+}
+
+/* Texto sobre superfícies de destaque (botões dourados): sempre escuro,
+   independente do tema. Substitui os antigos text-slate-950 nesses casos. */
+.text-onaccent { color: rgb(15 23 42); }
 
 * { box-sizing: border-box; }
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #1e293b; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #475569; }
+::-webkit-scrollbar-track { background: rgb(var(--c-slate-900)); }
+::-webkit-scrollbar-thumb { background: rgb(var(--c-slate-700)); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--c-slate-600)); }
 
 /* ── PROSE NEXUS — Markdown completo ── */
 .prose-nexus h1 { @apply text-2xl font-bold text-white mb-4 mt-0 leading-tight; }

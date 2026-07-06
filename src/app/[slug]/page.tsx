@@ -87,7 +87,7 @@ export default function SlugLoginPage() {
       <h1 className="text-2xl font-bold text-white mb-2">Empresa não encontrada</h1>
       <p className="text-slate-400 text-sm mb-6">O endereço <span className="text-white font-mono">/{slug}</span> não existe.</p>
       <button onClick={() => router.push('/cadastro')}
-        className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition text-sm">
+        className="bg-amber-500 hover:bg-amber-400 text-onaccent font-semibold px-6 py-2.5 rounded-lg transition text-sm">
         Criar minha empresa →
       </button>
     </div>
@@ -145,7 +145,7 @@ export default function SlugLoginPage() {
           )}
 
           <button onClick={handleLogin} disabled={loading}
-            className="w-full flex items-center justify-center gap-2 font-semibold py-2.5 rounded-lg transition text-slate-950 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 font-semibold py-2.5 rounded-lg transition text-onaccent disabled:opacity-50"
             style={{ background: accent }}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin"/> : 'Entrar'}
           </button>

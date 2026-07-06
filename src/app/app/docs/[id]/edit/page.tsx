@@ -145,7 +145,7 @@ export default function EditDocPage() {
             {preview ? 'Editar' : 'Preview'}
           </button>
           <button onClick={save} disabled={saving}
-            className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-semibold text-xs px-4 py-1.5 rounded-lg transition">
+            className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold text-xs px-4 py-1.5 rounded-lg transition">
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin"/> :
              saved ? <><CheckCircle2 className="w-3.5 h-3.5"/> Salvo!</> :
              <><Save className="w-3.5 h-3.5"/> Salvar</>}

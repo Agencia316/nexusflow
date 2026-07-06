@@ -87,7 +87,7 @@ export default function DocsPage() {
           </button>
           {canEdit && (
           <button onClick={() => router.push('/app/docs/new')}
-            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-4 py-2 rounded-lg transition text-sm">
+            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-onaccent font-semibold px-4 py-2 rounded-lg transition text-sm">
             <Plus className="w-4 h-4"/> Novo Documento
           </button>
           )}

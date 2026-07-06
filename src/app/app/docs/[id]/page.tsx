@@ -267,7 +267,7 @@ export default function DocPage() {
               placeholder="Cole a URL do YouTube, Vimeo ou MP4..."
               className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
             <button onClick={insertVideo} disabled={!videoUrl.trim()}
-              className="px-3 py-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-semibold rounded-lg text-sm transition">
+              className="px-3 py-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold rounded-lg text-sm transition">
               Inserir
             </button>
             <button onClick={() => setShowVideoInput(false)} className="px-3 py-2 text-slate-400 hover:text-white transition text-sm">
@@ -321,7 +321,7 @@ export default function DocPage() {
                 placeholder="Seu nome completo"
                 className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
               <button onClick={handleSign} disabled={signing || !signName.trim()}
-                className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-semibold px-4 py-2 rounded-lg transition">
+                className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold px-4 py-2 rounded-lg transition">
                 {signing ? <Loader2 className="w-4 h-4 animate-spin"/> : <PenLine className="w-4 h-4"/>}
                 Assinar
               </button>
@@ -360,7 +360,7 @@ export default function DocPage() {
                 placeholder={replyTo ? 'Escreva sua resposta...' : 'Escreva um comentário...'}
                 className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
               <button onClick={addComment} disabled={savingComment || !newComment.trim()}
-                className="p-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 rounded-lg transition">
+                className="p-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent rounded-lg transition">
                 {savingComment ? <Loader2 className="w-4 h-4 animate-spin"/> : <Send className="w-4 h-4"/>}
               </button>
             </div>

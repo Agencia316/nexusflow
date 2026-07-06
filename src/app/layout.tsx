@@ -6,10 +6,15 @@ export const metadata: Metadata = {
   description: 'Plataforma de gestão de conhecimento e treinamento para escritórios e empresas',
 }
 
+// Aplica o tema salvo antes da primeira pintura, evitando "flash" de cor.
+// Sem valor salvo (ou 'system'), o prefers-color-scheme do dispositivo decide.
+const themeScript = `(function(){try{var t=localStorage.getItem('nf_theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();`
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />

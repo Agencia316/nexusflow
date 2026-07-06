@@ -103,7 +103,7 @@ export default function CadastroPage() {
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
-              <BookOpen className="w-6 h-6 text-slate-950"/>
+              <BookOpen className="w-6 h-6 text-onaccent"/>
             </div>
             <div className="text-left">
               <h1 className="text-2xl font-bold text-white tracking-tight">NexusFlow</h1>
@@ -118,7 +118,7 @@ export default function CadastroPage() {
           {['segment','info','success'].map((s, i) => (
             <div key={s} className="flex items-center gap-2">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition ${
-                step === s ? 'bg-amber-500 text-slate-950' :
+                step === s ? 'bg-amber-500 text-onaccent' :
                 (i < ['segment','info','success'].indexOf(step)) ? 'bg-green-500 text-white' :
                 'bg-slate-800 text-slate-500'
               }`}>
@@ -182,7 +182,7 @@ export default function CadastroPage() {
             )}
 
             <button onClick={() => setStep('info')} disabled={!segment}
-              className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-slate-950 font-semibold py-3 rounded-xl transition">
+              className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-onaccent font-semibold py-3 rounded-xl transition">
               Continuar <ChevronRight className="w-4 h-4"/>
             </button>
           </div>
@@ -245,7 +245,7 @@ export default function CadastroPage() {
               )}
 
               <button onClick={handleSubmit} disabled={loading}
-                className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-semibold py-3 rounded-xl transition">
+                className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold py-3 rounded-xl transition">
                 {loading ? <><Loader2 className="w-4 h-4 animate-spin"/> Criando empresa e configurando...</>
                 : <><Sparkles className="w-4 h-4"/> Criar empresa com configuração automática</>}
               </button>
@@ -305,7 +305,7 @@ export default function CadastroPage() {
                   localStorage.setItem('nf_firm_slug', result.slug)
                   router.push('/app/dashboard')
                 }}
-                className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold py-3 rounded-xl transition">
+                className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-onaccent font-semibold py-3 rounded-xl transition">
                 Acessar minha empresa <ChevronRight className="w-4 h-4"/>
               </button>
               <p className="text-xs text-slate-600">

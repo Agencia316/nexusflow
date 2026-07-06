@@ -177,7 +177,7 @@ export default function NewDocPage() {
               placeholder='Ex: "Script de qualificação para SDR — critérios J1 a J5"'
               className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
             <button onClick={generateWithAI} disabled={aiLoading || !aiPrompt.trim()}
-              className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-semibold px-4 py-2 rounded-lg transition whitespace-nowrap">
+              className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold px-4 py-2 rounded-lg transition whitespace-nowrap">
               {aiLoading ? <Loader2 className="w-4 h-4 animate-spin"/> : <Sparkles className="w-4 h-4"/>}
               {aiLoading ? 'Gerando...' : 'Gerar'}
             </button>
@@ -303,7 +303,7 @@ export default function NewDocPage() {
             Cancelar
           </button>
           <button onClick={handleSave} disabled={saving || !title.trim()}
-            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition">
+            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold px-6 py-2.5 rounded-lg transition">
             {saving ? <Loader2 className="w-4 h-4 animate-spin"/> : <Save className="w-4 h-4"/>}
             {saving ? 'Salvando...' : 'Salvar Documento'}
           </button>

@@ -236,7 +236,7 @@ export default function TrainingPage() {
           </p>
         </div>
         {canEdit && (
-          <button onClick={openNew} className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-4 py-2 rounded-xl text-sm transition">
+          <button onClick={openNew} className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-onaccent font-semibold px-4 py-2 rounded-xl text-sm transition">
             <Plus className="w-4 h-4"/> Nova Trilha
           </button>
         )}
@@ -314,7 +314,7 @@ export default function TrainingPage() {
                   {path.is_active && (
                     <button onClick={()=>router.push(`/app/training/${path.id}`)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
-                        isComplete?'bg-green-400/10 border border-green-400/20 text-green-400':'bg-amber-500 hover:bg-amber-400 text-slate-950'}`}>
+                        isComplete?'bg-green-400/10 border border-green-400/20 text-green-400':'bg-amber-500 hover:bg-amber-400 text-onaccent'}`}>
                       {isComplete?'Ver':done>0?'Continuar':'Iniciar'}
                       <ChevronRight className="w-3.5 h-3.5"/>
                     </button>
@@ -423,7 +423,7 @@ export default function TrainingPage() {
             <div key={si} className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
               {/* Header etapa */}
               <div className="px-4 py-3 bg-slate-900/80 border-b border-slate-800 flex items-center gap-3">
-                <div className="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center text-slate-950 font-bold text-xs shrink-0">{si+1}</div>
+                <div className="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center text-onaccent font-bold text-xs shrink-0">{si+1}</div>
                 <span className="flex-1 text-xs text-slate-400 font-medium truncate">{step.title||`Etapa ${si+1}`}</span>
                 <div className="flex items-center gap-1">
                   <button onClick={()=>moveStep(si,-1)} disabled={si===0} className="p-1.5 rounded text-slate-600 hover:text-slate-300 disabled:opacity-20"><ChevronUp className="w-3.5 h-3.5"/></button>
@@ -512,7 +512,7 @@ export default function TrainingPage() {
                                     <button onClick={()=>updateQuestion(si,qi,'answer',oi)}
                                       className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition ${
                                         q.answer===oi?'border-green-400 bg-green-400':'border-slate-600 hover:border-slate-400'}`}>
-                                      {q.answer===oi && <CheckCircle2 className="w-3 h-3 text-slate-950"/>}
+                                      {q.answer===oi && <CheckCircle2 className="w-3 h-3 text-onaccent"/>}
                                     </button>
                                     <input value={opt} onChange={e=>updateOption(si,qi,oi,e.target.value)}
                                       placeholder={`Opção ${String.fromCharCode(65+oi)}`}
@@ -547,7 +547,7 @@ export default function TrainingPage() {
       <div className="flex items-center gap-3 sticky bottom-0 bg-slate-950/90 backdrop-blur py-4 border-t border-slate-800 -mx-6 px-6">
         <button onClick={()=>setMode('list')} className="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-300 text-sm hover:bg-slate-800 transition">Cancelar</button>
         <button onClick={savePath} disabled={saving}
-          className="flex-1 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-semibold py-2.5 rounded-xl text-sm transition">
+          className="flex-1 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold py-2.5 rounded-xl text-sm transition">
           {saving?<Loader2 className="w-4 h-4 animate-spin"/>:<Save className="w-4 h-4"/>}
           {mode==='new'?'Criar Trilha':'Salvar Alterações'}
         </button>
