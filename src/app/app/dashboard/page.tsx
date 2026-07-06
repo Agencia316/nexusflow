@@ -71,6 +71,11 @@ export default function Dashboard() {
   const progressPct = stats.steps_total > 0
     ? Math.round((stats.steps_done / stats.steps_total) * 100) : 0
 
+  // Primeiro nome para a saudação, pulando honoríficos (Dr., Dra., Sr., Sra.)
+  const HONORIFICS = new Set(['dr', 'dr.', 'dra', 'dra.', 'sr', 'sr.', 'sra', 'sra.'])
+  const nameParts = (user?.name || '').trim().split(/\s+/)
+  const firstName = nameParts[HONORIFICS.has((nameParts[0] || '').toLowerCase()) ? 1 : 0] || nameParts[0] || ''
+
   if (loading) return (
     <div className="flex items-center justify-center h-full">
       <div className="flex flex-col items-center gap-3">
@@ -85,7 +90,7 @@ export default function Dashboard() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">
-          Olá, {user?.name?.split(' ')[0]} 👋
+          Olá, {firstName} 👋
         </h1>
         <p className="text-slate-400 text-sm mt-1">
           {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}

@@ -103,7 +103,7 @@ export default function Sidebar() {
       )}
 
       {/* Sidebar / Drawer */}
-      <aside className={`w-64 md:w-56 h-screen md:h-auto md:min-h-screen bg-slate-900 border-r border-slate-800 flex flex-col shrink-0
+      <aside className={`w-64 md:w-60 h-screen md:h-auto md:min-h-screen bg-slate-900 border-r border-slate-800 flex flex-col shrink-0
         fixed md:static top-0 left-0 z-50 transition-transform duration-200 md:translate-x-0 ${
         open ? 'translate-x-0' : '-translate-x-full'}`}>
         {/* Logo */}
