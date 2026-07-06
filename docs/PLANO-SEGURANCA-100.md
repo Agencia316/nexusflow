@@ -149,12 +149,16 @@ Passos:
 - [x] **Checklist de deploy pronto**: `docs/DEPLOY-VERCEL.md` (envs, ordem, smoke test).
 - [x] Confirmado que TODAS as rotas `/api/*` que tocam tenant usam service role
       (`supabaseAdmin`); só `/api/session/login` usa anon (correto — chama `nf_login`).
-- [x] Vercel: envs já configuradas no projeto `nexusflow` (prj_LmpZKTlYi6oBstQDhRkZIhBQbQhZ,
-      team agencia316). Confirmado indiretamente pelo smoke test (login server-side OK).
-- [x] **Deploy de produção feito** (2026-07-06) via `vercel deploy --prod` →
-      `dpl_6UpFp4W9EFtLbBzTagko48sy7GKZ` READY, aliased em https://nexusflow-lake.vercel.app.
-      Smoke test: home 200; `/api/session/login` 400 (sem body) e 401 (credencial falsa,
-      prova `nf_login` conectando ao banco). Falta o smoke test manual de UI (login real).
+- [x] **Deploy de produção** (2026-07-06) via `vercel deploy --prod` em
+      https://nexusflow-lake.vercel.app (projeto `nexusflow`, team agencia316).
+- [x] **BUG CRÍTICO encontrado e corrigido no teste de UI**: a Vercel estava **sem**
+      `NEXT_PUBLIC_RLS_ENFORCED`, `SUPABASE_JWT_SECRET` e `SUPABASE_SERVICE_ROLE_KEY`.
+      Sem a flag, o cliente mandava a anon key e o RLS **zerava todas as telas** (app
+      efetivamente quebrado para todos os usuários logados). O smoke test de login
+      passou por coincidência (`nf_login` usa anon+RPC). Corrigido via `vercel env add`
+      (3 envs em Production) + redeploy. Pós-fix: dashboard do admin mostra 15/19 docs.
+      ⚠️ Lição: `NEXT_PUBLIC_*` é inlined em **build time** — confirmar sempre com
+      `vercel env ls production`, não só com smoke test de endpoint.
 - [ ] Cada firma cadastra a própria chave de IA em Configurações (já isolada no servidor).
 - [ ] E-mail transacional (Resend) validado (alertas/onboarding).
 
@@ -178,9 +182,15 @@ Passos:
       escrita cruzadas nas 2 direções em todas as 18 tabelas + derivadas por join).
 - [x] Repetir com super-admin → **tem que passar** (vê todas as firmas). Validado,
       inclusive com teste negativo (a detecção pega vazamento quando ele existe).
-- [x] Matriz E2E: roteiro de QA manual em `docs/QA-MATRIZ-E2E.md` (por papel +
-      super-admin, permissões de documento, IA por firma, e-mail, cadastro). Falta
-      **executar** o roteiro na UI (ação do usuário).
+- [x] Matriz E2E **executada** na UI de produção (via browser, sessões forjadas com
+      o JWT secret — não-destrutivo). Resultados:
+      - Admin (Campos Pillar): dashboard com 15/19 docs, 3 na equipe, 5 trilhas; menu
+        completo (Permissões, Configurações). ✅
+      - Member: menu restrito (sem Novo Documento/Relatórios/Permissões/Configurações). ✅
+      - Super-admin: item "Administração"; painel "Três16 · 2 firmas" vê ambas. ✅
+      - Isolamento cruzado: logado na Climadek só aparecem docs solares; **nenhum**
+        doc da Campos Pillar (Auxílio-Acidente/INSS/BotConversa) vaza. ✅
+      Roteiro reutilizável em `docs/QA-MATRIZ-E2E.md`.
 - [x] O núcleo do "100%" (barreira real no banco) está **provado**. Falta só a
       matriz E2E de UI/papéis e as Fases 4 (deploy Vercel) e 5 (limpeza).
 
