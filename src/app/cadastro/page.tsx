@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { setToken } from '@/lib/session'
 import {
   BookOpen, Building2, User, Mail, Lock, ChevronRight,
   Loader2, CheckCircle2, AlertCircle, Scale, Sun,
@@ -288,22 +289,29 @@ export default function CadastroPage() {
 
             <div className="space-y-3">
               <button
-                onClick={() => {
-                  // Login automático — salvar sessão e ir pro dashboard
-                  const user = {
-                    id: result.userId || '',
-                    name: adminName,
-                    email: adminEmail,
-                    role: 'admin',
-                    firm_id: result.firmId,
-                    firm_name: firmName,
-                    firm_segment: segment,
-                  }
-                  localStorage.setItem('nf_user', JSON.stringify(user))
-                  localStorage.setItem('nf_login_ts', Date.now().toString())
-                  localStorage.setItem('nf_firm_id', result.firmId)
-                  localStorage.setItem('nf_firm_slug', result.slug)
-                  router.push('/app/dashboard')
+                onClick={async () => {
+                  // Login automático pelo caminho ÚNICO: /api/session/login emite o
+                  // JWT de sessão. Sem esse token, o RLS por tenant bloqueia tudo e
+                  // o dashboard abriria vazio. Reusa email+senha recém-cadastrados.
+                  try {
+                    const res = await fetch('/api/session/login', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ email: adminEmail, password: adminPassword, firmId: result.firmId }),
+                    })
+                    const out = await res.json()
+                    if (res.ok && out.token) {
+                      localStorage.setItem('nf_user', JSON.stringify({ ...out.user, firm_name: firmName, firm_segment: segment }))
+                      localStorage.setItem('nf_login_ts', Date.now().toString())
+                      localStorage.setItem('nf_firm_id', out.user.firm_id)
+                      localStorage.setItem('nf_firm_slug', result.slug)
+                      setToken(out.token)
+                      router.push('/app/dashboard')
+                      return
+                    }
+                  } catch { /* cai no fallback */ }
+                  // Fallback seguro: manda para a tela de login da própria firma.
+                  router.push(`/${result.slug}`)
                 }}
                 className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-onaccent font-semibold py-3 rounded-xl transition">
                 Acessar minha empresa <ChevronRight className="w-4 h-4"/>

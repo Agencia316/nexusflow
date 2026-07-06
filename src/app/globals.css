@@ -92,6 +92,27 @@
    independente do tema. Substitui os antigos text-slate-950 nesses casos. */
 .text-onaccent { color: rgb(15 23 42); }
 
+/* ── Badges de status — cores semânticas tema-aware ──────────────────────
+   As cores não-slate (green/red/blue) não são re-tematizadas pelas vars, então
+   o tom -400 (claro, pensado p/ o escuro) fica ilegível sobre superfícies claras.
+   Aqui o padrão é o escuro (-400); no tema claro o texto escurece p/ -700,
+   preservando contraste. O status "draft" usa slate e já se re-tematiza. */
+.badge-success { background: rgb(74 222 128 / .10);  color: rgb(74 222 128);  border-color: rgb(74 222 128 / .20); }
+.badge-danger  { background: rgb(248 113 113 / .10); color: rgb(248 113 113); border-color: rgb(248 113 113 / .20); }
+.badge-info    { background: rgb(96 165 250 / .10);  color: rgb(96 165 250);  border-color: rgb(96 165 250 / .20); }
+.badge-warning { background: rgb(251 146 60 / .10);  color: rgb(251 146 60);  border-color: rgb(251 146 60 / .20); }
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .badge-success { color: rgb(21 128 61); }  /* green-700 */
+  :root:not([data-theme]) .badge-danger  { color: rgb(185 28 28); }  /* red-700 */
+  :root:not([data-theme]) .badge-info    { color: rgb(29 78 216); }  /* blue-700 */
+  :root:not([data-theme]) .badge-warning { color: rgb(194 65 12); }  /* orange-700 */
+}
+:root[data-theme='light'] .badge-success { color: rgb(21 128 61); }
+:root[data-theme='light'] .badge-danger  { color: rgb(185 28 28); }
+:root[data-theme='light'] .badge-info    { color: rgb(29 78 216); }
+:root[data-theme='light'] .badge-warning { color: rgb(194 65 12); }
+
 * { box-sizing: border-box; }
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }

@@ -23,9 +23,9 @@ interface FirmRow {
 }
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
-  active:    { label: 'Ativo',     cls: 'bg-green-400/10 text-green-400 border-green-400/20' },
-  trial:     { label: 'Trial',     cls: 'bg-blue-400/10 text-blue-400 border-blue-400/20' },
-  suspended: { label: 'Suspenso',  cls: 'bg-red-400/10 text-red-400 border-red-400/20' },
+  active:    { label: 'Ativo',     cls: 'badge-success' },
+  trial:     { label: 'Trial',     cls: 'badge-info' },
+  suspended: { label: 'Suspenso',  cls: 'badge-danger' },
 }
 
 const SEGMENTS = [

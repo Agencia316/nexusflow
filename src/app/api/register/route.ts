@@ -36,8 +36,9 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   if (data?.error) return NextResponse.json({ error: data.error }, { status: 400 })
 
-  // Popular com dados do segmento
-  const setupRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://nexusflow-campos-pillar.vercel.app'}/api/setup-firm`, {
+  // Popular com dados do segmento. Chama a própria instância (origin do request),
+  // sem depender de um domínio fixo em env — funciona em qualquer deploy/preview.
+  const setupRes = await fetch(new URL('/api/setup-firm', req.url), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ firmId: data.firm_id, segment }),

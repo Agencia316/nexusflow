@@ -7,9 +7,9 @@ import { useRouter } from 'next/navigation'
 import { FileText, Search, Plus, Tag, Eye, ChevronRight, BookOpen, Sparkles, Loader2 } from 'lucide-react'
 
 const statusColors: Record<string, string> = {
-  published: 'bg-green-400/10 text-green-400 border-green-400/20',
-  draft: 'bg-slate-400/10 text-slate-400 border-slate-400/20',
-  archived: 'bg-orange-400/10 text-orange-400 border-orange-400/20',
+  published: 'badge-success',
+  draft: 'bg-slate-400/10 text-slate-400 border-slate-400/20', // slate já se re-tematiza
+  archived: 'badge-warning',
 }
 const statusLabel: Record<string, string> = {
   published: 'Publicado', draft: 'Rascunho', archived: 'Arquivado'
