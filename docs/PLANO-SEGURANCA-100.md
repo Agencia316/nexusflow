@@ -149,11 +149,12 @@ Passos:
 - [x] **Checklist de deploy pronto**: `docs/DEPLOY-VERCEL.md` (envs, ordem, smoke test).
 - [x] Confirmado que TODAS as rotas `/api/*` que tocam tenant usam service role
       (`supabaseAdmin`); só `/api/session/login` usa anon (correto — chama `nf_login`).
-- [ ] Vercel: configurar as envs conforme `docs/DEPLOY-VERCEL.md` — segredos
-      (`SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`, `OPENAI_API_KEY`,
-      `RESEND_API_KEY`) **sem** prefixo `NEXT_PUBLIC`; públicas com `NEXT_PUBLIC`.
-      **(ação do usuário — precisa de login na Vercel)**
-- [ ] Deploy + smoke test (seção 4 do `DEPLOY-VERCEL.md`).
+- [x] Vercel: envs já configuradas no projeto `nexusflow` (prj_LmpZKTlYi6oBstQDhRkZIhBQbQhZ,
+      team agencia316). Confirmado indiretamente pelo smoke test (login server-side OK).
+- [x] **Deploy de produção feito** (2026-07-06) via `vercel deploy --prod` →
+      `dpl_6UpFp4W9EFtLbBzTagko48sy7GKZ` READY, aliased em https://nexusflow-lake.vercel.app.
+      Smoke test: home 200; `/api/session/login` 400 (sem body) e 401 (credencial falsa,
+      prova `nf_login` conectando ao banco). Falta o smoke test manual de UI (login real).
 - [ ] Cada firma cadastra a própria chave de IA em Configurações (já isolada no servidor).
 - [ ] E-mail transacional (Resend) validado (alertas/onboarding).
 
