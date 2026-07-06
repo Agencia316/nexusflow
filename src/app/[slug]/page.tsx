@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
+import { setToken } from '@/lib/session'
 import { BookOpen, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
 
 const supabase = createClient(
@@ -41,33 +42,29 @@ export default function SlugLoginPage() {
     if (!email.trim() || !password.trim()) { setError('Preencha todos os campos.'); return }
     setLoading(true); setError('')
 
-    const { data, error: rpcError } = await supabase
-      .rpc('nf_login', { p_email: email, p_password: password })
-
-    if (rpcError || !data || data.length === 0) {
-      setError('E-mail ou senha incorretos.')
-      setLoading(false); return
-    }
-
-    const row = data[0]
-
-    // Verificar se o usuário pertence a esta firma
-    if (row.firm_id !== firm.id) {
-      setError('Esse usuário não pertence a esta empresa.')
+    // Login unificado: o servidor valida (bcrypt) e emite o token de sessão.
+    const res = await fetch('/api/session/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, firmId: firm.id }),
+    })
+    const out = await res.json()
+    if (!res.ok) {
+      setError(out.error || 'E-mail ou senha incorretos.')
       setLoading(false); return
     }
 
     const user = {
-      id: row.id, name: row.name, email: row.email,
-      role: row.role, firm_id: row.firm_id,
-      firm_name: firm.name, firm_segment: firm.segment,
-      is_super_admin: !!row.is_super_admin,
+      ...out.user,
+      firm_name: firm.name,
+      firm_segment: firm.segment,
     }
 
     localStorage.setItem('nf_user', JSON.stringify(user))
     localStorage.setItem('nf_login_ts', Date.now().toString())
-    localStorage.setItem('nf_firm_id', row.firm_id)
+    localStorage.setItem('nf_firm_id', user.firm_id)
     localStorage.setItem('nf_firm_slug', firm.slug)
+    setToken(out.token)
 
     router.push('/app/dashboard')
   }

@@ -19,42 +19,9 @@ export interface User {
   is_super_admin?: boolean
 }
 
-export async function login(email: string, password: string): Promise<User | null> {
-  const { data, error } = await supabase
-    .rpc('nf_login', { p_email: email, p_password: password })
-
-  if (error || !data || data.length === 0) return null
-
-  const row = data[0]
-
-  const [firmRes, roleRes] = await Promise.all([
-    supabase.from('nf_firms').select('name, segment').eq('id', row.firm_id).single(),
-    row.job_role_id
-      ? supabase.from('nf_roles').select('name').eq('id', row.job_role_id).single()
-      : Promise.resolve({ data: null }),
-  ])
-
-  const user: User = {
-    id: row.id,
-    name: row.name,
-    email: row.email,
-    role: row.role,
-    firm_id: row.firm_id,
-    firm_name: firmRes.data?.name || '',
-    firm_segment: firmRes.data?.segment || 'advocacia',
-    job_role_id: row.job_role_id || undefined,
-    job_role_name: (roleRes as any).data?.name || undefined,
-    is_super_admin: !!row.is_super_admin,
-  }
-
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('nf_user', JSON.stringify(user))
-    localStorage.setItem('nf_login_ts', Date.now().toString())
-    localStorage.setItem('nf_firm_id', row.firm_id)
-  }
-
-  return user
-}
+// O login agora tem um caminho único: POST /api/session/login (valida via
+// nf_login/bcrypt e emite o token de sessão). A antiga função login() foi
+// removida para não haver dois caminhos divergentes.
 
 export function getUser(): User | null {
   if (typeof window === 'undefined') return null
@@ -78,6 +45,7 @@ export function logout() {
     localStorage.removeItem('nf_login_ts')
     localStorage.removeItem('nf_firm_id')
     localStorage.removeItem('nf_pending_firm')
+    localStorage.removeItem('nf_token')
   }
 }
 
