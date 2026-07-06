@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
-import { supabase, FIRM_ID } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
+import { useFirm } from '@/lib/firm-context'
 import {
   Send, Loader2, Bot, User, Sparkles, BookOpen,
   RotateCcw, Copy, CheckCheck, ChevronRight
@@ -13,6 +14,7 @@ interface Message { role: 'user' | 'assistant'; content: string }
 
 export default function ChatPage() {
   const user = getUser()
+  const { firmId } = useFirm()
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const [messages, setMessages] = useState<Message[]>([])
@@ -27,13 +29,13 @@ export default function ChatPage() {
       const { data } = await supabase
         .from('nf_firm_settings')
         .select('chat_persona, chat_welcome, chat_suggestions, ai_enabled, brand_color, ai_model')
-        .eq('firm_id', FIRM_ID)
+        .eq('firm_id', firmId)
         .single()
       setSettings(data)
       setLoadingSettings(false)
     }
     load()
-  }, [])
+  }, [firmId])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -52,7 +54,7 @@ export default function ChatPage() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages, firmId: FIRM_ID }),
+        body: JSON.stringify({ messages: newMessages, firmId }),
       })
       const data = await res.json()
       if (data.error) {

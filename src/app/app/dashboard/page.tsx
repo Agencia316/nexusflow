@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase, FIRM_ID } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
+import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
 import {
   FileText, Users, GraduationCap, MessageSquareText,
@@ -12,6 +13,7 @@ import {
 export default function Dashboard() {
   const router = useRouter()
   const user = getUser()
+  const { firmId } = useFirm()
   const [stats, setStats] = useState({
     docs: 0, published: 0, users: 0, categories: 0,
     paths: 0, steps_done: 0, steps_total: 0,
@@ -27,13 +29,13 @@ export default function Dashboard() {
         docsRes, usersRes, catsRes, recentRes,
         pathsRes, progressRes, alertsRes
       ] = await Promise.all([
-        supabase.from('nf_documents').select('status,requires_reading,requires_signature').eq('firm_id', FIRM_ID),
-        supabase.from('nf_users').select('id').eq('firm_id', FIRM_ID).eq('is_active', true),
-        supabase.from('nf_categories').select('id').eq('firm_id', FIRM_ID),
-        supabase.from('nf_documents').select('id,title,status,updated_at,view_count,requires_reading,requires_signature').eq('firm_id', FIRM_ID).eq('status','published').order('updated_at',{ascending:false}).limit(6),
-        supabase.from('nf_training_paths').select('id').eq('firm_id', FIRM_ID).eq('is_active', true),
+        supabase.from('nf_documents').select('status,requires_reading,requires_signature').eq('firm_id', firmId),
+        supabase.from('nf_users').select('id').eq('firm_id', firmId).eq('is_active', true),
+        supabase.from('nf_categories').select('id').eq('firm_id', firmId),
+        supabase.from('nf_documents').select('id,title,status,updated_at,view_count,requires_reading,requires_signature').eq('firm_id', firmId).eq('status','published').order('updated_at',{ascending:false}).limit(6),
+        supabase.from('nf_training_paths').select('id').eq('firm_id', firmId).eq('is_active', true),
         user ? supabase.from('nf_user_progress').select('*,step:step_id(title,path_id)').eq('user_id', user.id) : { data: [] },
-        user ? supabase.from('nf_alerts').select('id').eq('firm_id', FIRM_ID).eq('user_id', user.id).is('read_at', null) : { data: [] },
+        user ? supabase.from('nf_alerts').select('id').eq('firm_id', firmId).eq('user_id', user.id).is('read_at', null) : { data: [] },
       ])
 
       const docs = docsRes.data || []
@@ -64,7 +66,7 @@ export default function Dashboard() {
       setLoading(false)
     }
     load()
-  }, [])
+  }, [firmId])
 
   const progressPct = stats.steps_total > 0
     ? Math.round((stats.steps_done / stats.steps_total) * 100) : 0

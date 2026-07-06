@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase, FIRM_ID } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
+import { useFirm } from '@/lib/firm-context'
 import { useParams, useRouter } from 'next/navigation'
 import {
   ArrowLeft, Save, Loader2, CheckCircle2, History,
@@ -17,6 +18,7 @@ const STATUS_OPTS = [
 export default function EditDocPage() {
   const { id } = useParams()
   const router = useRouter()
+  const { firmId } = useFirm()
   const user = getUser()
 
   const [doc, setDoc] = useState<any>(null)
@@ -43,12 +45,12 @@ export default function EditDocPage() {
   useEffect(() => {
     if (user?.role === 'member') { router.push(`/app/docs/${id}`); return }
     load()
-  }, [id])
+  }, [id, firmId])
 
   async function load() {
     const [docRes, catsRes, versRes] = await Promise.all([
       supabase.from('nf_documents').select('*').eq('id', id).single(),
-      supabase.from('nf_categories').select('*').eq('firm_id', FIRM_ID).order('sort_order'),
+      supabase.from('nf_categories').select('*').eq('firm_id', firmId).order('sort_order'),
       supabase.from('nf_document_versions').select('*').eq('document_id', id).order('created_at', { ascending: false }).limit(10),
     ])
     if (docRes.data) {

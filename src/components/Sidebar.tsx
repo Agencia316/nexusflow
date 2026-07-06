@@ -2,7 +2,9 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { getUser, logout } from '@/lib/auth'
-import { supabase, FIRM_ID } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
+import { useFirm } from '@/lib/firm-context'
+import FirmSwitcher from '@/components/FirmSwitcher'
 import {
   LayoutDashboard, FileText, Plus, MessageSquareText,
   GraduationCap, BarChart3, Users, LogOut, BookOpen,
@@ -29,6 +31,7 @@ export default function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const user = getUser()
+  const { firmId } = useFirm()
   const [alertCount, setAlertCount] = useState(0)
   const [firmName, setFirmName] = useState('')
 
@@ -40,7 +43,7 @@ export default function Sidebar() {
       const { count } = await supabase
         .from('nf_alerts')
         .select('id', { count: 'exact', head: true })
-        .eq('firm_id', FIRM_ID)
+        .eq('firm_id', firmId)
         .eq('user_id', user!.id)
         .is('read_at', null)
       setAlertCount(count || 0)
@@ -48,7 +51,7 @@ export default function Sidebar() {
 
     // Buscar nome da firma
     async function loadFirm() {
-      const { data } = await supabase.from('nf_firms').select('name').eq('id', FIRM_ID).single()
+      const { data } = await supabase.from('nf_firms').select('name').eq('id', firmId).single()
       if (data) setFirmName(data.name)
     }
 
@@ -58,7 +61,7 @@ export default function Sidebar() {
     // Polling a cada 30s
     const interval = setInterval(loadAlerts, 30000)
     return () => clearInterval(interval)
-  }, [])
+  }, [firmId])
 
   function handleLogout() {
     logout()
@@ -79,6 +82,9 @@ export default function Sidebar() {
           </div>
         </div>
       </div>
+
+      {/* Seletor de firma — visível apenas para super-admin */}
+      <FirmSwitcher />
 
       {/* Navegação */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">

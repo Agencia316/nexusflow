@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
-import { supabase, FIRM_ID } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
+import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
 import {
   Sparkles, Save, ArrowLeft, Loader2, Tag, X,
@@ -12,6 +13,7 @@ type Mode = 'manual' | 'ai' | 'import' | 'template'
 
 export default function NewDocPage() {
   const router = useRouter()
+  const { firmId } = useFirm()
   const user = getUser()
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -43,9 +45,9 @@ export default function NewDocPage() {
   useEffect(() => {
     // Somente admin e editor podem criar documentos
     if (user?.role === 'member') { router.push('/app/docs'); return }
-    supabase.from('nf_categories').select('*').eq('firm_id', FIRM_ID)
+    supabase.from('nf_categories').select('*').eq('firm_id', firmId)
       .order('sort_order').then(r => setCategories(r.data || []))
-  }, [])
+  }, [firmId])
 
   async function generateWithAI() {
     if (!aiPrompt.trim()) return
@@ -98,7 +100,7 @@ export default function NewDocPage() {
     setSaving(true)
 
     const { data, error } = await supabase.from('nf_documents').insert({
-      firm_id: FIRM_ID,
+      firm_id: firmId,
       category_id: categoryId || null,
       title, content, status,
       requires_reading: requiresReading,

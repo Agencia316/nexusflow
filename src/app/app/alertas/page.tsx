@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase, FIRM_ID } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import { Bell, CheckCircle2, XCircle, BookOpen, GraduationCap, PenLine, Clock, Loader2 } from 'lucide-react'

@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
-import { supabase, FIRM_ID } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
+import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
 import {
   Shield, Search, CheckCircle2, XCircle, Users,
@@ -21,6 +22,7 @@ type PermMode = 'role' | 'user'
 export default function PermissoesPage() {
   const currentUser = getUser()
   const router = useRouter()
+  const { firmId } = useFirm()
   const isAdmin = currentUser?.role === 'admin'
 
   const [docs, setDocs] = useState<any[]>([])
@@ -38,9 +40,9 @@ export default function PermissoesPage() {
 
   async function loadData() {
     const [docsRes, usersRes, catsRes, permsRes] = await Promise.all([
-      supabase.from('nf_documents').select('*').eq('firm_id', FIRM_ID).eq('status','published').order('created_at'),
-      supabase.from('nf_users').select('*').eq('firm_id', FIRM_ID).eq('is_active', true).order('name'),
-      supabase.from('nf_categories').select('*').eq('firm_id', FIRM_ID).order('sort_order'),
+      supabase.from('nf_documents').select('*').eq('firm_id', firmId).eq('status','published').order('created_at'),
+      supabase.from('nf_users').select('*').eq('firm_id', firmId).eq('is_active', true).order('name'),
+      supabase.from('nf_categories').select('*').eq('firm_id', firmId).order('sort_order'),
       supabase.from('nf_document_permissions').select('document_id, user_id'),
     ])
     setDocs(docsRes.data || [])
@@ -60,7 +62,7 @@ export default function PermissoesPage() {
   useEffect(() => {
     if (!isAdmin) { router.push('/app/dashboard'); return }
     loadData()
-  }, [])
+  }, [firmId])
 
   // Verificar se cargo tem acesso
   function hasRoleAccess(doc: any, role: string) {

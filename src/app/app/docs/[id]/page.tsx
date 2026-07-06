@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase, FIRM_ID } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
+import { useFirm } from '@/lib/firm-context'
 import { useParams, useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -66,6 +67,7 @@ function DocContent({ content }: { content: string }) {
 export default function DocPage() {
   const { id } = useParams()
   const router = useRouter()
+  const { firmId } = useFirm()
   const user = getUser()
 
   const [doc, setDoc] = useState<any>(null)
@@ -91,7 +93,7 @@ export default function DocPage() {
       supabase.from('nf_documents').select('*').eq('id', id).single(),
       user ? supabase.from('nf_user_progress').select('*').eq('user_id', user.id).eq('document_id', id).maybeSingle() : null,
       supabase.from('nf_comments').select('*').eq('document_id', id).order('created_at'),
-      supabase.from('nf_users').select('id,name').eq('firm_id', FIRM_ID),
+      supabase.from('nf_users').select('id,name').eq('firm_id', firmId),
     ])
 
     if (docRes.data) {
@@ -116,7 +118,7 @@ export default function DocPage() {
     setLoading(false)
   }
 
-  useEffect(() => { loadAll() }, [id])
+  useEffect(() => { loadAll() }, [id, firmId])
 
   async function markAsRead() {
     if (!user || read) return
@@ -131,7 +133,7 @@ export default function DocPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: 'signed', userId: user.id, firmId: FIRM_ID,
+          type: 'signed', userId: user.id, firmId,
           title: `📖 Leitura confirmada: ${doc.title}`,
           message: `${user.name} confirmou a leitura do documento "${doc.title}".`,
           link: `/app/docs/${id}`, sendEmail: false,
@@ -154,7 +156,7 @@ export default function DocPage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        type: 'signed', userId: user.id, firmId: FIRM_ID,
+        type: 'signed', userId: user.id, firmId,
         title: `✍️ Documento assinado: ${doc?.title}`,
         message: `${user.name} assinou digitalmente o documento "${doc?.title}".`,
         link: `/app/docs/${id}`, sendEmail: false,

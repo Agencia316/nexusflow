@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase, FIRM_ID } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
+import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
 import {
   Users, Plus, Trash2, Save, X, Loader2,
@@ -22,6 +23,7 @@ const emptyForm: FormData = { name:'', email:'', password:'', role:'member', job
 export default function TeamPage() {
   const currentUser = getUser()
   const router = useRouter()
+  const { firmId } = useFirm()
   const isAdmin = currentUser?.role === 'admin'
 
   const [users,    setUsers]    = useState<any[]>([])
@@ -39,17 +41,17 @@ export default function TeamPage() {
   useEffect(() => {
     if (!isAdmin) { router.push('/app/dashboard'); return }
     load()
-  }, [])
+  }, [firmId])
 
   async function load() {
     const [usersRes, rolesRes] = await Promise.all([
       supabase.from('nf_users')
         .select('*, job_role:job_role_id(name, access_level)')
-        .eq('firm_id', FIRM_ID)
+        .eq('firm_id', firmId)
         .order('created_at'),
       supabase.from('nf_roles')
         .select('*')
-        .eq('firm_id', FIRM_ID)
+        .eq('firm_id', firmId)
         .order('sort_order'),
     ])
     setUsers(usersRes.data || [])
@@ -105,7 +107,7 @@ export default function TeamPage() {
         setSuccess('Membro atualizado.')
       } else {
         const { data: newId, error } = await supabase.rpc('nf_create_user', {
-          p_firm_id: FIRM_ID, p_name: form.name, p_email: form.email,
+          p_firm_id: firmId, p_name: form.name, p_email: form.email,
           p_password: form.password, p_role: form.role,
           p_job_role_id: form.job_role_id || null,
         })
@@ -116,14 +118,14 @@ export default function TeamPage() {
           const { data: paths } = await supabase
             .from('nf_training_paths')
             .select('id')
-            .eq('firm_id', FIRM_ID)
+            .eq('firm_id', firmId)
             .eq('is_active', true)
             .contains('target_role_ids', [form.job_role_id])
 
           if (paths?.length) {
             for (const path of paths) {
               await supabase.from('nf_assignments').upsert({
-                firm_id: FIRM_ID, user_id: newId,
+                firm_id: firmId, user_id: newId,
                 path_id: path.id, assigned_by: currentUser?.id,
               }, { onConflict: 'document_id,user_id', ignoreDuplicates: true })
             }

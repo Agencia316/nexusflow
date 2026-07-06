@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
-import { supabase, FIRM_ID } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
+import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
 import {
   GraduationCap, ChevronRight, CheckCircle2, Clock, Lock,
@@ -18,6 +19,7 @@ interface Role  { id:string; name:string; access_level:string }
 export default function TrainingPage() {
   const user   = getUser()
   const router = useRouter()
+  const { firmId } = useFirm()
   const canEdit = user?.role === 'admin' || user?.role === 'editor'
 
   const [paths,       setPaths]       = useState<Path[]>([])
@@ -38,12 +40,12 @@ export default function TrainingPage() {
 
   const load = useCallback(async () => {
     const [pathsRes, stepsRes, progressRes, certRes, docsRes, rolesRes] = await Promise.all([
-      supabase.from('nf_training_paths').select('*').eq('firm_id', FIRM_ID).order('created_at'),
+      supabase.from('nf_training_paths').select('*').eq('firm_id', firmId).order('created_at'),
       supabase.from('nf_training_steps').select('*').order('step_order'),
       user ? supabase.from('nf_user_progress').select('*').eq('user_id', user.id) : { data:[] },
       user ? supabase.from('nf_certificates').select('path_id').eq('user_id', user.id) : { data:[] },
-      supabase.from('nf_documents').select('id,title').eq('firm_id', FIRM_ID).eq('status','published').order('title'),
-      supabase.from('nf_roles').select('*').eq('firm_id', FIRM_ID).order('sort_order'),
+      supabase.from('nf_documents').select('id,title').eq('firm_id', firmId).eq('status','published').order('title'),
+      supabase.from('nf_roles').select('*').eq('firm_id', firmId).order('sort_order'),
     ])
     const sMap: Record<string,Step[]> = {}
     for (const s of (stepsRes.data||[])) {
@@ -62,9 +64,9 @@ export default function TrainingPage() {
     setDocs(docsRes.data||[])
     setRoles(rolesRes.data||[])
     setLoading(false)
-  }, [])
+  }, [firmId])
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [load])
 
   function getProgress(pathId:string) {
     const steps = stepsMap[pathId]||[]
@@ -118,7 +120,7 @@ export default function TrainingPage() {
     try {
       let pathId = editPath?.id
       const pathData = {
-        firm_id: FIRM_ID,
+        firm_id: firmId,
         title: pathForm.title.trim(),
         description: pathForm.description.trim(),
         target_role_ids: pathForm.target_role_ids,
@@ -169,7 +171,7 @@ export default function TrainingPage() {
       const res = await fetch('/api/generate-quiz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documentId: step.document_id, firmId: FIRM_ID, count: 4 }),
+        body: JSON.stringify({ documentId: step.document_id, firmId, count: 4 }),
       })
       const data = await res.json()
       if (data.quiz) {

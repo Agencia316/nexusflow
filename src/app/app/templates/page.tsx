@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase, FIRM_ID } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
+import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -35,12 +36,9 @@ interface Template {
 
 export default function TemplatesPage() {
   const router = useRouter()
+  const { firmId, firmSegment } = useFirm()
   const user = getUser()
   const canEdit = user?.role === 'admin' || user?.role === 'editor'
-
-  const firmSegment = typeof window !== 'undefined'
-    ? JSON.parse(localStorage.getItem('nf_user') || '{}').firm_segment || 'advocacia'
-    : 'advocacia'
 
   const [search,    setSearch]    = useState('')
   const [custom,    setCustom]    = useState<Template[]>([])
@@ -58,17 +56,17 @@ export default function TemplatesPage() {
   const [aiLoading, setAiLoading] = useState(false)
   const [deleteId,  setDeleteId]  = useState<string|null>(null)
 
-  useEffect(() => { loadCustom() }, [])
+  useEffect(() => { loadCustom() }, [firmId])
 
   async function loadCustom() {
     const { data } = await supabase.from('nf_documents')
       .select('id,title,content,tags,status')
-      .eq('firm_id', FIRM_ID)
+      .eq('firm_id', firmId)
       .eq('status', 'template')
       .order('created_at', { ascending: false })
     setCustom((data||[]).map(d => ({
       id: d.id, title: d.title, content: d.content||'',
-      tags: d.tags||[], is_custom: true, firm_id: FIRM_ID,
+      tags: d.tags||[], is_custom: true, firm_id: firmId,
       cat: 'Modelos da Empresa', icon: '⭐',
     })))
     setLoading(false)
@@ -92,9 +90,9 @@ export default function TemplatesPage() {
   async function useTemplate(t: Template) {
     if (!canEdit) return
     setUsing(t.id)
-    const { data: cats } = await supabase.from('nf_categories').select('id').eq('firm_id', FIRM_ID).limit(1)
+    const { data: cats } = await supabase.from('nf_categories').select('id').eq('firm_id', firmId).limit(1)
     const { data: doc } = await supabase.from('nf_documents').insert({
-      firm_id: FIRM_ID,
+      firm_id: firmId,
       category_id: cats?.[0]?.id || null,
       title: t.title,
       content: t.content,
@@ -131,7 +129,7 @@ export default function TemplatesPage() {
       const res = await fetch('/api/generate-doc', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: aiPrompt, firmId: FIRM_ID, segment: firmSegment }),
+        body: JSON.stringify({ prompt: aiPrompt, firmId, segment: firmSegment }),
       })
       const data = await res.json()
       setForm(f => ({ ...f, title: data.title || f.title, content: data.content || f.content }))
@@ -153,7 +151,7 @@ export default function TemplatesPage() {
         }).eq('id', editing.id)
       } else {
         await supabase.from('nf_documents').insert({
-          firm_id: FIRM_ID, title: form.title, content: form.content,
+          firm_id: firmId, title: form.title, content: form.content,
           tags, status: 'template',
           allowed_roles: ['admin','editor','member'],
         })

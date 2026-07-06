@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase, FIRM_ID } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
+import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
 import { FileText, Search, Plus, Tag, Eye, ChevronRight, BookOpen, Sparkles, Loader2 } from 'lucide-react'
 
@@ -16,6 +17,7 @@ const statusLabel: Record<string, string> = {
 
 export default function DocsPage() {
   const router = useRouter()
+  const { firmId } = useFirm()
   const currentUser = getUser()
   const canEdit = currentUser?.role === 'admin' || currentUser?.role === 'editor'
   const [docs, setDocs] = useState<any[]>([])
@@ -31,8 +33,8 @@ export default function DocsPage() {
     async function load() {
       const user = getUser()
       const [docsRes, catsRes] = await Promise.all([
-        supabase.from('nf_documents').select('*').eq('firm_id', FIRM_ID).order('updated_at', { ascending: false }),
-        supabase.from('nf_categories').select('*').eq('firm_id', FIRM_ID).order('sort_order'),
+        supabase.from('nf_documents').select('*').eq('firm_id', firmId).order('updated_at', { ascending: false }),
+        supabase.from('nf_categories').select('*').eq('firm_id', firmId).order('sort_order'),
       ])
       const allDocs = docsRes.data || []
       const visible = allDocs.filter((d: any) => {
@@ -44,7 +46,7 @@ export default function DocsPage() {
       setLoading(false)
     }
     load()
-  }, [])
+  }, [firmId])
 
   useEffect(() => {
     if (!search.trim()) { setSearchResults(null); setAiEnhanced(false); return }
@@ -55,7 +57,7 @@ export default function DocsPage() {
         const res = await fetch('/api/search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: search, firmId: FIRM_ID })
+          body: JSON.stringify({ query: search, firmId })
         })
         const data = await res.json()
         setSearchResults(data.results || [])
@@ -64,7 +66,7 @@ export default function DocsPage() {
       setSearching(false)
     }, 400)
     return () => clearTimeout(timer)
-  }, [search])
+  }, [search, firmId])
 
   const catMap = Object.fromEntries(categories.map(c => [c.id, c]))
   const displayDocs = searchResults !== null

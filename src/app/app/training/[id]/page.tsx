@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
-import { supabase, FIRM_ID } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
+import { useFirm } from '@/lib/firm-context'
 import { useParams, useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -14,6 +15,7 @@ import {
 export default function TrainingDetailPage() {
   const { id: pathId } = useParams()
   const router = useRouter()
+  const { firmId } = useFirm()
   const user = getUser()
 
   const [path, setPath] = useState<any>(null)
@@ -94,7 +96,7 @@ export default function TrainingDetailPage() {
       document_id: step.document_id,
       step_id: step.id,
       read_at: new Date().toISOString(),
-      firm_id: FIRM_ID,
+      firm_id: firmId,
     }, { onConflict: 'user_id,step_id' })
 
     // Recarregar progresso mas manter o step atual
@@ -124,7 +126,7 @@ export default function TrainingDetailPage() {
       read_at: new Date().toISOString(),
       completed_at: new Date().toISOString(),
       quiz_score: score ?? null,
-      firm_id: FIRM_ID,
+      firm_id: firmId,
     }, { onConflict: 'user_id,step_id' })
 
     // Recarregar progresso mantendo step atual (não deixar loadData mudar o step)
@@ -168,7 +170,7 @@ export default function TrainingDetailPage() {
     // Alerta se reprovado
     if (score < 70 && user) {
       await supabase.from('nf_alerts').insert({
-        firm_id: FIRM_ID,
+        firm_id: firmId,
         user_id: user.id,
         type: 'quiz_failed',
         title: `Quiz: ${score}% em "${step.title}"`,
@@ -193,7 +195,7 @@ export default function TrainingDetailPage() {
     }).select().single()
     setCert(data)
     await supabase.from('nf_alerts').insert({
-      firm_id: FIRM_ID, user_id: user.id, type: 'signed',
+      firm_id: firmId, user_id: user.id, type: 'signed',
       title: `🏆 Trilha concluída: ${path?.title}`,
       message: `Parabéns! Você concluiu a trilha e recebeu seu certificado.`,
       link: `/app/training/${pathId}`,

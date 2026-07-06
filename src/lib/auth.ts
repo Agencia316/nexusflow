@@ -15,6 +15,8 @@ export interface User {
   firm_segment?: string
   job_role_id?: string
   job_role_name?: string
+  /** Usuário master da Três16 — enxerga e gerencia todas as firmas. */
+  is_super_admin?: boolean
 }
 
 export async function login(email: string, password: string): Promise<User | null> {
@@ -42,6 +44,7 @@ export async function login(email: string, password: string): Promise<User | nul
     firm_segment: firmRes.data?.segment || 'advocacia',
     job_role_id: row.job_role_id || undefined,
     job_role_name: (roleRes as any).data?.name || undefined,
+    is_super_admin: !!row.is_super_admin,
   }
 
   if (typeof window !== 'undefined') {

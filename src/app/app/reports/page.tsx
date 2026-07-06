@@ -1,13 +1,15 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase, FIRM_ID } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
+import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
 import { BarChart3, CheckCircle2, PenLine, Clock, Users, FileText, TrendingUp } from 'lucide-react'
 
 export default function ReportsPage() {
   const user = getUser()
   const router = useRouter()
+  const { firmId } = useFirm()
   const [data, setData] = useState<any>({ users: [], docs: [], progress: [], assignments: [] })
   const [loading, setLoading] = useState(true)
 
@@ -15,8 +17,8 @@ export default function ReportsPage() {
     if (user?.role === 'member') { router.push('/app/dashboard'); return }
     async function load() {
       const [usersRes, docsRes, progressRes, assignRes] = await Promise.all([
-        supabase.from('nf_users').select('*').eq('firm_id', FIRM_ID),
-        supabase.from('nf_documents').select('id,title,status,requires_reading,requires_signature,view_count').eq('firm_id', FIRM_ID),
+        supabase.from('nf_users').select('*').eq('firm_id', firmId),
+        supabase.from('nf_documents').select('id,title,status,requires_reading,requires_signature,view_count').eq('firm_id', firmId),
         supabase.from('nf_user_progress').select('*'),
         supabase.from('nf_assignments').select('*'),
       ])
@@ -29,7 +31,7 @@ export default function ReportsPage() {
       setLoading(false)
     }
     load()
-  }, [])
+  }, [firmId])
 
   const totalReads = data.progress.filter((p: any) => p.read_at).length
   const totalSigns = data.progress.filter((p: any) => p.signed_at).length
