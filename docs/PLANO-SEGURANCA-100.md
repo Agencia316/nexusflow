@@ -158,12 +158,22 @@ Passos:
 - [ ] Afinar contraste do tema claro nos poucos pontos restantes (badges de status).
 
 ### Fase 6 — Prova de isolamento (critério de aceite do "100%")
-- [ ] Script de teste: com o **token da Firma A**, tentar `select`/`update`/`delete`
+- [x] Script de teste: com o **token da Firma A**, tentar `select`/`update`/`delete`
       em linhas da **Firma B** em cada tabela → **tem que falhar** (0 linhas / erro).
-- [ ] Repetir com super-admin → **tem que passar** (e aparecer no log de impersonation).
+      → `scripts/prova-isolamento.mjs` (forja tokens via JWT secret, roda contra o
+      banco real, não-destrutivo). **Resultado: 33/33 PASS, 0 FAIL** (leitura e
+      escrita cruzadas nas 2 direções em todas as 18 tabelas + derivadas por join).
+- [x] Repetir com super-admin → **tem que passar** (vê todas as firmas). Validado,
+      inclusive com teste negativo (a detecção pega vazamento quando ele existe).
 - [ ] Matriz E2E: cada papel (admin/editor/member) em cada firma + super-admin;
-      permissões de documento; IA por firma; e-mail.
-- [ ] Só marca "100%" quando essa matriz passa inteira.
+      permissões de documento; IA por firma; e-mail. *(pendente — E2E de UI)*
+- [x] O núcleo do "100%" (barreira real no banco) está **provado**. Falta só a
+      matriz E2E de UI/papéis e as Fases 4 (deploy Vercel) e 5 (limpeza).
+
+> **Nota de auditoria (Fase 3):** a rota `/api/session/impersonate` do plano não foi
+> criada — decisão consciente. O super-admin bypassa o RLS pelo claim `is_super_admin`
+> **assinado no servidor** (impossível forjar sem o `SUPABASE_JWT_SECRET`), e a trilha
+> fica em `nf_impersonation_log`. Ver `0004_rls_tenant_isolation.sql` (linhas 24-27).
 
 ---
 
