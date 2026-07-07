@@ -2,40 +2,39 @@
 import { useEffect, useState } from 'react'
 import { getUser } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
-import { Scale, Calculator, BookOpen, ChevronRight, ExternalLink } from 'lucide-react'
+import { Scale, Calculator, Sun, BookOpen, ChevronRight, ExternalLink } from 'lucide-react'
 
-const TABS = [
-  { id: 'juridico', label: 'Base Jurídica', icon: Scale, src: '/ferramentas/juridico.html', color: 'text-amber-400 bg-amber-400/10 border-amber-400/20' },
-  { id: 'calculadora', label: 'Calculadora de Benefício', icon: Calculator, src: '/ferramentas/calculadora.html', color: 'text-blue-400 bg-blue-400/10 border-blue-400/20' },
-]
+// Ferramentas por segmento. O src pode ser função para injetar o firmId no iframe.
+const TABS_BY_SEGMENT: Record<string, { id: string; label: string; icon: any; src: string | ((firmId: string) => string); color: string }[]> = {
+  advocacia: [
+    { id: 'juridico', label: 'Base Jurídica', icon: Scale, src: '/ferramentas/juridico.html', color: 'text-amber-400 bg-amber-400/10 border-amber-400/20' },
+    { id: 'calculadora', label: 'Calculadora de Benefício', icon: Calculator, src: '/ferramentas/calculadora.html', color: 'text-blue-400 bg-blue-400/10 border-blue-400/20' },
+  ],
+  solar: [
+    { id: 'orcamento', label: 'Orçamento Solar', icon: Sun, src: (firmId: string) => `/ferramentas/orcamento-solar.html?firm=${firmId}`, color: 'text-amber-400 bg-amber-400/10 border-amber-400/20' },
+  ],
+}
 
 export default function FerramentasPage() {
   const router = useRouter()
   const [firmSegment, setFirmSegment] = useState('advocacia')
-  const [active, setActive] = useState('juridico')
+  const [firmId, setFirmId] = useState('')
+  const [active, setActive] = useState('')
 
   useEffect(() => {
     const u = JSON.parse(localStorage.getItem('nf_user') || '{}')
-    setFirmSegment(u.firm_segment || 'advocacia')
+    const seg = u.firm_segment || 'advocacia'
+    setFirmSegment(seg)
+    setFirmId(localStorage.getItem('nf_firm_id') || u.firm_id || '')
+    setActive((TABS_BY_SEGMENT[seg] || TABS_BY_SEGMENT.advocacia)[0].id)
   }, [])
 
-  if (firmSegment !== 'advocacia') {
-    return (
-      <div className="flex flex-col items-center justify-center h-full py-20 text-center px-6">
-        <div className="text-5xl mb-4">☀️</div>
-        <h2 className="text-xl font-bold text-white mb-2">Ferramentas Solar</h2>
-        <p className="text-slate-400 text-sm max-w-md leading-relaxed mb-6">
-          Ferramentas específicas para Energia Solar em desenvolvimento. Em breve: simulador de proposta, calculadora de ROI e dashboard de instalações.
-        </p>
-        <button onClick={() => router.push('/app/docs')}
-          className="flex items-center gap-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-400 px-4 py-2 rounded-lg text-sm transition">
-          <BookOpen className="w-4 h-4"/> Ver Base de Conhecimento
-        </button>
-      </div>
-    )
-  }
+  const TABS = TABS_BY_SEGMENT[firmSegment] || TABS_BY_SEGMENT.advocacia
+  const srcOf = (t: typeof TABS[number]) => typeof t.src === 'function' ? t.src(firmId) : t.src
 
-  const current = TABS.find(t => t.id === active)!
+  if (!active) return null
+
+  const current = TABS.find(t => t.id === active) || TABS[0]
 
   return (
     <div className="flex flex-col h-full">
@@ -54,7 +53,7 @@ export default function FerramentasPage() {
             </button>
           )
         })}
-        <a href={current.src} target="_blank" rel="noopener noreferrer"
+        <a href={srcOf(current)} target="_blank" rel="noopener noreferrer"
           className="ml-auto flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 transition">
           <ExternalLink className="w-3.5 h-3.5"/> Abrir em nova aba
         </a>
@@ -63,7 +62,7 @@ export default function FerramentasPage() {
       {/* Conteúdo em fullscreen */}
       <div className="flex-1 relative">
         {TABS.map(tab => (
-          <iframe key={tab.id} src={tab.src}
+          <iframe key={tab.id} src={srcOf(tab)}
             className={`w-full h-full border-0 absolute inset-0 ${active === tab.id ? 'block' : 'hidden'}`}
             title={tab.label}
             allow="clipboard-read; clipboard-write"

@@ -6,7 +6,7 @@ import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
 import {
   Building2, Users, FileText, LogIn, Pencil, Power,
-  Loader2, Save, X, Search, ExternalLink, ShieldCheck, Plus
+  Loader2, Save, X, Search, ExternalLink, ShieldCheck, Plus, Sun
 } from 'lucide-react'
 
 interface FirmRow {
@@ -145,10 +145,16 @@ export default function AdminPage() {
             <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Painel Três16 · {firms.length} firma{firms.length !== 1 ? 's' : ''}</p>
           </div>
         </div>
-        <a href="/cadastro" target="_blank"
-          className="flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-onaccent font-semibold px-4 py-2 rounded-xl text-sm transition shrink-0">
-          <Plus className="w-4 h-4" /> Novo cliente
-        </a>
+        <div className="flex items-center gap-2 shrink-0">
+          <button onClick={() => router.push('/app/admin/solar')}
+            className="flex items-center justify-center gap-2 border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 font-semibold px-4 py-2 rounded-xl text-sm transition">
+            <Sun className="w-4 h-4" /> Config. Solar
+          </button>
+          <a href="/cadastro" target="_blank"
+            className="flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-onaccent font-semibold px-4 py-2 rounded-xl text-sm transition">
+            <Plus className="w-4 h-4" /> Novo cliente
+          </a>
+        </div>
       </div>
 
       {/* KPIs */}
