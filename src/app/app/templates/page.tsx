@@ -9,7 +9,7 @@ import remarkGfm from 'remark-gfm'
 import {
   BookOpen, Sparkles, Loader2, CheckCircle2, Search,
   Plus, Pencil, Trash2, X, Save, Eye, EyeOff,
-  ArrowRight, FileText, Tag, RefreshCw
+  ArrowRight, FileText, Tag, RefreshCw, Copy
 } from 'lucide-react'
 
 // Templates padrão do sistema (somente leitura)
@@ -256,6 +256,12 @@ export default function TemplatesPage() {
                           </button>
                         </>
                       )}
+                      {!t.is_custom && canEdit && (
+                        <button onClick={()=>openEdit(t)}
+                          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-700 text-slate-400 hover:text-white text-xs transition">
+                          <Copy className="w-3 h-3"/> Personalizar
+                        </button>
+                      )}
                       {canEdit && (
                         <button onClick={()=>useTemplate(t)} disabled={!!using}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
@@ -289,8 +295,14 @@ export default function TemplatesPage() {
             {/* Header modal */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 shrink-0">
               <div>
-                <h2 className="font-semibold text-white">{editing ? 'Editar modelo' : 'Novo modelo'}</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Modelos ficam disponíveis para toda a equipe reutilizar</p>
+                <h2 className="font-semibold text-white">
+                  {editing ? (editing.is_custom ? 'Editar modelo' : 'Personalizar modelo do sistema') : 'Novo modelo'}
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {editing && !editing.is_custom
+                    ? 'Salvar cria uma cópia editável da sua empresa (o modelo original do sistema é mantido)'
+                    : 'Modelos ficam disponíveis para toda a equipe reutilizar'}
+                </p>
               </div>
               <button onClick={()=>setModal(false)} className="text-slate-400 hover:text-white transition">
                 <X className="w-5 h-5"/>
@@ -375,7 +387,7 @@ export default function TemplatesPage() {
               <button onClick={saveTemplate} disabled={saving}
                 className="flex-1 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold py-2.5 rounded-xl text-sm transition">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin"/> : <Save className="w-4 h-4"/>}
-                {editing ? 'Salvar alterações' : 'Criar modelo'}
+                {editing ? (editing.is_custom ? 'Salvar alterações' : 'Criar cópia da empresa') : 'Criar modelo'}
               </button>
             </div>
           </div>
