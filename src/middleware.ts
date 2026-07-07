@@ -22,8 +22,7 @@ export function middleware(req: NextRequest) {
   if (DASHBOARD_ONLY_BRANDS.has(BRAND)) {
     const allowed =
       pathname.startsWith('/pillar') ||
-      pathname.startsWith('/api') ||
-      pathname.startsWith('/ferramentas') || // dashboard.html embutido no iframe
+      pathname.startsWith('/api') || // inclui /api/pillar/dashboard (marketing)
       pathname.startsWith('/_next') ||
       pathname === '/favicon.ico'
     if (!allowed) {
