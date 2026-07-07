@@ -10,7 +10,7 @@ import {
   LayoutDashboard, FileText, Plus, MessageSquareText,
   GraduationCap, BarChart3, Users, LogOut, BookOpen,
   ChevronRight, Wrench, Shield, Bell, Library, Settings,
-  Building2, Menu, X
+  Building2, Menu, X, ClipboardList
 } from 'lucide-react'
 
 // managerOnly = admin + editor | adminOnly = admin only | superOnly = super-admin (Três16)
@@ -24,6 +24,7 @@ const nav = [
   { label: 'Modelos',              href: '/app/templates',    icon: Library, sub: true },
   { label: 'DocuChat (IA)',        href: '/app/chat',         icon: MessageSquareText },
   { label: 'Ferramentas',          href: '/app/ferramentas',  icon: Wrench },
+  { label: 'Propostas',            href: '/app/orcamentos',   icon: ClipboardList, solarOnly: true },
   { label: 'Relatórios',           href: '/app/reports',      icon: BarChart3, managerOnly: true },
   { label: 'Equipe',               href: '/app/team',         icon: Users },
   { label: 'Permissões',           href: '/app/permissoes',   icon: Shield, adminOnly: true },
@@ -34,7 +35,7 @@ export default function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const user = getUser()
-  const { firmId, isSuperAdmin } = useFirm()
+  const { firmId, isSuperAdmin, firmSegment } = useFirm()
   const [alertCount, setAlertCount] = useState(0)
   const [firmName, setFirmName] = useState('')
   const [open, setOpen] = useState(false) // drawer mobile
@@ -79,6 +80,7 @@ export default function Sidebar() {
     if ((item as any).superOnly && !isSuperAdmin) return false
     if (item.adminOnly && user?.role !== 'admin') return false
     if ((item as any).managerOnly && user?.role !== 'admin' && user?.role !== 'editor') return false
+    if ((item as any).solarOnly && firmSegment !== 'solar') return false
     return true
   })
 

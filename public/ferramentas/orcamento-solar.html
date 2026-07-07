@@ -342,6 +342,7 @@ function renderResult() {
       <button class="btn btn-wa" onclick="enviarWhats()">Enviar no WhatsApp</button>
       <button class="btn btn-ghost" onclick="copiarMsg()">Copiar mensagem</button>
       <button class="btn btn-ghost" onclick="gerarPDF()">Gerar PDF A4</button>
+      <button class="btn btn-gold" id="btnSalvar" style="flex:1;min-width:150px;margin-top:0" onclick="salvarProposta()">Salvar proposta</button>
     </div>
     <div class="res-legal">Estimativa comercial não vinculante. Geração com HSP de ${NUM(r.hsp,1)} kWh/m²/dia e desempenho de ${Math.round(PERF*100)}%. Projeção de 25 anos considera degradação de ${(DEGRAD*100).toFixed(1)}%/ano e reajuste de tarifa de ${NUM(r.infla*100,1)}%/ano. Sujeito a visita técnica.</div>
   `;
@@ -373,6 +374,40 @@ function mensagem() {
     f.budget_phone ? `📞 ${f.budget_phone}` : ``,
     f.budget_site ? `🌐 ${f.budget_site}` : ``,
   ].filter(Boolean).join('\n');
+}
+
+async function salvarProposta() {
+  const token = (typeof localStorage !== 'undefined') ? localStorage.getItem('nf_token') : null;
+  if (!token) { showErr('Faça login no app para salvar a proposta.'); return; }
+  let nome = '';
+  try { nome = JSON.parse(localStorage.getItem('nf_user') || '{}').name || ''; } catch {}
+  const r = last;
+  const btn = document.getElementById('btnSalvar');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
+  try {
+    const res = await fetch('/api/solar-quote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        firmId: FIRM_ID, created_by_name: nome,
+        cliente_nome: r.cliente, cliente_zap: r.zap, cliente_cidade: r.cidade,
+        regiao: r.regiao, concessionaria: r.concessionaria, tarifa: r.tarifa,
+        painel: r.painel.name, painel_watt: r.painel.panel_watt, inversor: r.inversor.name,
+        distribuidor: r.distribuidor ? r.distribuidor.name : null,
+        kwp: r.kwp, n_paineis: r.nPaineis, geracao: r.geracao, cobertura: r.cobertura,
+        consumo_kwh: r.consumoKwh, investimento: r.investimento, parcela: r.parcela,
+        n_parcelas: r.nParcelas, economia_mes: r.economiaMes, economia_ano: r.economiaAno,
+        payback_anos: r.paybackAnos, economia_25: r.economia25,
+      }),
+    });
+    const out = await res.json();
+    if (!res.ok) { showErr(out.error || 'Erro ao salvar.'); if (btn) { btn.disabled = false; btn.textContent = 'Salvar proposta'; } return; }
+    if (btn) { btn.textContent = '✅ Salva!'; }
+    showErr('Proposta salva! Veja em Ferramentas → Propostas salvas.');
+  } catch (e) {
+    showErr('Erro ao salvar. Tente novamente.');
+    if (btn) { btn.disabled = false; btn.textContent = 'Salvar proposta'; }
+  }
 }
 
 function enviarWhats() {
