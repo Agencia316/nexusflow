@@ -24,10 +24,13 @@ function signJwt(payload: Record<string, unknown>, secret: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  const { email, password, firmId } = await req.json()
-  if (!email || !password) {
+  const { email: rawEmail, password, firmId } = await req.json()
+  if (!rawEmail || !password) {
     return NextResponse.json({ error: 'Informe e-mail e senha.' }, { status: 400 })
   }
+  // Normaliza o e-mail: teclado de celular capitaliza e autofill deixa espaço,
+  // o que fazia o login falhar mesmo com a senha certa.
+  const email = String(rawEmail).trim().toLowerCase()
 
   const { data, error } = await supabase.rpc('nf_login', {
     p_email: email, p_password: password,

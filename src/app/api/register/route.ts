@@ -21,6 +21,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'A senha precisa ter pelo menos 6 caracteres.' }, { status: 400 })
   }
 
+  // Guarda o e-mail sempre normalizado (o login também normaliza) para não
+  // falhar por maiúscula/espaço vindos de teclado de celular ou autofill.
+  const email = String(adminEmail).trim().toLowerCase()
+
   const slug = generateSlug(firmName)
 
   // Criar firma + admin via função SQL segura
@@ -29,7 +33,7 @@ export async function POST(req: NextRequest) {
     p_slug: slug,
     p_segment: segment,
     p_admin_name: adminName,
-    p_admin_email: adminEmail,
+    p_admin_email: email,
     p_admin_password: adminPassword,
   })
 
