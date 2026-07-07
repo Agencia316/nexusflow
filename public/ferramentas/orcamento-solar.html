@@ -122,7 +122,7 @@ async function boot() {
       sb('nf_solar_tariffs?select=*&active=eq.true&order=sort_order'),
       sb('nf_solar_brands?select=*&active=eq.true&order=sort_order'),
       sb('nf_solar_pricing?select=*&order=sort_order'),
-      FIRM_ID ? sb(`nf_firms?id=eq.${FIRM_ID}&select=name,logo_url,accent_color,primary_color,budget_whatsapp,budget_phone,budget_cnpj,budget_site,budget_address`) : Promise.resolve([]),
+      FIRM_ID ? sb(`nf_firms?id=eq.${FIRM_ID}&select=name,logo_url,accent_color,primary_color,solar_uf,budget_whatsapp,budget_phone,budget_cnpj,budget_site,budget_address`) : Promise.resolve([]),
     ]);
     DATA.tariffs = tariffs;
     DATA.panels = brands.filter(b => b.type === 'painel');
@@ -130,6 +130,9 @@ async function boot() {
     DATA.distributors = brands.filter(b => b.type === 'distribuidor');
     DATA.pricing = pricing;
     DATA.firm = firmRows[0] || null;
+    // Regiões do estado da empresa vêm primeiro (e ficam pré-selecionadas).
+    const uf = DATA.firm?.solar_uf;
+    if (uf) DATA.tariffs = [...DATA.tariffs].sort((a, b) => (b.uf === uf ? 1 : 0) - (a.uf === uf ? 1 : 0));
     render();
   } catch (e) {
     document.getElementById('app').innerHTML = `<div class="err show">${e.message}. Recarregue a página.</div>`;

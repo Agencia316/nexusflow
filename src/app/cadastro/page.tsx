@@ -51,11 +51,14 @@ const SEGMENTS = [
 
 type Step = 'segment' | 'info' | 'success'
 
+const UFS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO']
+
 export default function CadastroPage() {
   const router = useRouter()
   const [step, setStep] = useState<Step>('segment')
   const [segment, setSegment] = useState('')
   const [firmName, setFirmName] = useState('')
+  const [solarUf, setSolarUf] = useState('')
   const [adminName, setAdminName] = useState('')
   const [adminEmail, setAdminEmail] = useState('')
   const [adminPassword, setAdminPassword] = useState('')
@@ -76,7 +79,7 @@ export default function CadastroPage() {
       const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firmName, segment, adminName, adminEmail, adminPassword }),
+        body: JSON.stringify({ firmName, segment, adminName, adminEmail, adminPassword, solarUf }),
       })
       const data = await res.json()
       if (!res.ok || data.error) {
@@ -210,6 +213,21 @@ export default function CadastroPage() {
                     className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
                 </div>
               </div>
+
+              {segment === 'solar' && (
+                <div>
+                  <label className="text-xs font-medium text-slate-400 block mb-1.5">Estado de atuação (UF)</label>
+                  <div className="relative">
+                    <Sun className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"/>
+                    <select value={solarUf} onChange={e => setSolarUf(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition appearance-none">
+                      <option value="">Selecione o estado…</option>
+                      {UFS.map(uf => <option key={uf} value={uf}>{uf}</option>)}
+                    </select>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1.5">A calculadora de orçamento já abre com a tarifa e a região do seu estado.</p>
+                </div>
+              )}
 
               <div className="border-t border-slate-800 pt-4">
                 <p className="text-xs font-medium text-slate-400 mb-3">Conta do administrador</p>
