@@ -23,6 +23,9 @@ export default function PillarLayout({ children }: { children: React.ReactNode }
   const isLogin = pathname === '/pillar/login'
   const [ok, setOk] = useState(false)
 
+  // Título da aba do navegador reflete a marca (não o "NexusFlow" padrão).
+  useEffect(() => { document.title = BRAND.name }, [])
+
   useEffect(() => {
     if (isLogin) return
     function check() {
