@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { getToken } from '@/lib/session'
 import { CAMPOS_PILLAR_FIRM_ID } from '@/lib/brand'
-import { Scale, Calculator, Sun, Activity, LayoutDashboard, ExternalLink, Loader2, AlertCircle } from 'lucide-react'
+import { Scale, Calculator, Sun, Activity, TrendingUp, ExternalLink, Loader2, AlertCircle } from 'lucide-react'
 
 type Tab = {
   id: string
@@ -24,7 +24,7 @@ const TABS_BY_SEGMENT: Record<string, Tab[]> = {
     { id: 'calculadora', label: 'Calculadora de Benefício', icon: Calculator, src: '/ferramentas/calculadora.html', color: 'text-blue-400 bg-blue-400/10 border-blue-400/20' },
     // Exclusivas da Campos Pillar (Auxílio-Acidente + marketing privado).
     { id: 'painel', label: 'Painel Auxílio-Acidente', icon: Activity, src: '/ferramentas/painel.html', color: 'text-green-400 bg-green-400/10 border-green-400/20', firmId: CAMPOS_PILLAR_FIRM_ID },
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, src: '/api/pillar/dashboard', authed: true, color: 'text-purple-400 bg-purple-400/10 border-purple-400/20', firmId: CAMPOS_PILLAR_FIRM_ID },
+    { id: 'dashboard', label: 'Dashboard Marketing', icon: TrendingUp, src: '/api/pillar/dashboard', authed: true, color: 'text-purple-400 bg-purple-400/10 border-purple-400/20', firmId: CAMPOS_PILLAR_FIRM_ID },
   ],
   solar: [
     { id: 'orcamento', label: 'Orçamento Solar', icon: Sun, src: (firmId: string) => `/ferramentas/orcamento-solar.html?firm=${firmId}`, color: 'text-amber-400 bg-amber-400/10 border-amber-400/20' },
