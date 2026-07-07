@@ -335,7 +335,7 @@ export default function CadastroPage() {
                 Acessar minha empresa <ChevronRight className="w-4 h-4"/>
               </button>
               <p className="text-xs text-slate-600">
-                Próximos acessos: <span className="text-slate-500 font-mono">nexusflow-plataforma.vercel.app/{result.slug}</span>
+                Próximos acessos: <span className="text-slate-500 font-mono">nexusflow-lake.vercel.app/{result.slug}</span>
               </p>
             </div>
           </div>

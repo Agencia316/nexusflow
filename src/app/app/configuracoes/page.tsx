@@ -193,9 +193,9 @@ export default function ConfiguracoesPage() {
           <div>
             <label className="text-xs text-slate-400 block mb-1">Link de acesso da empresa</label>
             <div className="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5">
-              <span className="text-xs text-slate-500 font-mono">nexusflow-plataforma.vercel.app/</span>
+              <span className="text-xs text-slate-500 font-mono">nexusflow-lake.vercel.app/</span>
               <span className="text-xs text-amber-400 font-mono">{firm?.slug}</span>
-              <a href={`https://nexusflow-plataforma.vercel.app/${firm?.slug}`} target="_blank"
+              <a href={`https://nexusflow-lake.vercel.app/${firm?.slug}`} target="_blank"
                 className="ml-auto text-slate-500 hover:text-slate-300">
                 <ExternalLink className="w-3.5 h-3.5"/>
               </a>
