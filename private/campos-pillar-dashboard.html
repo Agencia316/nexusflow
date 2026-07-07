@@ -1175,6 +1175,7 @@ code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: va
         <button class="ptab" data-ptab="p-perito">👨‍⚕️ O perito</button>
         <button class="ptab" data-ptab="p-fluxo">🔄 Fluxo interno</button>
         <button class="ptab" data-ptab="p-recurso">⚖️ Laudo desfavorável</button>
+        <button class="ptab" data-ptab="p-adm">🏛️ Via administrativa</button>
         <button class="ptab" data-ptab="p-bio">🪪 Biometria 2026</button>
       </div>
 
@@ -1314,11 +1315,55 @@ code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: va
           <div class="prc"><span class="prc-n">B</span><div><div class="prc-title">Laudo de assistente técnico particular</div><div class="prc-desc">Médico especialista examina o cliente e elabora laudo contrário com fundamentação técnica. O juiz pondera os dois laudos.</div><div class="prc-who">⏱ Custo: cliente paga o médico</div></div></div>
           <div class="prc"><span class="prc-n">C</span><div><div class="prc-title">Requerimento de esclarecimentos ao perito</div><div class="prc-desc">Diego pede ao juiz que o perito esclareça pontos específicos. Útil quando o laudo tem lacunas.</div><div class="prc-who">⏱ Dentro do prazo de 15 dias</div></div></div>
           <div class="prc"><span class="prc-n">D</span><div><div class="prc-title">Requerimento de nova perícia</div><div class="prc-desc">Em casos com erros graves. O juiz decide se acata.</div><div class="prc-who">⏱ Mais difícil de ser deferida</div></div></div>
+          <div class="prc"><span class="prc-n">E</span><div><div class="prc-title">Prova testemunhal do acidente</div><div class="prc-desc">Colegas que presenciaram o acidente reforçam o nexo causal quando o laudo o questiona. Diego arrola as testemunhas junto da impugnação.</div><div class="prc-who">⏱ Junto da impugnação</div></div></div>
         </div>
         <div class="card" style="margin-top:14px">
           <div style="font-size:14px;font-weight:700;margin-bottom:10px">O que comunicar ao cliente</div>
           <div class="fa"><span class="fw adv">Diego</span><div class="fb2 adv-l">"<em>[Nome]</em>, recebi o laudo do perito. Infelizmente ele não reconheceu a sua limitação do jeito que esperávamos. Mas isso não é o fim — é muito comum e temos recursos para contestar. Já estou preparando a impugnação técnica e vamos continuar lutando pelo seu direito."</div></div>
           <div class="warn"><strong>Nunca dizer que "perdeu".</strong> O laudo pericial não é a sentença — o juiz decide. Diego já viu muitos casos com laudo negativo que terminaram em deferimento após impugnação bem fundamentada.</div>
+        </div>
+      </div>
+
+      <!-- VIA ADMINISTRATIVA & RECURSO -->
+      <div id="p-adm" class="p-panel">
+        <div class="card" style="margin-bottom:14px;border-left:3px solid var(--blue)">
+          <div style="font-size:14px;font-weight:700;color:var(--blue2);margin-bottom:6px">🏛️ Quando o caso passa pela via administrativa</div>
+          <div style="font-size:14px;color:var(--ink);line-height:1.7">Nossos processos são <strong>judiciais</strong>, mas parte dos clientes chega após uma negativa do INSS na via administrativa — ou opta por ela antes da ação. Entender esse caminho evita perder prazos.</div>
+        </div>
+
+        <div class="eyebrow">Via administrativa (INSS) — passo a passo</div>
+        <div class="card">
+          <div class="prc"><span class="prc-n">01</span><div><div class="prc-title">Protocolo do requerimento</div><div class="prc-desc">Presencial na agência do INSS ou pelo Meu INSS (agendamento pelo 135 ou app). O escritório protocola pelo procurador.</div><div class="prc-who">📌 Cliente / procurador</div></div></div>
+          <div class="prc"><span class="prc-n">02</span><div><div class="prc-title">Agendamento da perícia</div><div class="prc-desc">O INSS agenda automaticamente após o protocolo. Prazo médio: 15 a 45 dias. Data enviada por SMS / app Meu INSS.</div><div class="prc-who">📌 INSS</div></div></div>
+          <div class="prc"><span class="prc-n">03</span><div><div class="prc-title">Perícia médica presencial</div><div class="prc-desc">O perito do INSS avalia a sequela. Duração: 10 a 20 min. Levar toda a documentação médica original + cópias.</div><div class="prc-who">📌 Cliente</div></div></div>
+          <div class="prc"><span class="prc-n">04</span><div><div class="prc-title">Resultado — prazo legal: 45 dias</div><div class="prc-desc">Disponível no Meu INSS. Deferido: início do benefício. Negado: recurso administrativo ou ação judicial.</div><div class="prc-who">📌 INSS</div></div></div>
+        </div>
+        <div class="amb" style="margin-top:12px">💡 <strong>Atestmed (perícia online):</strong> disponível para afastamentos até 90 dias em 2026. Para auxílio-acidente (B-94), a perícia presencial ainda é necessária na maioria dos casos.</div>
+
+        <div class="eyebrow" style="margin-top:20px">Recurso administrativo — prazo 30 dias</div>
+        <div class="card">
+          <ul class="tlist">
+            <li><span class="tdot"></span><strong>Prazo:</strong> 30 dias após a notificação da negativa.</li>
+            <li><span class="tdot"></span><strong>Onde:</strong> CRPS — Conselho de Recursos da Previdência Social (online pelo Meu INSS).</li>
+            <li><span class="tdot"></span><strong>Documentos adicionais:</strong> laudo médico mais detalhado descrevendo a sequela e o impacto no trabalho habitual.</li>
+            <li><span class="tdot"></span><strong>Taxa de reversão:</strong> baixa via CRPS — recomendável já iniciar a ação judicial em paralelo.</li>
+          </ul>
+        </div>
+        <div class="warn" style="margin-top:12px"><strong>⚡ Armadilha comum:</strong> aguardar o resultado do recurso administrativo e perder o prazo prescricional. O correto é ajuizar a ação judicial dentro dos <strong>5 anos</strong>, mesmo com recurso administrativo em andamento.</div>
+
+        <div class="eyebrow" style="margin-top:20px">Fundamentos jurídicos que sustentam o pedido</div>
+        <div class="g2">
+          <div class="card">
+            <div style="font-size:14px;font-weight:700;color:var(--green2);margin-bottom:8px">Tema 416 STJ</div>
+            <div style="font-size:14px;color:var(--ink);line-height:1.7"><strong>Qualquer redução</strong> da capacidade laboral já basta para o auxílio-acidente — não precisa ser incapacidade total.</div>
+          </div>
+          <div class="card">
+            <div style="font-size:14px;font-weight:700;color:var(--green2);margin-bottom:8px">Tema 862 STJ</div>
+            <div style="font-size:14px;color:var(--ink);line-height:1.7">A <strong>DIB</strong> (data de início do benefício) retroage à data do requerimento/cessação indevida, garantindo os atrasados.</div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:12px;border-left:3px solid var(--blue)">
+          <div style="font-size:14px;color:var(--ink);line-height:1.7"><strong>JEF (Juizado Especial Federal):</strong> causas até <strong>60 salários mínimos</strong> (R$ 97.260 em 2026). Advogado não é obrigatório, mas recomendado — o escritório protocola a ação.</div>
         </div>
       </div>
 
