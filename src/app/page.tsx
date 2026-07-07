@@ -76,7 +76,7 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowLogin(v => !v)}
+          <button onClick={() => router.push('/login')}
             className="flex items-center gap-1.5 text-sm text-slate-300 hover:text-white px-3 py-2 rounded-lg hover:bg-slate-800 transition">
             <LogIn className="w-4 h-4"/> Entrar
           </button>

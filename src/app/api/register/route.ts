@@ -12,7 +12,7 @@ function generateSlug(name: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  const { firmName, segment, adminName, adminEmail, adminPassword } = await req.json()
+  const { firmName, segment, adminName, adminEmail, adminPassword, solarUf } = await req.json()
 
   if (!firmName || !segment || !adminName || !adminEmail || !adminPassword) {
     return NextResponse.json({ error: 'Todos os campos são obrigatórios.' }, { status: 400 })
@@ -35,6 +35,11 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   if (data?.error) return NextResponse.json({ error: data.error }, { status: 400 })
+
+  // Região da empresa solar (calculadora de orçamento já abre nela).
+  if (segment === 'solar' && solarUf) {
+    await supabase.from('nf_firms').update({ solar_uf: solarUf }).eq('id', data.firm_id)
+  }
 
   // Popular com dados do segmento. Chama a própria instância (origin do request),
   // sem depender de um domínio fixo em env — funciona em qualquer deploy/preview.
