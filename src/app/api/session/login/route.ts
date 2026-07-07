@@ -24,7 +24,7 @@ function signJwt(payload: Record<string, unknown>, secret: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  const { email: rawEmail, password, firmId } = await req.json()
+  const { email: rawEmail, password, firmId, allowSuperAdmin } = await req.json()
   if (!rawEmail || !password) {
     return NextResponse.json({ error: 'Informe e-mail e senha.' }, { status: 400 })
   }
@@ -40,8 +40,10 @@ export async function POST(req: NextRequest) {
   }
   const row = data[0]
 
-  // Trava de firma (quando o login vem por uma URL /[slug] específica).
-  if (firmId && row.firm_id !== firmId) {
+  // Trava de firma (quando o login vem por uma URL /[slug] específica, ou por um
+  // produto branded como o /pillar da Campos Pillar). Com allowSuperAdmin, o
+  // super-admin (Três16) atravessa a trava — ele enxerga qualquer firma.
+  if (firmId && row.firm_id !== firmId && !(allowSuperAdmin && row.is_super_admin)) {
     return NextResponse.json({ error: 'Esse usuário não pertence a esta empresa.' }, { status: 403 })
   }
 
