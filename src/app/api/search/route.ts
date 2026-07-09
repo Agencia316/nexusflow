@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
+import { getSession, resolveFirmId } from '@/lib/api-auth'
+
+export const runtime = 'nodejs'
 
 // Busca semântica melhorada: combina Postgres full-text search + ranking por relevância
 export async function POST(req: NextRequest) {
-  const { query, firmId } = await req.json()
+  // Lê documentos pela service role (ignora RLS): sem sessão, um anônimo
+  // buscava no acervo de qualquer firma passando o firmId.
+  const session = getSession(req)
+  if (!session) return NextResponse.json({ error: 'Sessão ausente ou inválida.' }, { status: 401 })
+
+  const { query, firmId: requestedFirmId } = await req.json()
+  const firmId = resolveFirmId(session, requestedFirmId)
   if (!query?.trim()) return NextResponse.json({ results: [] })
 
   // Preprocessar query: extrair termos importantes

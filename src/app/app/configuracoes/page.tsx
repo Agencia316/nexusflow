@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
 import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
+import { getToken } from '@/lib/session'
 import {
   Settings, Key, Brain, Save, Eye, EyeOff,
   CheckCircle2, AlertCircle, Loader2, Sparkles,
@@ -140,7 +141,7 @@ export default function ConfiguracoesPage() {
     try {
       const res = await fetch('/api/test-ai', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken() || ''}` },
         body: JSON.stringify({ firmId, apiKey: keyToTest }),
       })
       setTestResult(res.ok ? 'ok' : 'error')

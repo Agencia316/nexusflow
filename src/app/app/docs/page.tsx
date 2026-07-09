@@ -5,6 +5,7 @@ import { getUser } from '@/lib/auth'
 import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
 import { FileText, Search, Plus, Tag, Eye, ChevronRight, BookOpen, Sparkles, Loader2 } from 'lucide-react'
+import { getToken } from '@/lib/session'
 
 const statusColors: Record<string, string> = {
   published: 'badge-success',
@@ -60,7 +61,7 @@ export default function DocsPage() {
       try {
         const res = await fetch('/api/search', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken() || ''}` },
           body: JSON.stringify({ query: search, firmId })
         })
         const data = await res.json()

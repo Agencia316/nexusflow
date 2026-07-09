@@ -1,10 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
+import { getSession, resolveFirmId } from '@/lib/api-auth'
+
+export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
-  const { firmId, apiKey } = await req.json()
+  // Sem sessão, qualquer anônimo passava um firmId e fazia o servidor usar a
+  // chave da OpenAI daquela firma.
+  const session = getSession(req)
+  if (!session) return NextResponse.json({ error: 'Sessão ausente ou inválida.' }, { status: 401 })
 
-  // Usar chave passada ou buscar do banco
+  const { firmId: requestedFirmId, apiKey } = await req.json()
+  const firmId = resolveFirmId(session, requestedFirmId)
+
+  // Testar uma chave avulsa é privilégio de quem administra a firma.
+  if (apiKey && !(session.isSuperAdmin || session.role === 'admin')) {
+    return NextResponse.json({ error: 'Sem permissão.' }, { status: 403 })
+  }
+
   let keyToTest = apiKey
   if (!keyToTest && firmId) {
     const { data } = await supabase

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
+import { getSession, resolveFirmId } from '@/lib/api-auth'
+
+export const runtime = 'nodejs'
 
 async function getFirmSettings(firmId: string) {
   const { data } = await supabase
@@ -16,7 +19,12 @@ async function getApiKey(settings: any): Promise<string | null> {
 }
 
 export async function POST(req: NextRequest) {
-  const { messages, firmId } = await req.json()
+  // Rota paga (usa a chave da OpenAI da firma): exige sessão.
+  const session = getSession(req)
+  if (!session) return NextResponse.json({ error: 'Sessão ausente ou inválida.' }, { status: 401 })
+
+  const { messages, firmId: requestedFirmId } = await req.json()
+  const firmId = resolveFirmId(session, requestedFirmId)
 
   const settings = await getFirmSettings(firmId)
   const apiKey = await getApiKey(settings)
