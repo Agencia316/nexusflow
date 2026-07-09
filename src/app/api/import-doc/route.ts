@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getFirmAiContext } from '@/lib/firm-ai-context'
+import { getFirmAiContext, getFirmOpenAI } from '@/lib/firm-ai-context'
 import { getSession, resolveFirmId } from '@/lib/api-auth'
 
 export const runtime = 'nodejs'
@@ -13,6 +13,11 @@ export async function POST(req: NextRequest) {
   const file = formData.get('file') as File
   const firmId = resolveFirmId(session, formData.get('firmId'))
   const { firmContext } = await getFirmAiContext(firmId)
+
+  // A chave da firma tem precedência sobre a global. Antes esta rota usava só a
+  // global, então ficava quebrada em qualquer ambiente sem OPENAI_API_KEY válida.
+  const { apiKey, model } = await getFirmOpenAI(firmId)
+  if (!apiKey) return NextResponse.json({ error: 'Chave OpenAI não configurada' }, { status: 503 })
 
   if (!file) return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 })
 
@@ -48,10 +53,10 @@ export async function POST(req: NextRequest) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
+      model,
       max_tokens: 3000,
       messages: [
         {
@@ -77,12 +82,24 @@ Sem explicações, sem markdown extra ao redor do JSON.`
   })
 
   const data = await response.json()
-  const text = data.choices?.[0]?.message?.content || '{}'
+  const text = data.choices?.[0]?.message?.content
+
+  // Sem `choices` a chamada à OpenAI falhou (chave inválida, quota, etc.).
+  // Antes isso virava a string '{}', que faz JSON.parse ter SUCESSO — a rota
+  // devolvia 200 com corpo vazio e a tela de importar não mostrava nada.
+  if (!text) {
+    console.error('[import-doc] OpenAI não retornou choices:', JSON.stringify(data?.error ?? data).slice(0, 300))
+    return NextResponse.json(
+      { error: 'A IA não conseguiu processar o arquivo. Verifique a chave da OpenAI nas configurações.' },
+      { status: 502 },
+    )
+  }
 
   try {
     const clean = text.replace(/```json|```/g, '').trim()
     return NextResponse.json(JSON.parse(clean))
   } catch {
+    // A IA respondeu, mas fora do formato JSON pedido: devolve o texto cru.
     return NextResponse.json({
       title: file.name.replace(/\.[^.]+$/, ''),
       content: textToProcess,
