@@ -39,14 +39,20 @@ export default function TrainingPage() {
   const [quizOpenIdx, setQuizOpenIdx] = useState<number|null>(null)
 
   const load = useCallback(async () => {
-    const [pathsRes, stepsRes, progressRes, certRes, docsRes, rolesRes] = await Promise.all([
+    const [pathsRes, progressRes, certRes, docsRes, rolesRes] = await Promise.all([
       supabase.from('nf_training_paths').select('*').eq('firm_id', firmId).order('created_at'),
-      supabase.from('nf_training_steps').select('*').order('step_order'),
       user ? supabase.from('nf_user_progress').select('*').eq('user_id', user.id) : { data:[] },
       user ? supabase.from('nf_certificates').select('path_id').eq('user_id', user.id) : { data:[] },
       supabase.from('nf_documents').select('id,title').eq('firm_id', firmId).eq('status','published').order('title'),
       supabase.from('nf_roles').select('*').eq('firm_id', firmId).order('sort_order'),
     ])
+
+    // nf_training_steps não tem firm_id: escopo vem das trilhas da firma. Sem o
+    // .in(), o super-admin (que atravessa o RLS) traria as etapas de todas as firmas.
+    const pathIds = (pathsRes.data || []).map((p: any) => p.id)
+    const stepsRes = pathIds.length
+      ? await supabase.from('nf_training_steps').select('*').in('path_id', pathIds).order('step_order')
+      : { data: [] as any[] }
     const sMap: Record<string,Step[]> = {}
     for (const s of (stepsRes.data||[])) {
       if (!sMap[s.path_id]) sMap[s.path_id] = []
