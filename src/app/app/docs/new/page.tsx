@@ -58,7 +58,7 @@ export default function NewDocPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           prompt: aiPrompt,
-          firmContext: 'Campos Pillar Advocacia — especializada em Auxílio-Acidente INSS (B-36/B-94)'
+          firmId,
         })
       })
       const data = await res.json()
@@ -77,7 +77,7 @@ export default function NewDocPage() {
     try {
       const fd = new FormData()
       fd.append('file', file)
-      fd.append('firmContext', 'Campos Pillar Advocacia — Auxílio-Acidente INSS')
+      fd.append('firmId', firmId)
       const res = await fetch('/api/import-doc', { method: 'POST', body: fd })
       const data = await res.json()
       if (data.title) setTitle(data.title)
