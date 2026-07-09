@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
-import { getFirmAiContext } from '@/lib/firm-ai-context'
+import { getFirmAiContext, getFirmOpenAI } from '@/lib/firm-ai-context'
 import { getSession, resolveFirmId } from '@/lib/api-auth'
 
 export const runtime = 'nodejs'
@@ -14,15 +13,8 @@ export async function POST(req: NextRequest) {
   const { prompt, firmId: requestedFirmId } = await req.json()
   const firmId = resolveFirmId(session, requestedFirmId)
 
-  // Buscar chave/modelo da empresa
-  const { data: settings } = firmId ? await supabase
-    .from('nf_firm_settings')
-    .select('openai_api_key, ai_model, ai_enabled')
-    .eq('firm_id', firmId)
-    .single() : { data: null }
-
-  const apiKey = settings?.openai_api_key || process.env.OPENAI_API_KEY
-  const model = settings?.ai_model || 'gpt-4o'
+  // Chave/modelo da firma, com a global como fallback.
+  const { apiKey, model } = await getFirmOpenAI(firmId)
 
   if (!apiKey) return NextResponse.json({ error: 'Chave OpenAI não configurada' }, { status: 503 })
 
@@ -62,7 +54,18 @@ Sem markdown extra, sem explicações, apenas o JSON.`
     })
 
     const data = await res.json()
-    const text = data.choices?.[0]?.message?.content || '{}'
+    const text = data.choices?.[0]?.message?.content
+
+    // Sem `choices` a chamada falhou. O `|| '{}'` anterior fazia o JSON.parse ter
+    // SUCESSO, e a rota respondia 200 com corpo vazio — a tela não mostrava nada.
+    if (!text) {
+      console.error('[generate-doc] OpenAI não retornou choices:', JSON.stringify(data?.error ?? data).slice(0, 300))
+      return NextResponse.json(
+        { error: 'A IA não conseguiu gerar o documento. Verifique a chave da OpenAI nas configurações.' },
+        { status: 502 },
+      )
+    }
+
     const clean = text.replace(/```json|```/g, '').trim()
     const parsed = JSON.parse(clean)
     return NextResponse.json(parsed)

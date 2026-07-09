@@ -24,6 +24,33 @@ export function segmentContextFor(segment?: string | null): string {
  * O contexto nunca vem do cliente: `firmId` é o único dado confiável que ele
  * envia, e nome/segmento são lidos de `nf_firms` com a service role key.
  */
+export type FirmOpenAI = {
+  apiKey: string | null
+  model: string
+}
+
+/**
+ * Resolve a chave/modelo da OpenAI de uma firma: a chave da firma tem
+ * precedência sobre a global (OPENAI_API_KEY), que é só um fallback.
+ *
+ * Rotas que usam apenas a global quebram para todas as firmas quando ela não
+ * está configurada — foi o caso do import-doc.
+ */
+export async function getFirmOpenAI(firmId?: string | null): Promise<FirmOpenAI> {
+  const { data: settings } = firmId
+    ? await supabaseAdmin
+        .from('nf_firm_settings')
+        .select('openai_api_key, ai_model, ai_enabled')
+        .eq('firm_id', firmId)
+        .maybeSingle()
+    : { data: null }
+
+  return {
+    apiKey: settings?.openai_api_key || process.env.OPENAI_API_KEY || null,
+    model: settings?.ai_model || 'gpt-4o',
+  }
+}
+
 export async function getFirmAiContext(firmId?: string | null): Promise<FirmAiContext> {
   if (!firmId) {
     return { firmContext: '', segmentContext: FALLBACK_SEGMENT_CONTEXT }

@@ -35,6 +35,7 @@ export default function NewDocPage() {
   // IA
   const [aiPrompt, setAiPrompt] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
+  const [aiError, setAiError] = useState('')
 
   // Import
   const [importing, setImporting] = useState(false)
@@ -53,6 +54,7 @@ export default function NewDocPage() {
   async function generateWithAI() {
     if (!aiPrompt.trim()) return
     setAiLoading(true)
+    setAiError('')
     try {
       const res = await fetch('/api/generate-doc', {
         method: 'POST',
@@ -63,9 +65,15 @@ export default function NewDocPage() {
         })
       })
       const data = await res.json()
-      if (data.title) setTitle(data.title)
-      if (data.content) setContent(data.content)
-    } catch {}
+      if (!res.ok) {
+        setAiError(data.error || 'Não foi possível gerar o documento.')
+      } else {
+        if (data.title) setTitle(data.title)
+        if (data.content) setContent(data.content)
+      }
+    } catch {
+      setAiError('Falha de conexão ao gerar o documento.')
+    }
     setAiLoading(false)
   }
 
@@ -86,9 +94,13 @@ export default function NewDocPage() {
         body: fd,
       })
       const data = await res.json()
-      if (data.title) setTitle(data.title)
-      if (data.content) setContent(data.content)
-      if (data.tags?.length) setTags(data.tags)
+      if (!res.ok) {
+        setImportError(data.error || 'Erro ao processar o arquivo.')
+      } else {
+        if (data.title) setTitle(data.title)
+        if (data.content) setContent(data.content)
+        if (data.tags?.length) setTags(data.tags)
+      }
     } catch {
       setImportError('Erro ao processar o arquivo. Tente um arquivo .txt ou .md.')
     }
@@ -188,7 +200,12 @@ export default function NewDocPage() {
               {aiLoading ? 'Gerando...' : 'Gerar'}
             </button>
           </div>
-          {content && <p className="text-xs text-green-400 mt-2 flex items-center gap-1">✓ Documento gerado — revise abaixo antes de salvar</p>}
+          {aiError && (
+            <p className="text-xs text-red-400 mt-2 flex items-center gap-1.5">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0"/> {aiError}
+            </p>
+          )}
+          {content && !aiError && <p className="text-xs text-green-400 mt-2 flex items-center gap-1">✓ Documento gerado — revise abaixo antes de salvar</p>}
         </div>
       )}
 

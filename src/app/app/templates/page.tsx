@@ -133,6 +133,7 @@ export default function TemplatesPage() {
         body: JSON.stringify({ prompt: aiPrompt, firmId }),
       })
       const data = await res.json()
+      if (!res.ok) { alert(data.error || 'Erro ao gerar. Tente novamente.'); return }
       setForm(f => ({ ...f, title: data.title || f.title, content: data.content || f.content }))
       setAiPrompt('')
     } catch { alert('Erro ao gerar. Tente novamente.') }
