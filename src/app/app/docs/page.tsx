@@ -120,7 +120,7 @@ export default function DocsPage() {
       {search && searchResults !== null && (
         <div className="flex items-center gap-2 mb-4 text-xs flex-wrap">
           {aiEnhanced && <span className="flex items-center gap-1 text-purple-400 bg-purple-400/10 border border-purple-400/20 px-2.5 py-1 rounded-full"><Sparkles className="w-3 h-3"/> Busca aprimorada por IA</span>}
-          <span className="text-slate-500">{searchResults.length} resultado{searchResults.length !== 1?'s':''} para "{search}"</span>
+          <span className="text-slate-500">{searchResults.length} resultado{searchResults.length !== 1?'s':''} para &quot;{search}&quot;</span>
           <button onClick={() => setSearch('')} className="text-slate-600 hover:text-slate-400 ml-auto">× Limpar</button>
         </div>
       )}

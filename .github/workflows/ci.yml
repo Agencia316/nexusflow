@@ -23,6 +23,12 @@ jobs:
 
       - run: npm ci
 
+      # `next lint` sai com 0 quando só há warnings, então este passo barra
+      # apenas erros. Os 17 warnings herdados (quase todos exhaustive-deps)
+      # ficam visíveis no log sem travar o pipeline.
+      - name: Lint
+        run: npm run lint
+
       - name: Typecheck
         run: npm run typecheck
 
