@@ -24,6 +24,22 @@ function signJwt(payload: Record<string, unknown>, secret: string): string {
 }
 
 export async function POST(req: NextRequest) {
+  const secret = process.env.SUPABASE_JWT_SECRET
+
+  // Checado ANTES da credencial: é erro de configuração, não de autenticação.
+  // Com o RLS por tenant ligado, todas as policies são `to authenticated`; sem
+  // token o cliente cai na anon key, o app fica silenciosamente vazio e o
+  // isSessionExpired() dispara relogin em loop. Falhar cedo torna um deploy sem
+  // SUPABASE_JWT_SECRET diagnosticável por qualquer requisição, sem exigir uma
+  // senha válida para revelar o problema.
+  if (process.env.NEXT_PUBLIC_RLS_ENFORCED === 'true' && !secret) {
+    console.error('[session/login] SUPABASE_JWT_SECRET ausente com NEXT_PUBLIC_RLS_ENFORCED=true')
+    return NextResponse.json(
+      { error: 'Configuração do servidor incompleta. Contate o suporte.' },
+      { status: 500 },
+    )
+  }
+
   const { email: rawEmail, password, firmId, allowSuperAdmin } = await req.json()
   if (!rawEmail || !password) {
     return NextResponse.json({ error: 'Informe e-mail e senha.' }, { status: 400 })
@@ -45,20 +61,6 @@ export async function POST(req: NextRequest) {
   // super-admin (Três16) atravessa a trava — ele enxerga qualquer firma.
   if (firmId && row.firm_id !== firmId && !(allowSuperAdmin && row.is_super_admin)) {
     return NextResponse.json({ error: 'Esse usuário não pertence a esta empresa.' }, { status: 403 })
-  }
-
-  const secret = process.env.SUPABASE_JWT_SECRET
-
-  // Com o RLS por tenant ligado, todas as policies são `to authenticated`: sem
-  // token o cliente cai na anon key e o app fica silenciosamente vazio (e o
-  // isSessionExpired() dispara relogin em loop). Falhar aqui é o único jeito de
-  // um deploy sem SUPABASE_JWT_SECRET ser diagnosticável.
-  if (process.env.NEXT_PUBLIC_RLS_ENFORCED === 'true' && !secret) {
-    console.error('[session/login] SUPABASE_JWT_SECRET ausente com NEXT_PUBLIC_RLS_ENFORCED=true')
-    return NextResponse.json(
-      { error: 'Configuração do servidor incompleta. Contate o suporte.' },
-      { status: 500 },
-    )
   }
 
   let token: string | null = null
