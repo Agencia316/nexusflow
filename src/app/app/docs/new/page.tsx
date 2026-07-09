@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
 import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
+import { getToken } from '@/lib/session'
 import {
   Sparkles, Save, ArrowLeft, Loader2, Tag, X,
   Upload, FileText, AlertCircle, Eye, EyeOff, Library
@@ -55,7 +56,7 @@ export default function NewDocPage() {
     try {
       const res = await fetch('/api/generate-doc', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken() || ''}` },
         body: JSON.stringify({
           prompt: aiPrompt,
           firmId,
@@ -78,7 +79,12 @@ export default function NewDocPage() {
       const fd = new FormData()
       fd.append('file', file)
       fd.append('firmId', firmId)
-      const res = await fetch('/api/import-doc', { method: 'POST', body: fd })
+      // Sem Content-Type: o browser define sozinho o boundary do multipart.
+      const res = await fetch('/api/import-doc', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${getToken() || ''}` },
+        body: fd,
+      })
       const data = await res.json()
       if (data.title) setTitle(data.title)
       if (data.content) setContent(data.content)

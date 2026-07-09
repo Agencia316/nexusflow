@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
 import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
+import { getToken } from '@/lib/session'
 import {
   GraduationCap, ChevronRight, CheckCircle2, Clock, Lock,
   Trophy, Plus, Pencil, Trash2, X, Save, Loader2,
@@ -176,7 +177,7 @@ export default function TrainingPage() {
     try {
       const res = await fetch('/api/generate-quiz', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken() || ''}` },
         body: JSON.stringify({ documentId: step.document_id, firmId, count: 4 }),
       })
       const data = await res.json()

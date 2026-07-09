@@ -1,9 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
+import { getSession, resolveFirmId } from '@/lib/api-auth'
+
+export const runtime = 'nodejs'
 
 // Envia notificação via Resend (email) + alerta interno
 export async function POST(req: NextRequest) {
-  const { type, userId, firmId, title, message, link, sendEmail } = await req.json()
+  // Escreve alerta e dispara e-mail pela service role: sem sessão, um anônimo
+  // criava alertas em qualquer firma e mandava e-mail para qualquer usuário.
+  const session = getSession(req)
+  if (!session) return NextResponse.json({ error: 'Sessão ausente ou inválida.' }, { status: 401 })
+
+  const { type, userId, firmId: requestedFirmId, title, message, link, sendEmail } = await req.json()
+  const firmId = resolveFirmId(session, requestedFirmId)
+
+  // O destinatário precisa ser da mesma firma — senão o alerta (e o e-mail)
+  // atravessariam o tenant.
+  const { data: target } = await supabase
+    .from('nf_users')
+    .select('id, email, name, email_notifications')
+    .eq('id', userId)
+    .eq('firm_id', firmId)
+    .maybeSingle()
+
+  if (!target) return NextResponse.json({ error: 'Destinatário inválido.' }, { status: 404 })
 
   // 1. Salvar alerta interno sempre
   await supabase.from('nf_alerts').insert({
@@ -17,13 +37,7 @@ export async function POST(req: NextRequest) {
 
   // 2. Se sendEmail e tiver RESEND_API_KEY, envia e-mail
   if (sendEmail && process.env.RESEND_API_KEY) {
-    const userRes = await supabase
-      .from('nf_users')
-      .select('email, name, email_notifications')
-      .eq('id', userId)
-      .single()
-
-    const user = userRes.data
+    const user = target
     if (user?.email_notifications && user?.email) {
       await fetch('https://api.resend.com/emails', {
         method: 'POST',

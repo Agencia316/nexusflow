@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { getToken } from '@/lib/session'
 
 interface Message { role: 'user' | 'assistant'; content: string }
 
@@ -53,7 +54,7 @@ export default function ChatPage() {
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken() || ''}` },
         body: JSON.stringify({ messages: newMessages, firmId }),
       })
       const data = await res.json()

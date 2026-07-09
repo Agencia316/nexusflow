@@ -6,6 +6,7 @@ import { useFirm } from '@/lib/firm-context'
 import { useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { getToken } from '@/lib/session'
 import {
   BookOpen, Sparkles, Loader2, CheckCircle2, Search,
   Plus, Pencil, Trash2, X, Save, Eye, EyeOff,
@@ -128,7 +129,7 @@ export default function TemplatesPage() {
     try {
       const res = await fetch('/api/generate-doc', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken() || ''}` },
         body: JSON.stringify({ prompt: aiPrompt, firmId }),
       })
       const data = await res.json()

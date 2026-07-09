@@ -1,14 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
+import { getSession, resolveFirmId } from '@/lib/api-auth'
+
+export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
-  const { documentId, firmId, count = 4 } = await req.json()
+  // Rota paga e que lê documento pela service role: exige sessão.
+  const session = getSession(req)
+  if (!session) return NextResponse.json({ error: 'Sessão ausente ou inválida.' }, { status: 401 })
 
-  // Buscar documento
+  const { documentId, firmId: requestedFirmId, count = 4 } = await req.json()
+  const firmId = resolveFirmId(session, requestedFirmId)
+
+  // O documento precisa ser da firma da sessão: a service role ignora o RLS,
+  // então sem este filtro qualquer id de documento de qualquer firma seria lido.
   const { data: doc } = await supabase
     .from('nf_documents')
     .select('title, content')
     .eq('id', documentId)
+    .eq('firm_id', firmId)
     .single()
 
   if (!doc) return NextResponse.json({ error: 'Documento não encontrado' }, { status: 404 })

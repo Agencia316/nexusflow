@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
 import { getFirmAiContext } from '@/lib/firm-ai-context'
+import { getSession, resolveFirmId } from '@/lib/api-auth'
+
+export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
-  const { prompt, firmId } = await req.json()
+  // Rota paga: sem sessão, um anônimo escolhia o firmId e queimava a chave da
+  // OpenAI daquela firma.
+  const session = getSession(req)
+  if (!session) return NextResponse.json({ error: 'Sessão ausente ou inválida.' }, { status: 401 })
+
+  const { prompt, firmId: requestedFirmId } = await req.json()
+  const firmId = resolveFirmId(session, requestedFirmId)
 
   // Buscar chave/modelo da empresa
   const { data: settings } = firmId ? await supabase

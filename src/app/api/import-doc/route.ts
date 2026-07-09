@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getFirmAiContext } from '@/lib/firm-ai-context'
+import { getSession, resolveFirmId } from '@/lib/api-auth'
+
+export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
+  // Rota paga (chama a OpenAI): exige sessão.
+  const session = getSession(req)
+  if (!session) return NextResponse.json({ error: 'Sessão ausente ou inválida.' }, { status: 401 })
+
   const formData = await req.formData()
   const file = formData.get('file') as File
-  const firmId = formData.get('firmId') as string || ''
+  const firmId = resolveFirmId(session, formData.get('firmId'))
   const { firmContext } = await getFirmAiContext(firmId)
 
   if (!file) return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 })

@@ -6,6 +6,7 @@ import { useFirm } from '@/lib/firm-context'
 import { useParams, useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { getToken } from '@/lib/session'
 import {
   ArrowLeft, CheckCircle2, PenLine, Download, Share2,
   Tag, Eye, Loader2, MessageCircle, Send, Trash2,
@@ -138,7 +139,7 @@ export default function DocPage() {
     if (doc?.requires_reading) {
       await fetch('/api/notify', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken() || ''}` },
         body: JSON.stringify({
           type: 'signed', userId: user.id, firmId,
           title: `📖 Leitura confirmada: ${doc.title}`,
@@ -161,7 +162,7 @@ export default function DocPage() {
     // Notificar
     await fetch('/api/notify', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken() || ''}` },
       body: JSON.stringify({
         type: 'signed', userId: user.id, firmId,
         title: `✍️ Documento assinado: ${doc?.title}`,
