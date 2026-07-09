@@ -48,6 +48,19 @@ export async function POST(req: NextRequest) {
   }
 
   const secret = process.env.SUPABASE_JWT_SECRET
+
+  // Com o RLS por tenant ligado, todas as policies são `to authenticated`: sem
+  // token o cliente cai na anon key e o app fica silenciosamente vazio (e o
+  // isSessionExpired() dispara relogin em loop). Falhar aqui é o único jeito de
+  // um deploy sem SUPABASE_JWT_SECRET ser diagnosticável.
+  if (process.env.NEXT_PUBLIC_RLS_ENFORCED === 'true' && !secret) {
+    console.error('[session/login] SUPABASE_JWT_SECRET ausente com NEXT_PUBLIC_RLS_ENFORCED=true')
+    return NextResponse.json(
+      { error: 'Configuração do servidor incompleta. Contate o suporte.' },
+      { status: 500 },
+    )
+  }
+
   let token: string | null = null
   if (secret) {
     const now = Math.floor(Date.now() / 1000)

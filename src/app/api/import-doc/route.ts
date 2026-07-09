@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getFirmAiContext } from '@/lib/firm-ai-context'
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData()
   const file = formData.get('file') as File
-  const firmContext = formData.get('firmContext') as string || ''
+  const firmId = formData.get('firmId') as string || ''
+  const { firmContext } = await getFirmAiContext(firmId)
 
   if (!file) return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 })
 
@@ -47,8 +49,8 @@ export async function POST(req: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: `Você é um especialista em documentação profissional para escritórios de advocacia e empresas.
-Contexto: ${firmContext}
+          content: `Você é um especialista em documentação profissional corporativa.
+${firmContext ? `Contexto da empresa: ${firmContext}` : ''}
 
 Analise o texto extraído de um documento e crie uma versão limpa e bem formatada em Markdown.
 - Preserve todas as informações importantes

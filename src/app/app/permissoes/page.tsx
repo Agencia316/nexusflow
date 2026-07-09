@@ -39,12 +39,19 @@ export default function PermissoesPage() {
   const [success, setSuccess] = useState('')
 
   async function loadData() {
-    const [docsRes, usersRes, catsRes, permsRes] = await Promise.all([
+    const [docsRes, usersRes, catsRes] = await Promise.all([
       supabase.from('nf_documents').select('*').eq('firm_id', firmId).eq('status','published').order('created_at'),
       supabase.from('nf_users').select('*').eq('firm_id', firmId).eq('is_active', true).order('name'),
       supabase.from('nf_categories').select('*').eq('firm_id', firmId).order('sort_order'),
-      supabase.from('nf_document_permissions').select('document_id, user_id'),
     ])
+
+    // nf_document_permissions não tem firm_id: escopo vem dos documentos da firma.
+    // Sem o .in(), o super-admin (que atravessa o RLS) traria as permissões de
+    // todas as firmas para o navegador.
+    const docIds = (docsRes.data || []).map(d => d.id)
+    const permsRes = docIds.length
+      ? await supabase.from('nf_document_permissions').select('document_id, user_id').in('document_id', docIds)
+      : { data: [] as { document_id: string; user_id: string }[] }
     setDocs(docsRes.data || [])
     setUsers(usersRes.data || [])
     setCategories(catsRes.data || [])

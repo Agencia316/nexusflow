@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
+import { getFirmAiContext } from '@/lib/firm-ai-context'
 
 export async function POST(req: NextRequest) {
-  const { prompt, firmContext, firmId, segment } = await req.json()
+  const { prompt, firmId } = await req.json()
 
   // Buscar chave/modelo da empresa
   const { data: settings } = firmId ? await supabase
@@ -16,9 +17,7 @@ export async function POST(req: NextRequest) {
 
   if (!apiKey) return NextResponse.json({ error: 'Chave OpenAI não configurada' }, { status: 503 })
 
-  const segmentContext = segment === 'solar'
-    ? 'empresa de energia solar fotovoltaica — vendas, instalação, projetos, financiamento, pós-venda'
-    : 'escritório de advocacia previdenciária — Auxílio-Acidente INSS, B-36, B-94, critérios J1-J5, SDR, Closer'
+  const { firmContext, segmentContext } = await getFirmAiContext(firmId)
 
   const systemPrompt = `Você é especialista em documentação operacional para ${segmentContext}.
 ${firmContext ? `Contexto da empresa: ${firmContext}` : ''}

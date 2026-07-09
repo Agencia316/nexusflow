@@ -129,7 +129,7 @@ export default function TemplatesPage() {
       const res = await fetch('/api/generate-doc', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: aiPrompt, firmId, segment: firmSegment }),
+        body: JSON.stringify({ prompt: aiPrompt, firmId }),
       })
       const data = await res.json()
       setForm(f => ({ ...f, title: data.title || f.title, content: data.content || f.content }))

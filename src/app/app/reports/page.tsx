@@ -15,12 +15,13 @@ export default function ReportsPage() {
 
   useEffect(() => {
     if (user?.role === 'member') { router.push('/app/dashboard'); return }
+    if (!firmId) return
     async function load() {
       const [usersRes, docsRes, progressRes, assignRes] = await Promise.all([
         supabase.from('nf_users').select('*').eq('firm_id', firmId),
         supabase.from('nf_documents').select('id,title,status,requires_reading,requires_signature,view_count').eq('firm_id', firmId),
-        supabase.from('nf_user_progress').select('*'),
-        supabase.from('nf_assignments').select('*'),
+        supabase.from('nf_user_progress').select('*').eq('firm_id', firmId),
+        supabase.from('nf_assignments').select('*').eq('firm_id', firmId),
       ])
       setData({
         users: usersRes.data || [],
