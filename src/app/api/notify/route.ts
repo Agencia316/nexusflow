@@ -14,14 +14,22 @@ export async function POST(req: NextRequest) {
   const { type, userId, firmId: requestedFirmId, title, message, link, sendEmail } = await req.json()
   const firmId = resolveFirmId(session, requestedFirmId)
 
-  // O destinatário precisa ser da mesma firma — senão o alerta (e o e-mail)
+  // O destinatário precisa ser da firma alvo — senão o alerta (e o e-mail)
   // atravessariam o tenant.
-  const { data: target } = await supabase
+  //
+  // Exceção: notificar a si mesmo é sempre permitido. O super-admin da Três16
+  // pertence à firma dele, mas ao "entrar como cliente" assina documentos na
+  // firma impersonada; exigir que ele fosse membro dela quebrava a assinatura.
+  const isSelf = userId === session.userId
+
+  const query = supabase
     .from('nf_users')
     .select('id, email, name, email_notifications')
     .eq('id', userId)
-    .eq('firm_id', firmId)
-    .maybeSingle()
+
+  const { data: target } = isSelf
+    ? await query.maybeSingle()
+    : await query.eq('firm_id', firmId).maybeSingle()
 
   if (!target) return NextResponse.json({ error: 'Destinatário inválido.' }, { status: 404 })
 
