@@ -87,7 +87,7 @@ export default function TemplatesPage() {
     .filter(c => c === 'Modelos da Empresa' ? customVisible.length > 0 : systemVisible.some(t => t.cat === c))
 
   // Usar template — cria documento rascunho e abre para edição
-  async function useTemplate(t: Template) {
+  async function applyTemplate(t: Template) {
     if (!canEdit) return
     setUsing(t.id)
     const { data: cats } = await supabase.from('nf_categories').select('id').eq('firm_id', firmId).limit(1)
@@ -263,7 +263,7 @@ export default function TemplatesPage() {
                         </button>
                       )}
                       {canEdit && (
-                        <button onClick={()=>useTemplate(t)} disabled={!!using}
+                        <button onClick={()=>applyTemplate(t)} disabled={!!using}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                             done===t.id ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                             : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20'}`}>
