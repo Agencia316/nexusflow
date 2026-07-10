@@ -10,7 +10,7 @@ import {
   LayoutDashboard, FileText, Plus, MessageSquareText,
   GraduationCap, BarChart3, Users, LogOut, BookOpen,
   ChevronRight, Wrench, Shield, Bell, Library, Settings,
-  Building2, Menu, X, ClipboardList
+  Building2, Menu, X, ClipboardList, KeyRound
 } from 'lucide-react'
 
 // managerOnly = admin + editor | adminOnly = admin only | superOnly = super-admin (Três16)
@@ -173,6 +173,14 @@ export default function Sidebar() {
               <p className="text-[10px] text-slate-500 capitalize">{user?.role}</p>
             </div>
           </div>
+          <button onClick={() => router.push('/app/conta')}
+            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition text-sm ${
+              pathname === '/app/conta'
+                ? 'text-amber-400 bg-amber-400/10'
+                : 'text-slate-500 hover:text-white hover:bg-slate-800'
+            }`}>
+            <KeyRound className="w-3.5 h-3.5"/> Minha conta
+          </button>
           <button onClick={handleLogout}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition text-sm">
             <LogOut className="w-3.5 h-3.5"/> Sair
