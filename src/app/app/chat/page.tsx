@@ -3,13 +3,15 @@ import { useEffect, useState, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getUser } from '@/lib/auth'
 import { useFirm } from '@/lib/firm-context'
+import Link from 'next/link'
 import {
   Send, Loader2, Bot, User, Sparkles, BookOpen,
-  RotateCcw, Copy, CheckCheck, ChevronRight
+  RotateCcw, Copy, CheckCheck, ChevronRight, KeyRound, Settings
 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { getToken } from '@/lib/session'
+import { DEFAULT_MODEL } from '@/lib/ai/providers'
 
 interface Message { role: 'user' | 'assistant'; content: string }
 
@@ -24,15 +26,21 @@ export default function ChatPage() {
   const [settings, setSettings] = useState<any>(null)
   const [copied, setCopied] = useState<number|null>(null)
   const [loadingSettings, setLoadingSettings] = useState(true)
+  /** A chave nunca é lida pelo cliente; a RPC só diz se existe. */
+  const [hasAiKey, setHasAiKey] = useState(false)
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
-        .from('nf_firm_settings')
-        .select('chat_persona, chat_welcome, chat_suggestions, ai_enabled, brand_color, ai_model')
-        .eq('firm_id', firmId)
-        .single()
-      setSettings(data)
+      const [settingsRes, hasKeyRes] = await Promise.all([
+        supabase
+          .from('nf_firm_settings')
+          .select('chat_persona, chat_welcome, chat_suggestions, ai_enabled, brand_color, ai_model')
+          .eq('firm_id', firmId)
+          .single(),
+        supabase.rpc('nf_has_ai_key', { p_firm_id: firmId }),
+      ])
+      setSettings(settingsRes.data)
+      setHasAiKey(!!hasKeyRes.data)
       setLoadingSettings(false)
     }
     load()
@@ -86,6 +94,38 @@ export default function ChatPage() {
     </div>
   )
 
+  // Sem IA ligada ou sem chave, o /api/chat responderia 503 a cada envio.
+  // Melhor dizer antes, e mandar quem pode resolver direto para o lugar certo.
+  const aiReady = !!settings?.ai_enabled && hasAiKey
+  if (!aiReady) {
+    const isAdmin = user?.role === 'admin'
+    return (
+      <div className="flex items-center justify-center h-full px-6">
+        <div className="max-w-md text-center">
+          <div className="w-14 h-14 rounded-2xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center mx-auto mb-4">
+            <KeyRound className="w-6 h-6 text-amber-400"/>
+          </div>
+          <h1 className="text-lg font-semibold text-white mb-2">IA ainda não configurada</h1>
+          <p className="text-sm text-slate-400 leading-relaxed">
+            O DocuChat usa a chave de IA da sua empresa. Escolha o provedor —{' '}
+            <span className="text-slate-300">Claude (Anthropic)</span> ou{' '}
+            <span className="text-slate-300">ChatGPT (OpenAI)</span>, conforme sua preferência — e cadastre a chave.
+          </p>
+          {isAdmin ? (
+            <Link href="/app/configuracoes"
+              className="mt-5 inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-sm font-medium px-4 py-2.5 rounded-xl transition">
+              <Settings className="w-4 h-4"/> Ir para Configurações → IA
+            </Link>
+          ) : (
+            <p className="mt-5 text-xs text-slate-500">
+              Peça a um administrador da empresa para cadastrar a chave em Configurações → IA.
+            </p>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col h-full max-h-screen">
       {/* Header */}
@@ -99,7 +139,7 @@ export default function ChatPage() {
             <h1 className="text-sm font-semibold text-white">{persona}</h1>
             <p className="text-xs text-slate-500 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block"/>
-              Online · {settings?.ai_model || 'gpt-4o'} · Base de conhecimento carregada
+              Online · {settings?.ai_model || DEFAULT_MODEL.openai} · Base de conhecimento carregada
             </p>
           </div>
           {messages.length > 0 && (

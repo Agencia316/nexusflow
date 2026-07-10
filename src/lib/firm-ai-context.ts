@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { isAiProvider, resolveModel, type AiProvider } from '@/lib/ai'
 
 export type FirmAiContext = {
   /** Nome da firma + descrição do segmento, para o system prompt. */
@@ -24,35 +25,42 @@ export function segmentContextFor(segment?: string | null): string {
  * O contexto nunca vem do cliente: `firmId` é o único dado confiável que ele
  * envia, e nome/segmento são lidos de `nf_firms` com a service role key.
  */
-export type FirmOpenAI = {
+export type FirmAI = {
+  provider: AiProvider
   apiKey: string | null
   model: string
 }
 
 /**
- * Resolve a chave/modelo da OpenAI de uma firma.
+ * Resolve provedor, chave e modelo de IA de uma firma.
  *
- * Cada firma usa a PRÓPRIA chave. Não há mais fallback para uma chave global
- * (`OPENAI_API_KEY`): ela fazia a plataforma pagar a IA de qualquer firma, e
- * como o fallback valia mesmo com `ai_enabled = false`, o toggle de
- * Configurações → IA não tinha efeito nenhum.
+ * Cada firma escolhe o provedor (OpenAI ou Anthropic) e usa a PRÓPRIA chave.
+ * Não há fallback para uma chave global: ela fazia a plataforma pagar a IA de
+ * qualquer firma, e como o fallback valia mesmo com `ai_enabled = false`, o
+ * toggle de Configurações → IA não tinha efeito nenhum.
  *
  * Sem chave da firma, ou com a IA desligada, `apiKey` é `null` — o contrato de
  * "IA indisponível", que o chamador traduz em 503.
+ *
+ * `resolveModel` protege contra um modelo órfão: se a firma trocou de provedor
+ * e a coluna `ai_model` ainda guarda o modelo do provedor antigo, cai no
+ * default do novo em vez de mandar `gpt-4o` para a Anthropic.
  */
-export async function getFirmOpenAI(firmId?: string | null): Promise<FirmOpenAI> {
+export async function getFirmAI(firmId?: string | null): Promise<FirmAI> {
   const { data: settings } = firmId
     ? await supabaseAdmin
         .from('nf_firm_settings')
-        .select('openai_api_key, ai_model, ai_enabled')
+        .select('openai_api_key, ai_model, ai_enabled, ai_provider')
         .eq('firm_id', firmId)
         .maybeSingle()
     : { data: null }
 
-  const model = settings?.ai_model || 'gpt-4o'
-  if (!settings?.ai_enabled) return { apiKey: null, model }
+  const provider: AiProvider = isAiProvider(settings?.ai_provider) ? settings.ai_provider : 'openai'
+  const model = resolveModel(provider, settings?.ai_model)
 
-  return { apiKey: settings.openai_api_key || null, model }
+  if (!settings?.ai_enabled) return { provider, apiKey: null, model }
+
+  return { provider, apiKey: settings.openai_api_key || null, model }
 }
 
 export async function getFirmAiContext(firmId?: string | null): Promise<FirmAiContext> {

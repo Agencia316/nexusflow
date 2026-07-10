@@ -1,22 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getFirmAiContext, getFirmOpenAI } from '@/lib/firm-ai-context'
+import { getFirmAiContext, getFirmAI } from '@/lib/firm-ai-context'
 import { getSession, resolveFirmId } from '@/lib/api-auth'
+import { callAi, aiErrorResponse, AI_NOT_CONFIGURED } from '@/lib/ai'
 
 export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
-  // Rota paga: sem sessão, um anônimo escolhia o firmId e queimava a chave da
-  // OpenAI daquela firma.
+  // Rota paga: sem sessão, um anônimo escolhia o firmId e queimava a chave de
+  // IA daquela firma.
   const session = getSession(req)
   if (!session) return NextResponse.json({ error: 'Sessão ausente ou inválida.' }, { status: 401 })
 
   const { prompt, firmId: requestedFirmId } = await req.json()
   const firmId = resolveFirmId(session, requestedFirmId)
 
-  // Chave/modelo da firma, com a global como fallback.
-  const { apiKey, model } = await getFirmOpenAI(firmId)
+  // Provedor/chave/modelo da firma (respeita o toggle ai_enabled).
+  const { provider, apiKey, model } = await getFirmAI(firmId)
 
-  if (!apiKey) return NextResponse.json({ error: 'Chave OpenAI não configurada' }, { status: 503 })
+  if (!apiKey) return NextResponse.json({ error: AI_NOT_CONFIGURED }, { status: 503 })
 
   const { firmContext, segmentContext } = await getFirmAiContext(firmId)
 
@@ -35,41 +36,31 @@ Crie documentos profissionais em Markdown com:
 Responda APENAS com JSON: {"title": "Título", "content": "markdown aqui"}
 Sem markdown extra, sem explicações, apenas o JSON.`
 
+  const result = await callAi(provider, {
+    apiKey,
+    model,
+    system: systemPrompt,
+    messages: [{ role: 'user', content: `Crie um documento sobre: ${prompt}` }],
+    maxTokens: 3000,
+    temperature: 0.3, // ignorado no Anthropic — ver src/lib/ai/anthropic.ts
+  })
+
+  if (result.kind === 'error') {
+    console.error('[generate-doc] %s %d para firma %s: %s', provider, result.error.status, firmId, result.error.detail)
+    const { status, body } = aiErrorResponse(result.error)
+    return NextResponse.json(body, { status })
+  }
+
   try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: 3000,
-        temperature: 0.3,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Crie um documento sobre: ${prompt}` }
-        ],
-      }),
-    })
-
-    const data = await res.json()
-    const text = data.choices?.[0]?.message?.content
-
-    // Sem `choices` a chamada falhou. O `|| '{}'` anterior fazia o JSON.parse ter
-    // SUCESSO, e a rota respondia 200 com corpo vazio — a tela não mostrava nada.
-    if (!text) {
-      console.error('[generate-doc] OpenAI não retornou choices:', JSON.stringify(data?.error ?? data).slice(0, 300))
-      return NextResponse.json(
-        { error: 'A IA não conseguiu gerar o documento. Verifique a chave da OpenAI nas configurações.' },
-        { status: 502 },
-      )
-    }
-
-    const clean = text.replace(/```json|```/g, '').trim()
-    const parsed = JSON.parse(clean)
-    return NextResponse.json(parsed)
-  } catch (e: any) {
-    return NextResponse.json({ title: prompt, content: `# ${prompt}\n\nConteúdo gerado com erro. Tente novamente.` })
+    const clean = result.text.replace(/```json|```/g, '').trim()
+    return NextResponse.json(JSON.parse(clean))
+  } catch {
+    // A IA respondeu, mas não em JSON. Antes isso virava um documento de
+    // placeholder com 200; agora o cliente sabe que precisa tentar de novo.
+    console.error('[generate-doc] resposta não é JSON: %s', result.text.slice(0, 300))
+    return NextResponse.json(
+      { error: 'A IA não devolveu um documento válido. Tente novamente.' },
+      { status: 502 },
+    )
   }
 }

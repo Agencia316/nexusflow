@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
 import { getSession, resolveFirmId } from '@/lib/api-auth'
+import { verifyKey, isAiProvider, type AiProvider } from '@/lib/ai'
 
 export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
   // Sem sessão, qualquer anônimo passava um firmId e fazia o servidor usar a
-  // chave da OpenAI daquela firma.
+  // chave de IA daquela firma.
   const session = getSession(req)
   if (!session) return NextResponse.json({ error: 'Sessão ausente ou inválida.' }, { status: 401 })
 
-  const { firmId: requestedFirmId, apiKey } = await req.json()
+  const { firmId: requestedFirmId, apiKey, provider: requestedProvider } = await req.json()
   const firmId = resolveFirmId(session, requestedFirmId)
 
   // Testar uma chave avulsa é privilégio de quem administra a firma.
@@ -18,25 +19,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Sem permissão.' }, { status: 403 })
   }
 
-  let keyToTest = apiKey
-  if (!keyToTest && firmId) {
+  // A tela testa a chave ANTES de salvar, então o provedor precisa vir no
+  // corpo: validar uma chave `sk-ant-...` contra a OpenAI daria sempre
+  // "inválida". Sem provedor no corpo, cai no que está salvo na firma.
+  let provider: AiProvider | null = isAiProvider(requestedProvider) ? requestedProvider : null
+  let keyToTest: string | undefined = apiKey
+
+  if ((!keyToTest || !provider) && firmId) {
     const { data } = await supabase
       .from('nf_firm_settings')
-      .select('openai_api_key')
+      .select('openai_api_key, ai_provider')
       .eq('firm_id', firmId)
-      .single()
-    keyToTest = data?.openai_api_key
+      .maybeSingle()
+    keyToTest = keyToTest || data?.openai_api_key
+    provider = provider || (isAiProvider(data?.ai_provider) ? data.ai_provider : 'openai')
   }
 
   if (!keyToTest) return NextResponse.json({ error: 'Nenhuma chave configurada' }, { status: 400 })
+  if (!provider) return NextResponse.json({ error: 'Provedor não informado' }, { status: 400 })
 
-  try {
-    const res = await fetch('https://api.openai.com/v1/models', {
-      headers: { 'Authorization': `Bearer ${keyToTest}` }
-    })
-    if (!res.ok) return NextResponse.json({ error: 'Chave inválida' }, { status: 401 })
-    return NextResponse.json({ ok: true })
-  } catch {
-    return NextResponse.json({ error: 'Erro de conexão' }, { status: 500 })
-  }
+  const valid = await verifyKey(provider, keyToTest)
+  if (!valid) return NextResponse.json({ error: 'Chave inválida' }, { status: 401 })
+
+  return NextResponse.json({ ok: true, provider })
 }

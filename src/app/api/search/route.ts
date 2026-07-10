@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
 import { getSession, resolveFirmId } from '@/lib/api-auth'
-import { getFirmOpenAI } from '@/lib/firm-ai-context'
+import { getFirmAI } from '@/lib/firm-ai-context'
+import { callAi } from '@/lib/ai'
 
 export const runtime = 'nodejs'
 
@@ -84,28 +85,21 @@ export async function POST(req: NextRequest) {
   // Se nenhum resultado, usar IA para interpretar intenção. Usa a chave da
   // firma (não a global): a busca é paga e deve ser cobrada de quem a fez.
   // Sem IA habilitada, a busca textual acima é o resultado final.
-  const { apiKey, model } = await getFirmOpenAI(firmId)
+  const { provider, apiKey, model } = await getFirmAI(firmId)
   if (results.length === 0 && query.length > 10 && apiKey) {
-    const aiRes = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model,
-        max_tokens: 100,
-        messages: [{
-          role: 'system',
-          content: 'Extraia 3-5 palavras-chave em português da pergunta do usuário. Retorne apenas as palavras separadas por vírgula, sem explicações.'
-        }, {
-          role: 'user', content: query
-        }]
-      })
+    const aiRes = await callAi(provider, {
+      apiKey,
+      model,
+      system: 'Extraia 3-5 palavras-chave em português da pergunta do usuário. Retorne apenas as palavras separadas por vírgula, sem explicações.',
+      messages: [{ role: 'user', content: query }],
+      maxTokens: 100,
     })
-    if (!aiRes.ok) {
-      console.error('[search] OpenAI %d para firma %s', aiRes.status, firmId)
+    if (aiRes.kind === 'error') {
+      // A busca textual já rodou: degrada em vez de falhar a requisição.
+      console.error('[search] %s %d para firma %s: %s', provider, aiRes.error.status, firmId, aiRes.error.detail)
       return NextResponse.json({ results })
     }
-    const aiData = await aiRes.json()
-    const keywords = aiData.choices?.[0]?.message?.content?.split(',').map((k: string) => k.trim()) || []
+    const keywords = aiRes.text.split(',').map((k: string) => k.trim()).filter(Boolean)
 
     const aiScored = docs.map((doc: any) => {
       const text = `${doc.title} ${(doc.tags||[]).join(' ')} ${doc.content}`.toLowerCase()
