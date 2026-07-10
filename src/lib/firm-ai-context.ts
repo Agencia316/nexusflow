@@ -30,11 +30,20 @@ export type FirmOpenAI = {
 }
 
 /**
- * Resolve a chave/modelo da OpenAI de uma firma: a chave da firma tem
- * precedência sobre a global (OPENAI_API_KEY), que é só um fallback.
+ * Resolve a chave/modelo da OpenAI de uma firma.
  *
- * Rotas que usam apenas a global quebram para todas as firmas quando ela não
- * está configurada — foi o caso do import-doc.
+ * Duas regras, nesta ordem:
+ *
+ * 1. `ai_enabled = false` desliga a IA da firma. Sem isso, o fallback para a
+ *    chave global fazia uma firma com a IA desligada consumir a chave da
+ *    plataforma — o toggle de Configurações → IA não tinha efeito nenhum e o
+ *    503 "IA não configurada" nunca disparava enquanto existisse global.
+ * 2. Com a IA ligada, a chave da firma tem precedência sobre a global
+ *    (OPENAI_API_KEY), que é só um fallback. Rotas que usam apenas a global
+ *    quebram para todas as firmas quando ela não está configurada — foi o
+ *    caso do import-doc.
+ *
+ * `apiKey: null` é o contrato de "IA indisponível": o chamador responde 503.
  */
 export async function getFirmOpenAI(firmId?: string | null): Promise<FirmOpenAI> {
   const { data: settings } = firmId
@@ -45,9 +54,12 @@ export async function getFirmOpenAI(firmId?: string | null): Promise<FirmOpenAI>
         .maybeSingle()
     : { data: null }
 
+  const model = settings?.ai_model || 'gpt-4o'
+  if (!settings?.ai_enabled) return { apiKey: null, model }
+
   return {
-    apiKey: settings?.openai_api_key || process.env.OPENAI_API_KEY || null,
-    model: settings?.ai_model || 'gpt-4o',
+    apiKey: settings.openai_api_key || process.env.OPENAI_API_KEY || null,
+    model,
   }
 }
 

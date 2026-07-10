@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
 import { getSession, resolveFirmId } from '@/lib/api-auth'
+import { getFirmOpenAI } from '@/lib/firm-ai-context'
 
 export const runtime = 'nodejs'
 
@@ -11,9 +12,10 @@ export async function POST(req: NextRequest) {
   const session = getSession(req)
   if (!session) return NextResponse.json({ error: 'Sessão ausente ou inválida.' }, { status: 401 })
 
-  const { query, firmId: requestedFirmId } = await req.json()
-  const firmId = resolveFirmId(session, requestedFirmId)
-  if (!query?.trim()) return NextResponse.json({ results: [] })
+  const body = await req.json().catch(() => null)
+  const query = typeof body?.query === 'string' ? body.query : ''
+  const firmId = resolveFirmId(session, body?.firmId)
+  if (!query.trim()) return NextResponse.json({ results: [] })
 
   // Preprocessar query: extrair termos importantes
   const terms = query
@@ -79,13 +81,16 @@ export async function POST(req: NextRequest) {
     .slice(0, 8)
     .map(({ score, content, ...rest }: any) => rest)
 
-  // Se nenhum resultado, usar IA para interpretar intenção
-  if (results.length === 0 && query.length > 10) {
+  // Se nenhum resultado, usar IA para interpretar intenção. Usa a chave da
+  // firma (não a global): a busca é paga e deve ser cobrada de quem a fez.
+  // Sem IA habilitada, a busca textual acima é o resultado final.
+  const { apiKey, model } = await getFirmOpenAI(firmId)
+  if (results.length === 0 && query.length > 10 && apiKey) {
     const aiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model,
         max_tokens: 100,
         messages: [{
           role: 'system',
@@ -95,6 +100,10 @@ export async function POST(req: NextRequest) {
         }]
       })
     })
+    if (!aiRes.ok) {
+      console.error('[search] OpenAI %d para firma %s', aiRes.status, firmId)
+      return NextResponse.json({ results })
+    }
     const aiData = await aiRes.json()
     const keywords = aiData.choices?.[0]?.message?.content?.split(',').map((k: string) => k.trim()) || []
 
