@@ -61,6 +61,8 @@ export default function ConfiguracoesPage() {
   useEffect(() => {
     if (user?.role !== 'admin') { router.push('/app/dashboard'); return }
     load()
+    // Guarda de montagem: roda uma vez. router estável; user?.role fixo na sessão.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function load() {

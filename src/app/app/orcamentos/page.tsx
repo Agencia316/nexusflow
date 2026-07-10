@@ -45,6 +45,8 @@ export default function OrcamentosPage() {
   const [filter, setFilter] = useState('')
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
+  // Recarrega ao trocar de firma (impersonation); load só lê firmId.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (firmId) load() }, [firmId])
 
   async function load() {

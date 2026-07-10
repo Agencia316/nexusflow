@@ -126,6 +126,8 @@ export default function DocPage() {
     setLoading(false)
   }
 
+  // Recarrega ao mudar o documento ou a firma; loadAll depende de id e firmId.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { loadAll() }, [id, firmId])
 
   async function markAsRead() {

@@ -49,6 +49,8 @@ export default function NewDocPage() {
     if (user?.role === 'member') { router.push('/app/docs'); return }
     supabase.from('nf_categories').select('*').eq('firm_id', firmId)
       .order('sort_order').then(r => setCategories(r.data || []))
+    // Recarrega ao trocar de firma. router estável; user?.role fixo na sessão.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firmId])
 
   async function generateWithAI() {

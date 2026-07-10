@@ -29,6 +29,8 @@ export default function AlertasPage() {
     setLoading(false)
   }
 
+  // Carrega uma vez na montagem; user é fixo na sessão.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load() }, [])
 
   async function markRead(id: string) {

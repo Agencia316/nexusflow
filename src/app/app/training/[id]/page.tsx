@@ -74,6 +74,8 @@ export default function TrainingDetailPage() {
     setLoading(false)
   }, [pathId, user])
 
+  // Recarrega quando muda a trilha; loadData depende de pathId (e user, fixo na sessão).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { loadData() }, [pathId])
 
   // Ir para um step específico — reseta TODO o estado do quiz

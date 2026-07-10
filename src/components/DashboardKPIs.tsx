@@ -76,6 +76,8 @@ export default function DashboardKPIs({ drilldown = true }: { drilldown?: boolea
       setLoading(false)
     }
     load()
+    // Recarrega ao trocar de firma. user é fixo na sessão.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firmId])
 
   const progressPct = stats.steps_total > 0

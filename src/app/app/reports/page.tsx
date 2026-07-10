@@ -32,6 +32,8 @@ export default function ReportsPage() {
       setLoading(false)
     }
     load()
+    // Recarrega ao trocar de firma. router estável; user?.role fixo na sessão.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firmId])
 
   const totalReads = data.progress.filter((p: any) => p.read_at).length

@@ -69,6 +69,8 @@ export default function Sidebar() {
     // Polling a cada 30s
     const interval = setInterval(loadAlerts, 30000)
     return () => clearInterval(interval)
+    // Recarrega ao trocar de firma. user é fixo na sessão.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firmId])
 
   function handleLogout() {

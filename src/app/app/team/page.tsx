@@ -41,6 +41,8 @@ export default function TeamPage() {
   useEffect(() => {
     if (!isAdmin) { router.push('/app/dashboard'); return }
     load()
+    // Recarrega ao trocar de firma. router/isAdmin estáveis na sessão.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firmId])
 
   async function load() {
