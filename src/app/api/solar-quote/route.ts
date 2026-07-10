@@ -28,6 +28,41 @@ function verifyToken(token: string | null): any | null {
 
 const num = (v: any) => (v === '' || v == null ? null : Number(v))
 
+// Teto do snapshot. A série de 25 anos + equipamentos + branding dá ~4 KB; 64 KB
+// deixa folga de sobra e impede que um cliente adulterado encha a linha.
+const SNAPSHOT_MAX_BYTES = 64 * 1024
+
+function sanitizeSnapshot(raw: unknown): object | null {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null
+  const json = JSON.stringify(raw)
+  if (Buffer.byteLength(json, 'utf8') > SNAPSHOT_MAX_BYTES) return null
+  return raw as object
+}
+
+/**
+ * Detalhe de uma proposta salva. O firm_id do token manda: só devolve a linha
+ * se ela for da firma da sessão (ou se quem pede for super admin). Sem isso, um
+ * id vazado daria leitura cruzada entre firmas — a service_role usada aqui
+ * ignora o RLS da tabela.
+ */
+export async function GET(req: NextRequest) {
+  const auth = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '') || null
+  const p = verifyToken(auth)
+  if (!p) return NextResponse.json({ error: 'Sessão inválida ou expirada.' }, { status: 401 })
+
+  const id = req.nextUrl.searchParams.get('id')
+  if (!id) return NextResponse.json({ error: 'Informe o id da proposta.' }, { status: 400 })
+
+  const { data, error } = await supabase.from('nf_solar_quotes').select('*').eq('id', id).maybeSingle()
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (!data) return NextResponse.json({ error: 'Proposta não encontrada.' }, { status: 404 })
+  if (data.firm_id !== p.firm_id && !p.is_super_admin) {
+    return NextResponse.json({ error: 'Proposta não encontrada.' }, { status: 404 })
+  }
+
+  return NextResponse.json({ quote: data })
+}
+
 export async function POST(req: NextRequest) {
   const auth = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '') || null
   const p = verifyToken(auth)
@@ -64,6 +99,7 @@ export async function POST(req: NextRequest) {
     economia_ano: num(body.economia_ano),
     payback_anos: num(body.payback_anos),
     economia_25: num(body.economia_25),
+    snapshot: sanitizeSnapshot(body.snapshot),
     status: 'novo',
   }
 
