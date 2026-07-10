@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
+import { verifyKey, isAiProvider, DEFAULT_MODEL, type AiProvider } from '@/lib/ai'
 
 function generateSlug(name: string): string {
   return name
@@ -12,11 +13,21 @@ function generateSlug(name: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  const { firmName, segment, adminName, adminEmail, adminPassword, solarUf } = await req.json()
+  const {
+    firmName, segment, adminName, adminEmail, adminPassword, solarUf,
+    aiProvider, aiApiKey,
+  } = await req.json()
 
   if (!firmName || !segment || !adminName || !adminEmail || !adminPassword) {
     return NextResponse.json({ error: 'Todos os campos são obrigatórios.' }, { status: 400 })
   }
+
+  // A chave de IA é opcional no cadastro; o provedor só é lido se ela veio.
+  const key = typeof aiApiKey === 'string' ? aiApiKey.trim() : ''
+  if (key && !isAiProvider(aiProvider)) {
+    return NextResponse.json({ error: 'Provedor de IA inválido.' }, { status: 400 })
+  }
+  const provider: AiProvider | null = key ? (aiProvider as AiProvider) : null
   if (adminPassword.length < 6) {
     return NextResponse.json({ error: 'A senha precisa ter pelo menos 6 caracteres.' }, { status: 400 })
   }
@@ -55,6 +66,30 @@ export async function POST(req: NextRequest) {
 
   const setup = await setupRes.json()
 
+  // Chave de IA do onboarding. A validação acontece DEPOIS de criar a firma:
+  // esta rota é pública, e validar antes transformaria /api/register num
+  // oráculo gratuito para testar chaves de terceiros. Aqui cada tentativa
+  // custa um cadastro real, com e-mail único.
+  //
+  // Chave inválida não derruba o cadastro: a firma nasce com a IA desligada e
+  // o cliente é avisado na tela final. O `ai_enabled` default da coluna é
+  // false, então "não configurou" e "configurou errado" convergem no mesmo
+  // estado seguro — e o DocuChat mostra o aviso pedindo a chave.
+  let aiKeyValid: boolean | null = null
+  if (provider && key) {
+    aiKeyValid = await verifyKey(provider, key)
+    if (aiKeyValid) {
+      await supabase.from('nf_firm_settings').update({
+        ai_provider: provider,
+        ai_model: DEFAULT_MODEL[provider],
+        openai_api_key: key,
+        ai_enabled: true,
+      }).eq('firm_id', data.firm_id)
+    } else {
+      console.error('[register] chave de IA inválida (%s) no cadastro da firma %s', provider, data.firm_id)
+    }
+  }
+
   return NextResponse.json({
     ok: true,
     firmId: data.firm_id,
@@ -62,5 +97,7 @@ export async function POST(req: NextRequest) {
     slug: data.slug,
     segment: data.segment,
     created: setup.created,
+    // null = não informou chave; false = informou e é inválida.
+    aiKeyValid,
   })
 }

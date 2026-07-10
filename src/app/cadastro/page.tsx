@@ -5,8 +5,12 @@ import { setToken } from '@/lib/session'
 import {
   BookOpen, Building2, User, Mail, Lock, ChevronRight,
   Loader2, CheckCircle2, AlertCircle, Scale, Sun,
-  Calculator, Users, Eye, EyeOff, Sparkles
+  Calculator, Users, Eye, EyeOff, Sparkles, Brain, Key, ExternalLink
 } from 'lucide-react'
+// Constantes puras — o index de `@/lib/ai` puxa o SDK da Anthropic (só servidor).
+import {
+  AI_PROVIDERS, PROVIDER_LABEL, KEY_HINT, CONSOLE_URL, type AiProvider,
+} from '@/lib/ai/providers'
 
 const SEGMENTS = [
   {
@@ -49,7 +53,8 @@ const SEGMENTS = [
   },
 ]
 
-type Step = 'segment' | 'info' | 'success'
+type Step = 'segment' | 'info' | 'ia' | 'success'
+const STEPS: Step[] = ['segment', 'info', 'ia', 'success']
 
 const UFS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO']
 
@@ -67,7 +72,22 @@ export default function CadastroPage() {
   const [error, setError] = useState('')
   const [result, setResult] = useState<any>(null)
 
-  async function handleSubmit() {
+  // Passo de IA
+  const [aiProvider, setAiProvider] = useState<AiProvider>('anthropic')
+  const [aiApiKey, setAiApiKey] = useState('')
+  const [showAiKey, setShowAiKey] = useState(false)
+
+  function goToIaStep() {
+    if (!firmName.trim() || !adminName.trim() || !adminEmail.trim() || !adminPassword.trim()) {
+      setError('Preencha todos os campos.')
+      return
+    }
+    setError('')
+    setStep('ia')
+  }
+
+  /** `skipAi` ignora o que estiver digitado no campo da chave. */
+  async function handleSubmit(skipAi = false) {
     if (!firmName.trim() || !adminName.trim() || !adminEmail.trim() || !adminPassword.trim()) {
       setError('Preencha todos os campos.')
       return
@@ -79,7 +99,11 @@ export default function CadastroPage() {
       const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firmName, segment, adminName, adminEmail, adminPassword, solarUf }),
+        body: JSON.stringify({
+          firmName, segment, adminName, adminEmail, adminPassword, solarUf,
+          // Chave vazia = "configurar depois": a firma nasce com a IA desligada.
+          aiProvider, aiApiKey: skipAi ? '' : aiApiKey.trim(),
+        }),
       })
       const data = await res.json()
       if (!res.ok || data.error) {
@@ -119,18 +143,24 @@ export default function CadastroPage() {
 
         {/* Steps indicator */}
         <div className="flex items-center justify-center gap-2 mb-8">
-          {['segment','info','success'].map((s, i) => (
-            <div key={s} className="flex items-center gap-2">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition ${
-                step === s ? 'bg-amber-500 text-onaccent' :
-                (i < ['segment','info','success'].indexOf(step)) ? 'bg-green-500 text-white' :
-                'bg-slate-800 text-slate-500'
-              }`}>
-                {i < ['segment','info','success'].indexOf(step) ? '✓' : i + 1}
+          {STEPS.map((s, i) => {
+            const atual = STEPS.indexOf(step)
+            const concluido = i < atual
+            return (
+              <div key={s} className="flex items-center gap-2">
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition ${
+                  step === s ? 'bg-amber-500 text-onaccent' :
+                  concluido ? 'bg-green-500 text-white' :
+                  'bg-slate-800 text-slate-500'
+                }`}>
+                  {concluido ? '✓' : i + 1}
+                </div>
+                {i < STEPS.length - 1 && (
+                  <div className={`w-9 h-0.5 ${concluido ? 'bg-green-500' : 'bg-slate-800'}`}/>
+                )}
               </div>
-              {i < 2 && <div className={`w-12 h-0.5 ${i < ['segment','info','success'].indexOf(step) ? 'bg-green-500' : 'bg-slate-800'}`}/>}
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {/* Step 1 — Escolher segmento */}
@@ -263,10 +293,9 @@ export default function CadastroPage() {
                 </div>
               )}
 
-              <button onClick={handleSubmit} disabled={loading}
-                className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold py-3 rounded-xl transition">
-                {loading ? <><Loader2 className="w-4 h-4 animate-spin"/> Criando empresa e configurando...</>
-                : <><Sparkles className="w-4 h-4"/> Criar empresa com configuração automática</>}
+              <button onClick={goToIaStep}
+                className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-onaccent font-semibold py-3 rounded-xl transition">
+                Continuar <ChevronRight className="w-4 h-4"/>
               </button>
               <p className="text-center text-xs text-slate-600">
                 Plano Trial — 14 dias grátis, sem cartão de crédito
@@ -275,7 +304,92 @@ export default function CadastroPage() {
           </div>
         )}
 
-        {/* Step 3 — Sucesso */}
+        {/* Step 3 — Chave de IA */}
+        {step === 'ia' && (
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8">
+            <button onClick={() => setStep('info')} className="text-xs text-slate-500 hover:text-slate-300 transition mb-6 flex items-center gap-1">
+              ← Voltar
+            </button>
+
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center">
+                <Brain className="w-5 h-5 text-amber-400"/>
+              </div>
+              <h2 className="text-xl font-bold text-white">Conecte sua IA</h2>
+            </div>
+            <p className="text-sm text-slate-400 leading-relaxed mb-6">
+              O DocuChat, a geração de documentos e a busca inteligente usam a chave da sua empresa —
+              sua cota, seu controle. Escolha o provedor que preferir.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs text-slate-400 block mb-2">Provedor</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {AI_PROVIDERS.map(p => (
+                    <button key={p} onClick={() => { setAiProvider(p); setAiApiKey('') }}
+                      className={`flex items-center gap-2.5 text-left px-4 py-3 rounded-xl border transition ${
+                        aiProvider === p
+                          ? 'bg-amber-500/10 border-amber-500/30 text-white'
+                          : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                      }`}>
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                        aiProvider === p ? 'border-amber-400' : 'border-slate-600'
+                      }`}>
+                        {aiProvider === p && <div className="w-2 h-2 rounded-full bg-amber-400"/>}
+                      </div>
+                      <span className="text-sm font-medium">{PROVIDER_LABEL[p]}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs text-slate-400 flex items-center gap-1.5">
+                    <Key className="w-3 h-3"/> Chave de API · {PROVIDER_LABEL[aiProvider]}
+                  </label>
+                  <a href={CONSOLE_URL[aiProvider]} target="_blank" rel="noopener noreferrer"
+                    className="text-[10px] text-amber-400 hover:underline flex items-center gap-1">
+                    Obter chave <ExternalLink className="w-2.5 h-2.5"/>
+                  </a>
+                </div>
+                <div className="relative">
+                  <input type={showAiKey ? 'text' : 'password'} value={aiApiKey}
+                    onChange={e => setAiApiKey(e.target.value)}
+                    placeholder={KEY_HINT[aiProvider]}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 pr-10 text-sm text-white placeholder-slate-500 font-mono focus:outline-none focus:border-amber-500 transition"/>
+                  <button onClick={() => setShowAiKey(!showAiKey)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
+                    {showAiKey ? <EyeOff className="w-4 h-4"/> : <Eye className="w-4 h-4"/>}
+                  </button>
+                </div>
+                <p className="text-[11px] text-slate-600 mt-2">
+                  A chave é guardada no banco da sua empresa e nunca volta para o navegador. Validamos assim que a empresa for criada.
+                </p>
+              </div>
+
+              {error && (
+                <div className="flex items-center gap-2 text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-lg px-3 py-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0"/> {error}
+                </div>
+              )}
+
+              <button onClick={() => handleSubmit(false)} disabled={loading || !aiApiKey.trim()}
+                className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold py-3 rounded-xl transition">
+                {loading ? <><Loader2 className="w-4 h-4 animate-spin"/> Criando empresa e configurando...</>
+                : <><Sparkles className="w-4 h-4"/> Criar empresa com configuração automática</>}
+              </button>
+
+              <button onClick={() => handleSubmit(true)} disabled={loading}
+                className="w-full text-center text-xs text-slate-500 hover:text-slate-300 transition disabled:opacity-50">
+                Configurar depois — a IA fica desligada até você cadastrar a chave
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4 — Sucesso */}
         {step === 'success' && result && (
           <div className="bg-slate-900 border border-green-500/30 rounded-2xl p-8 text-center">
             <div className="w-16 h-16 rounded-2xl bg-green-500/15 border border-green-500/30 flex items-center justify-center mx-auto mb-4">
@@ -297,6 +411,27 @@ export default function CadastroPage() {
                   <p className="text-xs text-slate-400">{s.label}</p>
                 </div>
               ))}
+            </div>
+
+            {/* Estado da IA. `null` = não informou chave; `false` = informou e é inválida. */}
+            <div className="mb-2">
+              {result.aiKeyValid === true && (
+                <p className="flex items-center justify-center gap-1.5 text-xs text-green-400">
+                  <CheckCircle2 className="w-3.5 h-3.5"/> IA conectada — DocuChat pronto para usar.
+                </p>
+              )}
+              {result.aiKeyValid === false && (
+                <p className="flex items-start justify-center gap-1.5 text-xs text-amber-400 text-left">
+                  <AlertCircle className="w-3.5 h-3.5 mt-0.5 shrink-0"/>
+                  A chave informada não foi aceita pelo provedor. A empresa foi criada com a IA desligada — cadastre a chave em Configurações → IA.
+                </p>
+              )}
+              {result.aiKeyValid == null && (
+                <p className="flex items-start justify-center gap-1.5 text-xs text-slate-500 text-left">
+                  <AlertCircle className="w-3.5 h-3.5 mt-0.5 shrink-0"/>
+                  IA desligada. Cadastre a chave em Configurações → IA para liberar o DocuChat.
+                </p>
+              )}
             </div>
 
             <div className="bg-slate-800 rounded-xl p-4 mb-6 text-left">
