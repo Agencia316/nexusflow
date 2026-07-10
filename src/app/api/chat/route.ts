@@ -1,21 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
 import { getSession, resolveFirmId } from '@/lib/api-auth'
+import { getFirmOpenAI } from '@/lib/firm-ai-context'
 
 export const runtime = 'nodejs'
 
-async function getFirmSettings(firmId: string) {
-  const { data } = await supabase
-    .from('nf_firm_settings')
-    .select('openai_api_key, ai_enabled, ai_model, chat_system_prompt, chat_persona')
-    .eq('firm_id', firmId)
-    .single()
-  return data
+type ChatMessage = { role: 'user' | 'assistant' | 'system'; content: string }
+
+/** Aceita só o formato que repassamos à OpenAI — corpo malformado dava 500. */
+function parseMessages(input: unknown): ChatMessage[] | null {
+  if (!Array.isArray(input) || input.length === 0) return null
+  const ok = input.every(
+    (m): m is ChatMessage =>
+      !!m && typeof m === 'object' &&
+      ['user', 'assistant', 'system'].includes((m as any).role) &&
+      typeof (m as any).content === 'string',
+  )
+  return ok ? (input as ChatMessage[]) : null
 }
 
-async function getApiKey(settings: any): Promise<string | null> {
-  if (settings?.ai_enabled && settings?.openai_api_key) return settings.openai_api_key
-  return process.env.OPENAI_API_KEY || null
+async function getChatSettings(firmId: string) {
+  const { data } = await supabase
+    .from('nf_firm_settings')
+    .select('chat_system_prompt, chat_persona')
+    .eq('firm_id', firmId)
+    .maybeSingle()
+  return data
 }
 
 export async function POST(req: NextRequest) {
@@ -23,16 +33,22 @@ export async function POST(req: NextRequest) {
   const session = getSession(req)
   if (!session) return NextResponse.json({ error: 'Sessão ausente ou inválida.' }, { status: 401 })
 
-  const { messages, firmId: requestedFirmId } = await req.json()
-  const firmId = resolveFirmId(session, requestedFirmId)
+  const body = await req.json().catch(() => null)
+  const messages = parseMessages(body?.messages)
+  if (!messages) {
+    return NextResponse.json(
+      { error: 'Corpo inválido: "messages" deve ser uma lista de {role, content}.' },
+      { status: 400 },
+    )
+  }
+  const firmId = resolveFirmId(session, body?.firmId)
 
-  const settings = await getFirmSettings(firmId)
-  const apiKey = await getApiKey(settings)
-  const model = settings?.ai_model || 'gpt-4o'
+  const settings = await getChatSettings(firmId)
+  const { apiKey, model } = await getFirmOpenAI(firmId)
 
   if (!apiKey) {
     return NextResponse.json({
-      error: 'IA não configurada. Acesse Configurações → IA para ativar.'
+      error: 'IA não configurada. Ative a IA e cadastre a chave da OpenAI em Configurações → IA.'
     }, { status: 503 })
   }
 
@@ -81,13 +97,30 @@ INSTRUÇÃO FINAL: Responda sempre em português brasileiro. Se a pergunta não 
     })
 
     if (!res.ok) {
-      const err = await res.json()
-      return NextResponse.json({ error: err.error?.message || 'Erro na API OpenAI' }, { status: res.status })
+      // A mensagem crua da OpenAI vaza detalhe de infraestrutura ao cliente
+      // (o 401 devolve a chave mascarada). Loga inteiro, responde genérico.
+      const err = await res.json().catch(() => ({}))
+      console.error('[chat] OpenAI %d para firma %s: %o', res.status, firmId, err)
+      const upstreamAuth = res.status === 401 || res.status === 403
+      return NextResponse.json(
+        {
+          error: upstreamAuth
+            ? 'IA indisponível: a chave da OpenAI desta firma é inválida. Verifique em Configurações → IA.'
+            : 'IA indisponível no momento. Tente novamente em instantes.',
+        },
+        { status: upstreamAuth ? 502 : 503 },
+      )
     }
 
     const data = await res.json()
-    return NextResponse.json({ content: data.choices[0].message.content })
+    const content = data.choices?.[0]?.message?.content
+    if (typeof content !== 'string') {
+      console.error('[chat] resposta inesperada da OpenAI: %o', data)
+      return NextResponse.json({ error: 'IA indisponível no momento.' }, { status: 502 })
+    }
+    return NextResponse.json({ content })
   } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 })
+    console.error('[chat] falha ao chamar a OpenAI:', e)
+    return NextResponse.json({ error: 'IA indisponível no momento.' }, { status: 502 })
   }
 }

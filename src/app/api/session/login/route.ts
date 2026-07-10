@@ -32,8 +32,13 @@ export async function POST(req: NextRequest) {
   // isSessionExpired() dispara relogin em loop. Falhar cedo torna um deploy sem
   // SUPABASE_JWT_SECRET diagnosticável por qualquer requisição, sem exigir uma
   // senha válida para revelar o problema.
-  if (process.env.NEXT_PUBLIC_RLS_ENFORCED === 'true' && !secret) {
-    console.error('[session/login] SUPABASE_JWT_SECRET ausente com NEXT_PUBLIC_RLS_ENFORCED=true')
+  //
+  // A guarda NÃO depende de NEXT_PUBLIC_RLS_ENFORCED. Um ambiente sem o segredo
+  // costuma estar sem a flag também — foi o caso dos previews da Vercel, que
+  // devolviam 200 com `token: null` e telas vazias, o modo de falha silencioso
+  // que esta guarda existe para eliminar. Sessão sem token não é sessão.
+  if (!secret) {
+    console.error('[session/login] SUPABASE_JWT_SECRET ausente no ambiente')
     return NextResponse.json(
       { error: 'Configuração do servidor incompleta. Contate o suporte.' },
       { status: 500 },
@@ -63,20 +68,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Esse usuário não pertence a esta empresa.' }, { status: 403 })
   }
 
-  let token: string | null = null
-  if (secret) {
-    const now = Math.floor(Date.now() / 1000)
-    token = signJwt({
-      sub: row.id,
-      role: 'authenticated',
-      aud: 'authenticated',
-      firm_id: row.firm_id,
-      user_role: row.role,
-      is_super_admin: !!row.is_super_admin,
-      iat: now,
-      exp: now + 8 * 60 * 60, // 8h, igual à sessão atual
-    }, secret)
-  }
+  // A guarda no topo garante o segredo: aqui o token sempre é emitido.
+  const now = Math.floor(Date.now() / 1000)
+  const token = signJwt({
+    sub: row.id,
+    role: 'authenticated',
+    aud: 'authenticated',
+    firm_id: row.firm_id,
+    user_role: row.role,
+    is_super_admin: !!row.is_super_admin,
+    iat: now,
+    exp: now + 8 * 60 * 60, // 8h, igual à sessão atual
+  }, secret)
 
   return NextResponse.json({
     user: {

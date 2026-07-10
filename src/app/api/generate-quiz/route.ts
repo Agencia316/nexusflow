@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
 import { getSession, resolveFirmId } from '@/lib/api-auth'
+import { getFirmOpenAI } from '@/lib/firm-ai-context'
 
 export const runtime = 'nodejs'
 
@@ -23,17 +24,15 @@ export async function POST(req: NextRequest) {
 
   if (!doc) return NextResponse.json({ error: 'Documento não encontrado' }, { status: 404 })
 
-  // Buscar chave/modelo da empresa
-  const { data: settings } = await supabase
-    .from('nf_firm_settings')
-    .select('openai_api_key, ai_model, ai_enabled')
-    .eq('firm_id', firmId)
-    .single()
+  // Chave/modelo da firma (respeita o toggle ai_enabled).
+  const { apiKey, model } = await getFirmOpenAI(firmId)
 
-  const apiKey = settings?.openai_api_key || process.env.OPENAI_API_KEY
-  const model = settings?.ai_model || 'gpt-4o'
-
-  if (!apiKey) return NextResponse.json({ error: 'Chave OpenAI não configurada' }, { status: 503 })
+  if (!apiKey) {
+    return NextResponse.json(
+      { error: 'IA não configurada. Ative a IA e cadastre a chave da OpenAI em Configurações → IA.' },
+      { status: 503 },
+    )
+  }
 
   const content = doc.content?.substring(0, 4000) || ''
 
