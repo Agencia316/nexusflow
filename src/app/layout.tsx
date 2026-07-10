@@ -17,6 +17,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Fontes via link do Google (Inter + Fira Code). Migrar para next/font
+            mudaria a renderização e pede revisão visual — fica para um PR próprio. */}
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
       </head>
       <body className="font-sans bg-slate-950 text-slate-100 antialiased">{children}</body>

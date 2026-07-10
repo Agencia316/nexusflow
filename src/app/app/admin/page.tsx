@@ -56,6 +56,8 @@ export default function AdminPage() {
     const u = getUser()
     if (!u?.is_super_admin) { router.push('/app/dashboard'); return }
     load()
+    // Guarda de montagem: roda uma vez. router é ref estável; load só é chamado aqui.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function load() {

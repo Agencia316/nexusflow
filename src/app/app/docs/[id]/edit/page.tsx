@@ -45,6 +45,8 @@ export default function EditDocPage() {
   useEffect(() => {
     if (user?.role === 'member') { router.push(`/app/docs/${id}`); return }
     load()
+    // Recarrega ao mudar doc/firma. router estável; user?.role fixo na sessão.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, firmId])
 
   async function load() {

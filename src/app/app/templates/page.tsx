@@ -57,6 +57,8 @@ export default function TemplatesPage() {
   const [aiLoading, setAiLoading] = useState(false)
   const [deleteId,  setDeleteId]  = useState<string|null>(null)
 
+  // Recarrega ao trocar de firma; loadCustom só lê firmId.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { loadCustom() }, [firmId])
 
   async function loadCustom() {

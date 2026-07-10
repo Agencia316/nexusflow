@@ -71,6 +71,9 @@ export default function TrainingPage() {
     setDocs(docsRes.data||[])
     setRoles(rolesRes.data||[])
     setLoading(false)
+    // user é fixo na sessão; incluí-lo mudaria a identidade de `load` a cada
+    // render e faria o efeito abaixo (deps [load]) recarregar em loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firmId])
 
   useEffect(() => { load() }, [load])
