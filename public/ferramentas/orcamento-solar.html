@@ -102,6 +102,12 @@ const DEGRAD = 0.005;   // degradação anual dos painéis (0,5%/ano)
 
 const params = new URLSearchParams(location.search);
 const FIRM_ID = params.get('firm');
+// ?quote=<id> abre uma proposta já salva em modo leitura, sem o formulário.
+const QUOTE_ID = params.get('quote');
+const VIEW = !!QUOTE_ID;
+// Proposta salva antes da migration 0015 (sem snapshot): dá para mostrar os
+// números gravados, mas não a série de 25 anos — logo, não dá para gerar o PDF.
+let DEGRADED = false;
 
 async function sb(path) {
   const r = await fetch(`${SB_URL}/rest/v1/${path}`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
@@ -116,7 +122,59 @@ const NUM = (n,d=0) => n.toLocaleString('pt-BR', { minimumFractionDigits:d, maxi
 let DATA = { tariffs:[], panels:[], inverters:[], distributors:[], pricing:[], firm:null };
 let last = null;
 
+// ── Modo leitura: hidrata `last` a partir do snapshot e não toca na config ──
+// Não carrega tariffs/brands/pricing de propósito: a proposta salva não deve
+// mudar quando o admin reajusta tarifa ou fator de preço.
+async function bootQuote() {
+  const app = document.getElementById('app');
+  try {
+    const token = localStorage.getItem('nf_token');
+    if (!token) throw new Error('Faça login no app para ver a proposta');
+
+    const res = await fetch(`/api/solar-quote?id=${encodeURIComponent(QUOTE_ID)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const out = await res.json();
+    if (!res.ok) throw new Error(out.error || 'Falha ao carregar a proposta');
+    const q = out.quote;
+
+    if (q.snapshot && q.snapshot.painel && q.snapshot.proj) {
+      last = q.snapshot;
+      DATA.firm = q.snapshot.firm || null;
+    } else {
+      DEGRADED = true;
+      DATA.firm = null;
+      last = {
+        cliente: q.cliente_nome, zap: q.cliente_zap, cidade: q.cliente_cidade,
+        regiao: q.regiao, concessionaria: q.concessionaria, tarifa: Number(q.tarifa) || 0,
+        cobertura: Number(q.cobertura) || 1,
+        painel: { name: q.painel, panel_watt: q.painel_watt },
+        inversor: { name: q.inversor },
+        distribuidor: q.distribuidor ? { name: q.distribuidor } : null,
+        consumoKwh: Number(q.consumo_kwh) || 0, kwp: Number(q.kwp) || 0,
+        nPaineis: q.n_paineis || 0, geracao: Number(q.geracao) || 0,
+        investimento: Number(q.investimento) || 0, parcela: Number(q.parcela) || 0,
+        nParcelas: q.n_parcelas || 0, juros: 0,
+        economiaMes: Number(q.economia_mes) || 0, economiaAno: Number(q.economia_ano) || 0,
+        paybackAnos: Number(q.payback_anos) || 0, economia25: Number(q.economia_25) || 0,
+        geradaEm: q.created_at,
+      };
+    }
+
+    const f = DATA.firm;
+    if (f?.accent_color) document.documentElement.style.setProperty('--gold', f.accent_color);
+    document.getElementById('firmName').textContent = f?.name || 'Proposta salva';
+    if (f?.logo_url) document.getElementById('firmLogo').innerHTML = `<img src="${f.logo_url}" alt="logo">`;
+
+    app.innerHTML = `<div class="err" id="err"></div><div class="result" id="result"></div>`;
+    renderResult();
+  } catch (e) {
+    app.innerHTML = `<div class="err show">${e.message}.</div>`;
+  }
+}
+
 async function boot() {
+  if (VIEW) return bootQuote();
   try {
     const [tariffs, brands, pricing, firmRows] = await Promise.all([
       sb('nf_solar_tariffs?select=*&active=eq.true&order=sort_order'),
@@ -323,7 +381,9 @@ function renderResult() {
   document.getElementById('result').innerHTML = `
     <div class="res-head">
       <h2>Proposta — ${NUM(r.kwp,2)} kWp</h2>
-      <p>${r.cliente ? r.cliente + ' · ' : ''}${r.cidade || r.regiao} · cobertura ${Math.round(r.cobertura*100)}%</p>
+      <p>${r.cliente ? r.cliente + ' · ' : ''}${r.cidade || r.regiao} · cobertura ${Math.round(r.cobertura*100)}%${
+        VIEW && r.geradaEm ? ` · gerada em ${new Date(r.geradaEm).toLocaleDateString('pt-BR')}` : ''
+      }</p>
     </div>
     <div class="res-grid">
       <div class="res-card"><div class="res-label">Sistema</div><div class="res-val">${NUM(r.kwp,2)} kWp</div><div class="res-note">${r.nPaineis} painéis de ${r.painel.panel_watt}W</div></div>
@@ -332,7 +392,7 @@ function renderResult() {
     </div>
     <div class="res-detail">
       <div class="res-row"><span class="res-row-l">Investimento à vista</span><span class="res-row-v" style="color:var(--gold)">${BRL(r.investimento)}</span></div>
-      <div class="res-row"><span class="res-row-l">Financiado (${r.nParcelas}x, ${NUM(r.juros*100,1)}% a.m.)</span><span class="res-row-v">${BRL(r.parcela)}/mês</span></div>
+      <div class="res-row"><span class="res-row-l">Financiado (${r.nParcelas}x${r.juros ? `, ${NUM(r.juros*100,1)}% a.m.` : ''})</span><span class="res-row-v">${BRL(r.parcela)}/mês</span></div>
       <div class="res-row"><span class="res-row-l">Retorno do investimento (payback)</span><span class="res-row-v" style="color:var(--grn)">${paybackTxt}</span></div>
       <div class="res-row"><span class="res-row-l">Economia líquida em 25 anos</span><span class="res-row-v" style="color:var(--grn)">${BRL(r.economia25)}</span></div>
       <div class="res-row"><span class="res-row-l">Painel / Inversor</span><span class="res-row-v">${r.painel.name} · ${r.inversor.name}</span></div>
@@ -341,10 +401,14 @@ function renderResult() {
     <div class="res-actions">
       <button class="btn btn-wa" onclick="enviarWhats()">Enviar no WhatsApp</button>
       <button class="btn btn-ghost" onclick="copiarMsg()">Copiar mensagem</button>
-      <button class="btn btn-ghost" onclick="gerarPDF()">Gerar PDF A4</button>
-      <button class="btn btn-gold" id="btnSalvar" style="flex:1;min-width:150px;margin-top:0" onclick="salvarProposta()">Salvar proposta</button>
+      ${DEGRADED ? '' : '<button class="btn btn-ghost" onclick="gerarPDF()">Gerar PDF A4</button>'}
+      ${VIEW ? '' : '<button class="btn btn-gold" id="btnSalvar" style="flex:1;min-width:150px;margin-top:0" onclick="salvarProposta()">Salvar proposta</button>'}
     </div>
-    <div class="res-legal">Estimativa comercial não vinculante. Geração com HSP de ${NUM(r.hsp,1)} kWh/m²/dia e desempenho de ${Math.round(PERF*100)}%. Projeção de 25 anos considera degradação de ${(DEGRAD*100).toFixed(1)}%/ano e reajuste de tarifa de ${NUM(r.infla*100,1)}%/ano. Sujeito a visita técnica.</div>
+    <div class="res-legal">${
+      DEGRADED
+        ? 'Proposta salva antes do registro completo de parâmetros: os valores acima são os que foram gravados, mas a projeção de 25 anos e o PDF não podem ser reproduzidos.'
+        : `Estimativa comercial não vinculante. Geração com HSP de ${NUM(r.hsp,1)} kWh/m²/dia e desempenho de ${Math.round(PERF*100)}%. Projeção de 25 anos considera degradação de ${(DEGRAD*100).toFixed(1)}%/ano e reajuste de tarifa de ${NUM(r.infla*100,1)}%/ano. Sujeito a visita técnica.`
+    }</div>
   `;
   document.getElementById('result').classList.add('show');
   document.getElementById('result').scrollIntoView({ behavior:'smooth', block:'nearest' });
@@ -398,6 +462,10 @@ async function salvarProposta() {
         consumo_kwh: r.consumoKwh, investimento: r.investimento, parcela: r.parcela,
         n_parcelas: r.nParcelas, economia_mes: r.economiaMes, economia_ano: r.economiaAno,
         payback_anos: r.paybackAnos, economia_25: r.economia25,
+        // Congela o cálculo inteiro + o branding usado. É isso que a tela de
+        // detalhe relê para reproduzir a proposta e o PDF exatamente como o
+        // cliente recebeu, mesmo que tarifas e fatores de preço mudem depois.
+        snapshot: { ...r, firm: DATA.firm, geradaEm: new Date().toISOString() },
       }),
     });
     const out = await res.json();
@@ -465,7 +533,9 @@ async function gerarPDF() {
   doc.text(`Cliente: ${r.cliente || '—'}`, M, y);
   doc.text(`${r.cidade || r.regiao} · ${r.concessionaria}`, W-M, y, { align:'right' }); y += 5;
   setInk(mut); doc.setFontSize(8.5);
-  doc.text(`Proposta gerada em ${new Date().toLocaleDateString('pt-BR')} · válida por 7 dias`, M, y); y += 8;
+  // Reimpressão de proposta salva mantém a data original — não a de hoje.
+  const dataGeracao = new Date(r.geradaEm || Date.now()).toLocaleDateString('pt-BR');
+  doc.text(`Proposta gerada em ${dataGeracao} · válida por 7 dias`, M, y); y += 8;
 
   // ── 3 cards de destaque ──
   const cards = [
