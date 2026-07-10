@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
   if (!apiKey) {
     return NextResponse.json({
-      error: 'IA não configurada. Acesse Configurações → IA para ativar.'
+      error: 'IA não configurada. Ative a IA e cadastre a chave da OpenAI em Configurações → IA.'
     }, { status: 503 })
   }
 

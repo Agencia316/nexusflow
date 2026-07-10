@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   const firmId = resolveFirmId(session, formData.get('firmId'))
   const { firmContext } = await getFirmAiContext(firmId)
 
-  // A chave da firma tem precedência sobre a global. Antes esta rota usava só a
+  // Cada firma usa a própria chave; não há global. Antes esta rota usava só a
   // global, então ficava quebrada em qualquer ambiente sem OPENAI_API_KEY válida.
   const { apiKey, model } = await getFirmOpenAI(firmId)
   if (!apiKey) return NextResponse.json({ error: 'Chave OpenAI não configurada' }, { status: 503 })
