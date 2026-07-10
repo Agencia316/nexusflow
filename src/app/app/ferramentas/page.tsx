@@ -1,6 +1,7 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { getToken } from '@/lib/session'
+import { useFirm } from '@/lib/firm-context'
 import { CAMPOS_PILLAR_FIRM_ID } from '@/lib/brand'
 import { Scale, Calculator, Sun, Activity, TrendingUp, ExternalLink, Loader2, AlertCircle } from 'lucide-react'
 
@@ -13,7 +14,7 @@ type Tab = {
   color: string
   /** Carrega via endpoint autenticado (fetch + srcDoc) em vez de iframe público. */
   authed?: boolean
-  /** Só aparece para esta firma (ou super admin). Omitido = todos do segmento. */
+  /** Só aparece para esta firma. Omitido = todos do segmento. */
   firmId?: string
 }
 
@@ -81,25 +82,24 @@ function AuthedFrame({ path, title, active }: { path: string; title: string; act
 }
 
 export default function FerramentasPage() {
-  const [firmSegment, setFirmSegment] = useState('advocacia')
-  const [firmId, setFirmId] = useState('')
-  const [isSuper, setIsSuper] = useState(false)
+  // Segmento vem da firma ATIVA (segue o "entrar como cliente" do super-admin),
+  // não do usuário logado — senão o super-admin da Campos Pillar veria as
+  // ferramentas de advocacia enquanto opera uma firma solar.
+  const { firmId, firmSegment } = useFirm()
   const [active, setActive] = useState('')
 
-  useEffect(() => {
-    const u = JSON.parse(localStorage.getItem('nf_user') || '{}')
-    const seg = u.firm_segment || 'advocacia'
-    const fid = localStorage.getItem('nf_firm_id') || u.firm_id || ''
-    setFirmSegment(seg)
-    setFirmId(fid)
-    setIsSuper(!!u.is_super_admin)
-    const base = TABS_BY_SEGMENT[seg] || TABS_BY_SEGMENT.advocacia
-    const vis = base.filter(t => !t.firmId || t.firmId === fid || u.is_super_admin)
-    setActive(vis[0]?.id || '')
-  }, [])
+  // Abas exclusivas seguem a firma ATIVA, inclusive para o super-admin: quem
+  // opera como cliente deve ver as ferramentas do cliente, não as suas.
+  const TABS = useMemo(() => {
+    const base = TABS_BY_SEGMENT[firmSegment] || TABS_BY_SEGMENT.advocacia
+    return base.filter(t => !t.firmId || t.firmId === firmId)
+  }, [firmSegment, firmId])
 
-  const allTabs = TABS_BY_SEGMENT[firmSegment] || TABS_BY_SEGMENT.advocacia
-  const TABS = allTabs.filter(t => !t.firmId || t.firmId === firmId || isSuper)
+  // Ao trocar de firma o conjunto de abas muda; reancora numa aba válida.
+  useEffect(() => {
+    setActive(prev => (TABS.some(t => t.id === prev) ? prev : TABS[0]?.id || ''))
+  }, [TABS])
+
   const srcOf = (t: Tab) => typeof t.src === 'function' ? t.src(firmId) : t.src
 
   if (!active) return null
