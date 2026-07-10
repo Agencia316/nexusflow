@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
 import { getSession, resolveFirmId } from '@/lib/api-auth'
-import { getFirmOpenAI } from '@/lib/firm-ai-context'
+import { getFirmAI } from '@/lib/firm-ai-context'
+import { callAi, aiErrorResponse, AI_NOT_CONFIGURED } from '@/lib/ai'
 
 export const runtime = 'nodejs'
 
@@ -24,15 +25,10 @@ export async function POST(req: NextRequest) {
 
   if (!doc) return NextResponse.json({ error: 'Documento não encontrado' }, { status: 404 })
 
-  // Chave/modelo da firma (respeita o toggle ai_enabled).
-  const { apiKey, model } = await getFirmOpenAI(firmId)
+  // Provedor/chave/modelo da firma (respeita o toggle ai_enabled).
+  const { provider, apiKey, model } = await getFirmAI(firmId)
 
-  if (!apiKey) {
-    return NextResponse.json(
-      { error: 'IA não configurada. Ative a IA e cadastre a chave da OpenAI em Configurações → IA.' },
-      { status: 503 },
-    )
-  }
+  if (!apiKey) return NextResponse.json({ error: AI_NOT_CONFIGURED }, { status: 503 })
 
   const content = doc.content?.substring(0, 4000) || ''
 
@@ -63,28 +59,25 @@ Retorne APENAS JSON válido neste formato exato, sem markdown, sem explicações
   ]
 }`
 
+  const result = await callAi(provider, {
+    apiKey,
+    model,
+    messages: [{ role: 'user', content: prompt }],
+    maxTokens: 2000,
+    temperature: 0.4, // ignorado no Anthropic — ver src/lib/ai/anthropic.ts
+  })
+
+  if (result.kind === 'error') {
+    console.error('[generate-quiz] %s %d para firma %s: %s', provider, result.error.status, firmId, result.error.detail)
+    const { status, body } = aiErrorResponse(result.error)
+    return NextResponse.json(body, { status })
+  }
+
   try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: 2000,
-        temperature: 0.4,
-        messages: [{ role: 'user', content: prompt }],
-      }),
-    })
-
-    const data = await res.json()
-    const text = data.choices?.[0]?.message?.content || ''
-    const clean = text.replace(/```json|```/g, '').trim()
-    const quiz = JSON.parse(clean)
-
-    return NextResponse.json({ quiz })
-  } catch (e: any) {
-    return NextResponse.json({ error: 'Erro ao gerar quiz: ' + e.message }, { status: 500 })
+    const clean = result.text.replace(/```json|```/g, '').trim()
+    return NextResponse.json({ quiz: JSON.parse(clean) })
+  } catch {
+    console.error('[generate-quiz] resposta não é JSON: %s', result.text.slice(0, 300))
+    return NextResponse.json({ error: 'A IA não devolveu um quiz válido. Tente novamente.' }, { status: 502 })
   }
 }
