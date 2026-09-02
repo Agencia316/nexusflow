@@ -9,14 +9,14 @@ import { NextResponse, type NextRequest } from 'next/server'
  * Deploy principal (sem a var): esconde a superfície /pillar.
  *
  * Obs.: a autenticação por usuário continua client-side (localStorage), igual
- * ao resto do app — o middleware só cuida do que cada DEPLOY expõe, não de quem
- * está logado.
+ * ao resto do app — o proxy (ex-middleware, renomeado no Next 16) só cuida do
+ * que cada DEPLOY expõe, não de quem está logado.
  */
 
 const BRAND = process.env.NEXT_PUBLIC_BRAND || ''
 const DASHBOARD_ONLY_BRANDS = new Set(['campos-pillar'])
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
   if (DASHBOARD_ONLY_BRANDS.has(BRAND)) {
