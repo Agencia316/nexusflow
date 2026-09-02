@@ -7,6 +7,10 @@
 >
 > Rodar em https://nexusflow-lake.vercel.app (ou `/<slug>` da firma). ~15 min.
 > Marque cada linha: ✅ passou · ❌ falhou (anote o quê).
+>
+> **Automatizado desde 2026-09:** `npm run test:e2e` cobre 1.1, 1.2 e uma
+> passada por todas as telas de `/app/*` (ver `tests/smoke/`). O restante
+> continua manual.
 
 ## Pré-requisitos
 - 2 firmas com dados (ex.: Campos Pillar / Climadek).
