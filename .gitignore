@@ -42,3 +42,6 @@ next-env.d.ts
 test-results/
 playwright-report/
 playwright/.cache/
+
+# Capturas de tela para comparação visual (locais)
+capturas/
