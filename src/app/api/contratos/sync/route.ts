@@ -17,7 +17,7 @@ async function fetchAllDocs(token: string): Promise<ZapDoc[]> {
   let url: string | null = `${ZAPSIGN_BASE}/docs/?status=signed&page_size=100`
   while (url) {
     const res = await fetch(url, {
-      headers: { Authorization: `Token ${token}` },
+      headers: { Authorization: `Bearer ${token}` },h
       next: { revalidate: 0 },
     })
     if (!res.ok) throw new Error(`ZapSign API error: ${res.status}`)
