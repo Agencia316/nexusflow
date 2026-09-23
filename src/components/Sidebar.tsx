@@ -10,7 +10,7 @@ import {
   LayoutDashboard, FileText, Plus, MessageSquareText,
   GraduationCap, BarChart3, Users, LogOut, BookOpen,
   ChevronRight, Wrench, Shield, Bell, Library, Settings,
-  Building2, Menu, X, ClipboardList, KeyRound
+  Building2, Menu, X, ClipboardList, KeyRound, ScrollText
 } from 'lucide-react'
 
 // managerOnly = admin + editor | adminOnly = admin only | superOnly = super-admin (Três16)
@@ -24,6 +24,7 @@ const nav = [
   { label: 'Modelos',              href: '/app/templates',    icon: Library, sub: true },
   { label: 'DocuChat (IA)',        href: '/app/chat',         icon: MessageSquareText },
   { label: 'Ferramentas',          href: '/app/ferramentas',  icon: Wrench },
+  { label: 'Contratos',            href: '/app/contratos',    icon: ScrollText },
   { label: 'Propostas',            href: '/app/orcamentos',   icon: ClipboardList, solarOnly: true },
   { label: 'Relatórios',           href: '/app/reports',      icon: BarChart3, managerOnly: true },
   { label: 'Equipe',               href: '/app/team',         icon: Users },
@@ -191,4 +192,4 @@ export default function Sidebar() {
       </aside>
     </>
   )
-}
+    }
