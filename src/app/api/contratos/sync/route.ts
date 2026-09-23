@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+íçíçóimport { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 const ZAPSIGN_BASE = 'https://api.zapsign.com.br/api/v1'
