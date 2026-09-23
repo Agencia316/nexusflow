@@ -1,4 +1,4 @@
-íçíçóimport { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 const ZAPSIGN_BASE = 'https://api.zapsign.com.br/api/v1'
@@ -17,7 +17,7 @@ async function fetchAllDocs(token: string): Promise<ZapDoc[]> {
   let url: string | null = `${ZAPSIGN_BASE}/docs/?status=signed&page_size=100`
   while (url) {
     const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },h
+      headers: { Authorization: `Bearer ${token}` },
       next: { revalidate: 0 },
     })
     if (!res.ok) throw new Error(`ZapSign API error: ${res.status}`)
