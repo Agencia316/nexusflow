@@ -85,7 +85,7 @@ export function FirmProvider({ children }: { children: React.ReactNode }) {
 
   // Carrega todas as firmas apenas para o super-admin (fonte do seletor).
   useEffect(() => {
-    if (!isSuperAdmin) { setFirms([]); return }
+    if (!isSuperAdmin) return
     let cancelled = false
     supabase
       .from('nf_firms')
@@ -122,7 +122,7 @@ export function FirmProvider({ children }: { children: React.ReactNode }) {
     firmSegment: activeFirm?.segment || user?.firm_segment || 'advocacia',
     isSuperAdmin,
     isImpersonating: !!user && !!user.firm_id && firmId !== user.firm_id,
-    firms,
+    firms: isSuperAdmin ? firms : [],
     setActiveFirm,
     resetFirm,
   }
