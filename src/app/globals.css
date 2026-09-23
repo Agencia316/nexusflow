@@ -165,3 +165,20 @@
 .prose-nexus tbody td:first-child {
   @apply font-medium text-white;
 }
+
+/* ── PROSE NEXUS — contraste no tema claro ──────────────────────────────────
+   amber-300/400 sobre fundo claro tem contraste insuficiente; usamos amber-700
+   para preservar a identidade âmbar com legibilidade adequada.
+   O bg do code inline fica claro (slate-800 vira cinza-claro pelo var).       */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .prose-nexus h3           { color: rgb(180 83 9); }
+  :root:not([data-theme]) .prose-nexus a            { color: rgb(180 83 9); }
+  :root:not([data-theme]) .prose-nexus a:hover      { color: rgb(146 64 14); }
+  :root:not([data-theme]) .prose-nexus code         { color: rgb(180 83 9); }
+  :root:not([data-theme]) .prose-nexus blockquote   { border-color: rgb(180 83 9); }
+}
+:root[data-theme='light'] .prose-nexus h3           { color: rgb(180 83 9); }
+:root[data-theme='light'] .prose-nexus a            { color: rgb(180 83 9); }
+:root[data-theme='light'] .prose-nexus a:hover      { color: rgb(146 64 14); }
+:root[data-theme='light'] .prose-nexus code         { color: rgb(180 83 9); }
+:root[data-theme='light'] .prose-nexus blockquote   { border-color: rgb(180 83 9); }
