@@ -52,14 +52,6 @@ export default function AdminPage() {
   const [form, setForm] = useState({ name: '', slug: '', segment: 'advocacia', plan: '', status: 'active' })
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => {
-    const u = getUser()
-    if (!u?.is_super_admin) { router.push('/app/dashboard'); return }
-    load()
-    // Guarda de montagem: roda uma vez. router é ref estável; load só é chamado aqui.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   async function load() {
     setLoading(true)
     const [firmsRes, usersRes, docsRes, logsRes] = await Promise.all([
@@ -87,6 +79,14 @@ export default function AdminPage() {
     })))
     setLoading(false)
   }
+
+  useEffect(() => {
+    const u = getUser()
+    if (!u?.is_super_admin) { router.push('/app/dashboard'); return }
+    load()
+    // Guarda de montagem: roda uma vez. router é ref estável; load só é chamado aqui.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function enterFirm(f: FirmRow) {
     setActiveFirm(f.id)
