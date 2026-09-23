@@ -173,7 +173,7 @@ export default function ContratosTable({ contratos, loading, onUpdate }: Props) 
                       </span>
                     ))}
                     {/* Categorias únicas */}
-                    {[...new Set(g.docs.map(d => d.categoria).filter((c): c is string => c !== null))].map(cat => (
+                    {Array.from(new Set(g.docs.map(d => d.categoria).filter((c): c is string => c !== null))).map(cat => (
                       cat !== 'Geral' && (
                         <span key={cat} className="text-[10px] text-slate-400 bg-slate-800 border border-slate-700 px-2 py-0.5 rounded-full flex items-center gap-1">
                           <Tag className="w-2.5 h-2.5" />{cat}
