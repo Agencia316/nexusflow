@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   const zapUrl = `https://api.zapsign.com.br/api/v1/docs/?status=${status}&page_size=${page_size}&page=${page}`
 
   const res = await fetch(zapUrl, {
-    headers: { Authorization: `Token ${token}` },
+    headers: { Authorization: `Bearer ${token}` },
     cache: 'no-store',
   })
 
