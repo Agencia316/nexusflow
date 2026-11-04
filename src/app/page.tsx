@@ -62,7 +62,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Grid de fundo */}
-      <div className="fixed inset-0 bg-[linear-gradient(rgba(212,160,23,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(212,160,23,0.03)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none"/>
+      <div className="fixed inset-0 bg-[linear-gradient(rgba(212,160,23,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(212,160,23,0.03)_1px,transparent_1px)] bg-size-[48px_48px] pointer-events-none"/>
 
       {/* Header */}
       <header className="relative z-10 max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
@@ -98,7 +98,7 @@ export default function LandingPage() {
                 <input value={slug} onChange={e => setSlug(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && entrar()}
                   placeholder="sua-empresa" autoFocus
-                  className="flex-1 bg-transparent py-2 pl-1 text-sm text-white placeholder-slate-500 focus:outline-none"/>
+                  className="flex-1 bg-transparent py-2 pl-1 text-sm text-white placeholder-slate-500 focus:outline-hidden"/>
               </div>
               <button onClick={entrar} disabled={!slug.trim()}
                 className="bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-onaccent p-2 rounded-lg transition">
@@ -193,7 +193,7 @@ export default function LandingPage() {
 
       {/* CTA final */}
       <section className="relative z-10 max-w-3xl mx-auto px-6 pb-24 text-center">
-        <div className="bg-gradient-to-b from-slate-900 to-slate-900/40 border border-slate-800 rounded-3xl p-10">
+        <div className="bg-linear-to-b from-slate-900 to-slate-900/40 border border-slate-800 rounded-3xl p-10">
           <ShieldCheck className="w-10 h-10 text-amber-400 mx-auto mb-4"/>
           <h2 className="text-2xl font-bold mb-2">Comece hoje com tudo configurado</h2>
           <p className="text-slate-400 mb-6 max-w-lg mx-auto">

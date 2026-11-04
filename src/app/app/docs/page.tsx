@@ -105,12 +105,12 @@ export default function DocsPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"/>
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Busca inteligente — ex: 'como qualificar lead', 'documentos B-94'..."
-            className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-9 pr-10 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+            className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-9 pr-10 py-2 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
           {searching && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-amber-400"/>}
         </div>
         {!search && (
           <select value={catFilter} onChange={e => setCatFilter(e.target.value)}
-            className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-300 focus:outline-none focus:border-amber-500 transition appearance-none">
+            className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-300 focus:outline-hidden focus:border-amber-500 transition appearance-none">
             <option value="">Todas as categorias</option>
             {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
           </select>

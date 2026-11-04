@@ -195,7 +195,7 @@ export default function NewDocPage() {
             <input value={aiPrompt} onChange={e => setAiPrompt(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && generateWithAI()}
               placeholder='Ex: "Script de qualificação para SDR — critérios J1 a J5"'
-              className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+              className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
             <button onClick={generateWithAI} disabled={aiLoading || !aiPrompt.trim()}
               className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold px-4 py-2 rounded-lg transition whitespace-nowrap">
               {aiLoading ? <Loader2 className="w-4 h-4 animate-spin"/> : <Sparkles className="w-4 h-4"/>}
@@ -247,14 +247,14 @@ export default function NewDocPage() {
           <label className="text-xs font-medium text-slate-400 block mb-1.5">Título *</label>
           <input value={title} onChange={e => setTitle(e.target.value)}
             placeholder="Nome do documento"
-            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-xs font-medium text-slate-400 block mb-1.5">Categoria</label>
             <select value={categoryId} onChange={e => setCategoryId(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-300 focus:outline-none focus:border-amber-500 transition appearance-none">
+              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-300 focus:outline-hidden focus:border-amber-500 transition appearance-none">
               <option value="">Sem categoria</option>
               {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
             </select>
@@ -262,7 +262,7 @@ export default function NewDocPage() {
           <div>
             <label className="text-xs font-medium text-slate-400 block mb-1.5">Status</label>
             <select value={status} onChange={e => setStatus(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-300 focus:outline-none focus:border-amber-500 transition appearance-none">
+              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-300 focus:outline-hidden focus:border-amber-500 transition appearance-none">
               <option value="published">Publicado</option>
               <option value="draft">Rascunho</option>
             </select>
@@ -287,7 +287,7 @@ export default function NewDocPage() {
             <textarea value={content} onChange={e => setContent(e.target.value)}
               placeholder={'# Título\n\n## Seção\n\nConteúdo...'}
               rows={18}
-              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition font-mono resize-none"/>
+              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition font-mono resize-none"/>
           )}
         </div>
 
@@ -306,7 +306,7 @@ export default function NewDocPage() {
             <input value={tagInput} onChange={e => setTagInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && addTag()}
               placeholder="Adicionar tag e pressionar Enter..."
-              className="bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition flex-1 max-w-xs"/>
+              className="bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition flex-1 max-w-xs"/>
             <button onClick={addTag} className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition">+ Tag</button>
           </div>
         </div>

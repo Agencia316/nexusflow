@@ -93,7 +93,7 @@ export default function AlertasPage() {
                     </div>
                     {!isRead && (
                       <button onClick={() => markRead(alert.id)} disabled={marking===alert.id}
-                        className="text-[10px] text-slate-500 hover:text-white px-2 py-1 border border-slate-700 rounded hover:border-slate-500 transition shrink-0">
+                        className="text-[10px] text-slate-500 hover:text-white px-2 py-1 border border-slate-700 rounded-sm hover:border-slate-500 transition shrink-0">
                         {marking===alert.id ? <Loader2 className="w-3 h-3 animate-spin"/> : 'Lido'}
                       </button>
                     )}

@@ -298,7 +298,7 @@ export default function TeamPage() {
                 <label className="block text-xs font-medium text-slate-400 mb-1.5">Nome completo *</label>
                 <input value={form.name} onChange={e => setForm(f=>({...f,name:e.target.value}))}
                   placeholder="Ex: João Silva"
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-500 transition"/>
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-hidden focus:border-amber-500 transition"/>
               </div>
 
               {/* E-mail */}
@@ -306,7 +306,7 @@ export default function TeamPage() {
                 <label className="block text-xs font-medium text-slate-400 mb-1.5">E-mail *</label>
                 <input value={form.email} onChange={e => setForm(f=>({...f,email:e.target.value}))}
                   type="email" placeholder="joao@empresa.com.br"
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-500 transition"/>
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-hidden focus:border-amber-500 transition"/>
               </div>
 
               {/* Senha */}
@@ -317,7 +317,7 @@ export default function TeamPage() {
                 <div className="relative">
                   <input value={form.password} onChange={e => setForm(f=>({...f,password:e.target.value}))}
                     type={showPwd ? 'text' : 'password'} placeholder="Mínimo 6 caracteres"
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 pr-10 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-500 transition"/>
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 pr-10 text-sm text-white placeholder-slate-600 focus:outline-hidden focus:border-amber-500 transition"/>
                   <button type="button" onClick={() => setShowPwd(s=>!s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
                     {showPwd ? <EyeOff className="w-4 h-4"/> : <Eye className="w-4 h-4"/>}
                   </button>
@@ -329,7 +329,7 @@ export default function TeamPage() {
                 <div>
                   <label className="block text-xs font-medium text-slate-400 mb-1.5">Cargo</label>
                   <select value={form.job_role_id} onChange={e => handleJobRoleChange(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition">
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-hidden focus:border-amber-500 transition">
                     <option value="">— Sem cargo definido —</option>
                     {roles.map(r => (
                       <option key={r.id} value={r.id}>{r.name} · {roleLabel[r.access_level]}</option>

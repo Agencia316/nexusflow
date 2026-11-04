@@ -182,7 +182,7 @@ export default function AdminPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
         <input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Buscar cliente por nome ou slug..."
-          className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition" />
+          className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition" />
       </div>
 
       {/* Lista */}
@@ -286,28 +286,28 @@ export default function AdminPage() {
               <div>
                 <label className="text-xs font-medium text-slate-400 block mb-1.5">Nome</label>
                 <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition" />
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-hidden focus:border-amber-500 transition" />
               </div>
               <div>
                 <label className="text-xs font-medium text-slate-400 block mb-1.5">Slug (endereço de acesso)</label>
                 <div className="flex items-center bg-slate-800 border border-slate-700 rounded-lg overflow-hidden focus-within:border-amber-500 transition">
                   <span className="text-xs text-slate-500 pl-3 font-mono">/</span>
                   <input value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))}
-                    className="flex-1 bg-transparent px-2 py-2.5 text-sm text-white font-mono focus:outline-none" />
+                    className="flex-1 bg-transparent px-2 py-2.5 text-sm text-white font-mono focus:outline-hidden" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-medium text-slate-400 block mb-1.5">Segmento</label>
                   <select value={form.segment} onChange={e => setForm(f => ({ ...f, segment: e.target.value }))}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-amber-500 transition">
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-300 focus:outline-hidden focus:border-amber-500 transition">
                     {SEGMENTS.map(s => <option key={s.value} value={s.value}>{s.icon} {s.label}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-medium text-slate-400 block mb-1.5">Status</label>
                   <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-amber-500 transition">
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-300 focus:outline-hidden focus:border-amber-500 transition">
                     <option value="active">Ativo</option>
                     <option value="trial">Trial</option>
                     <option value="suspended">Suspenso</option>
@@ -318,7 +318,7 @@ export default function AdminPage() {
                 <label className="text-xs font-medium text-slate-400 block mb-1.5">Plano</label>
                 <input value={form.plan} onChange={e => setForm(f => ({ ...f, plan: e.target.value }))}
                   placeholder="Ex: free, pro, enterprise"
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition" />
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition" />
               </div>
             </div>
             <div className="px-5 py-4 border-t border-slate-800 flex gap-3">

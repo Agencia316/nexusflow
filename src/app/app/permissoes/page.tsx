@@ -206,7 +206,7 @@ export default function PermissoesPage() {
           <select
             value={selectedUser}
             onChange={e => setSelectedUser(e.target.value)}
-            className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-300 focus:outline-none focus:border-amber-500 transition"
+            className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-300 focus:outline-hidden focus:border-amber-500 transition"
           >
             <option value="">Selecionar usuário...</option>
             {users.map(u => (
@@ -243,13 +243,13 @@ export default function PermissoesPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar documento..."
-            className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"
+            className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"
           />
         </div>
         <select
           value={catFilter}
           onChange={e => setCatFilter(e.target.value)}
-          className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-300 focus:outline-none focus:border-amber-500 transition"
+          className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-300 focus:outline-hidden focus:border-amber-500 transition"
         >
           <option value="">Todas as categorias</option>
           {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}

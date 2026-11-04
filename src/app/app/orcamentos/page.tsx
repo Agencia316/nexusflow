@@ -150,7 +150,7 @@ export default function OrcamentosPage() {
         <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-800/70">
           {/* Dropdown mantido: arrastar não funciona em tela de toque. */}
           <select value={q.status} onChange={e => setStatus(q.id, e.target.value)}
-            className={`text-[11px] font-medium rounded-lg px-2 py-1 border bg-transparent focus:outline-none cursor-pointer ${STATUS[q.status]?.cls || STATUS.novo.cls}`}>
+            className={`text-[11px] font-medium rounded-lg px-2 py-1 border bg-transparent focus:outline-hidden cursor-pointer ${STATUS[q.status]?.cls || STATUS.novo.cls}`}>
             {STAGES.map(k => <option key={k} value={k} className="bg-slate-900 text-white">{STATUS[k].label}</option>)}
           </select>
           <div className="flex items-center gap-2 ml-auto text-[10px] text-slate-600 min-w-0">
@@ -198,7 +198,7 @@ export default function OrcamentosPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por cliente ou cidade..."
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition" />
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition" />
         </div>
         <div className="flex bg-slate-900 border border-slate-800 rounded-xl p-1 shrink-0">
           {([['kanban', LayoutGrid, 'Kanban'], ['lista', List, 'Lista']] as const).map(([v, Icon, label]) => (
@@ -232,7 +232,7 @@ export default function OrcamentosPage() {
                 onDragOver={e => { e.preventDefault(); setOverStage(stage) }}
                 onDragLeave={() => setOverStage(s => (s === stage ? null : s))}
                 onDrop={() => onDrop(stage)}
-                className={`rounded-xl border p-2 min-h-[7rem] transition ${
+                className={`rounded-xl border p-2 min-h-28 transition ${
                   overStage === stage && dragId
                     ? 'border-amber-500/60 bg-amber-500/5'
                     : 'border-slate-800 bg-slate-950/40'

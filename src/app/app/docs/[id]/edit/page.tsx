@@ -167,7 +167,7 @@ export default function EditDocPage() {
           {/* Título */}
           <input value={title} onChange={e => setTitle(e.target.value)}
             placeholder="Título do documento"
-            className="w-full bg-transparent text-2xl font-bold text-white placeholder-slate-600 border-none outline-none mb-6 resize-none"/>
+            className="w-full bg-transparent text-2xl font-bold text-white placeholder-slate-600 border-none outline-hidden mb-6 resize-none"/>
 
           {/* Conteúdo */}
           {preview ? (
@@ -189,7 +189,7 @@ Texto normal, **negrito**, *itálico*
 | Coluna 1 | Coluna 2 |
 |---|---|
 | Dado | Dado |"
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl p-6 text-sm text-slate-300 placeholder-slate-600 font-mono focus:outline-none focus:border-amber-500 transition resize-none min-h-96 leading-relaxed"
+              className="w-full bg-slate-900 border border-slate-800 rounded-xl p-6 text-sm text-slate-300 placeholder-slate-600 font-mono focus:outline-hidden focus:border-amber-500 transition resize-none min-h-96 leading-relaxed"
               style={{ minHeight: '500px' }}
               onInput={e => {
                 const t = e.target as HTMLTextAreaElement
@@ -227,7 +227,7 @@ Texto normal, **negrito**, *itálico*
           <div>
             <label className="text-xs font-semibold text-slate-400 block mb-2">Categoria</label>
             <select value={categoryId} onChange={e => setCategoryId(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-amber-500 transition">
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-hidden focus:border-amber-500 transition">
               <option value="">Sem categoria</option>
               {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
             </select>
@@ -250,7 +250,7 @@ Texto normal, **negrito**, *itálico*
               <input value={newTag} onChange={e => setNewTag(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && addTag()}
                 placeholder="Nova tag..."
-                className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+                className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
               <button onClick={addTag} className="p-1.5 bg-slate-800 border border-slate-700 rounded-lg hover:border-slate-600 text-slate-400 hover:text-white transition">
                 <Plus className="w-3.5 h-3.5"/>
               </button>
