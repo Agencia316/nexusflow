@@ -2,10 +2,13 @@
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-@theme {
-  --font-sans: Inter, sans-serif;
-  --font-mono: Fira Code, monospace;
+/* Fontes vêm do next/font (layout.tsx), que injeta --font-inter e --font-fira-code. */
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-fira-code), ui-monospace, monospace;
+}
 
+@theme {
   --color-white: rgb(var(--c-white));
 
   --color-slate-50: rgb(var(--c-slate-50));

@@ -1,5 +1,23 @@
 import type { Metadata } from 'next'
+import localFont from 'next/font/local'
 import './globals.css'
+
+// Fontes self-hosted (pacotes @fontsource): sem requisição ao Google em runtime
+// nem em build. Subset latin cobre todo o português.
+const inter = localFont({
+  src: '../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2',
+  weight: '100 900',
+  display: 'swap',
+  variable: '--font-inter',
+})
+const firaCode = localFont({
+  src: [
+    { path: '../../node_modules/@fontsource/fira-code/files/fira-code-latin-400-normal.woff2', weight: '400', style: 'normal' },
+    { path: '../../node_modules/@fontsource/fira-code/files/fira-code-latin-500-normal.woff2', weight: '500', style: 'normal' },
+  ],
+  display: 'swap',
+  variable: '--font-fira-code',
+})
 
 export const metadata: Metadata = {
   title: 'NexusFlow — Documente e treine com IA',
@@ -12,15 +30,9 @@ const themeScript = `(function(){try{var t=localStorage.getItem('nf_theme');if(t
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
+    <html lang="pt-BR" className={`${inter.variable} ${firaCode.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Fontes via link do Google (Inter + Fira Code). Migrar para next/font
-            mudaria a renderização e pede revisão visual — fica para um PR próprio. */}
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
       </head>
       <body className="font-sans bg-slate-950 text-slate-100 antialiased">{children}</body>
     </html>
