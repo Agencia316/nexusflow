@@ -1,6 +1,47 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --font-sans: Inter, sans-serif;
+  --font-mono: Fira Code, monospace;
+
+  --color-white: rgb(var(--c-white));
+
+  --color-slate-50: rgb(var(--c-slate-50));
+  --color-slate-100: rgb(var(--c-slate-100));
+  --color-slate-200: rgb(var(--c-slate-200));
+  --color-slate-300: rgb(var(--c-slate-300));
+  --color-slate-400: rgb(var(--c-slate-400));
+  --color-slate-500: rgb(var(--c-slate-500));
+  --color-slate-600: rgb(var(--c-slate-600));
+  --color-slate-700: rgb(var(--c-slate-700));
+  --color-slate-800: rgb(var(--c-slate-800));
+  --color-slate-900: rgb(var(--c-slate-900));
+  --color-slate-950: rgb(var(--c-slate-950));
+
+  --color-brand-dark: #0f172a;
+  --color-brand-gold: #d4a017;
+  --color-brand-gold-light: #f0c040;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
 
 /* ──────────────────────────────────────────────────────────────
    SISTEMA DE CORES — claro / escuro / conforme o dispositivo
@@ -133,7 +174,7 @@
 .prose-nexus strong { @apply text-white font-semibold; }
 .prose-nexus em { @apply italic text-slate-300; }
 .prose-nexus blockquote { @apply border-l-4 border-amber-500 pl-4 italic text-slate-400 my-4 bg-amber-500/5 py-2 pr-3 rounded-r-lg; }
-.prose-nexus code { @apply font-mono text-amber-300 bg-slate-800 px-1.5 py-0.5 rounded text-[13px]; }
+.prose-nexus code { @apply font-mono text-amber-300 bg-slate-800 px-1.5 py-0.5 rounded-sm text-[13px]; }
 .prose-nexus pre { @apply bg-slate-800 rounded-xl p-4 overflow-x-auto mb-4 border border-slate-700; }
 .prose-nexus pre code { @apply bg-transparent p-0 text-slate-300; }
 .prose-nexus a { @apply text-amber-400 underline hover:text-amber-300 transition; }

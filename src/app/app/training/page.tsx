@@ -378,13 +378,13 @@ export default function TrainingPage() {
           <label className="block text-xs font-medium text-slate-400 mb-1.5">Título *</label>
           <input value={pathForm.title} onChange={e=>setPathForm(p=>({...p,title:e.target.value}))}
             placeholder="Ex: Onboarding — SDR de Captação"
-            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-500 transition"/>
+            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-hidden focus:border-amber-500 transition"/>
         </div>
         <div>
           <label className="block text-xs font-medium text-slate-400 mb-1.5">Descrição</label>
           <textarea value={pathForm.description} onChange={e=>setPathForm(p=>({...p,description:e.target.value}))}
             placeholder="Objetivo desta trilha..." rows={2}
-            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-500 transition resize-none"/>
+            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-hidden focus:border-amber-500 transition resize-none"/>
         </div>
         {/* Cargos alvo */}
         <div>
@@ -436,9 +436,9 @@ export default function TrainingPage() {
                 <div className="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center text-onaccent font-bold text-xs shrink-0">{si+1}</div>
                 <span className="flex-1 text-xs text-slate-400 font-medium truncate">{step.title||`Etapa ${si+1}`}</span>
                 <div className="flex items-center gap-1">
-                  <button onClick={()=>moveStep(si,-1)} disabled={si===0} className="p-1.5 rounded text-slate-600 hover:text-slate-300 disabled:opacity-20"><ChevronUp className="w-3.5 h-3.5"/></button>
-                  <button onClick={()=>moveStep(si,1)} disabled={si===editSteps.length-1} className="p-1.5 rounded text-slate-600 hover:text-slate-300 disabled:opacity-20"><ChevronDown className="w-3.5 h-3.5"/></button>
-                  <button onClick={()=>removeStep(si)} className="p-1.5 rounded text-slate-600 hover:text-red-400 ml-1"><Trash2 className="w-3.5 h-3.5"/></button>
+                  <button onClick={()=>moveStep(si,-1)} disabled={si===0} className="p-1.5 rounded-sm text-slate-600 hover:text-slate-300 disabled:opacity-20"><ChevronUp className="w-3.5 h-3.5"/></button>
+                  <button onClick={()=>moveStep(si,1)} disabled={si===editSteps.length-1} className="p-1.5 rounded-sm text-slate-600 hover:text-slate-300 disabled:opacity-20"><ChevronDown className="w-3.5 h-3.5"/></button>
+                  <button onClick={()=>removeStep(si)} className="p-1.5 rounded-sm text-slate-600 hover:text-red-400 ml-1"><Trash2 className="w-3.5 h-3.5"/></button>
                 </div>
               </div>
 
@@ -447,12 +447,12 @@ export default function TrainingPage() {
                   <label className="block text-[11px] font-medium text-slate-500 mb-1">Título da etapa *</label>
                   <input value={step.title||''} onChange={e=>updateStep(si,'title',e.target.value)}
                     placeholder="Ex: Aprenda o script de captação"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-500 transition"/>
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-hidden focus:border-amber-500 transition"/>
                 </div>
                 <div>
                   <label className="block text-[11px] font-medium text-slate-500 mb-1">Documento de leitura *</label>
                   <select value={step.document_id||''} onChange={e=>updateStep(si,'document_id',e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500 transition">
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-hidden focus:border-amber-500 transition">
                     <option value="">— Selecione um documento —</option>
                     {docs.map(d=><option key={d.id} value={d.id}>{d.title}</option>)}
                   </select>
@@ -461,7 +461,7 @@ export default function TrainingPage() {
                   <label className="block text-[11px] font-medium text-slate-500 mb-1">Descrição (opcional)</label>
                   <input value={step.description||''} onChange={e=>updateStep(si,'description',e.target.value)}
                     placeholder="Objetivo ou dica para esta etapa"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-500 transition"/>
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-hidden focus:border-amber-500 transition"/>
                 </div>
 
                 {/* Quiz */}
@@ -514,7 +514,7 @@ export default function TrainingPage() {
                               </div>
                               <input value={q.q} onChange={e=>updateQuestion(si,qi,'q',e.target.value)}
                                 placeholder="Digite a pergunta..."
-                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 transition"/>
+                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-hidden focus:border-purple-500 transition"/>
                               <div className="space-y-2">
                                 <p className="text-[11px] text-slate-500">Opções — clique no círculo para marcar a correta:</p>
                                 {q.options.map((opt:string, oi:number) => (
@@ -526,7 +526,7 @@ export default function TrainingPage() {
                                     </button>
                                     <input value={opt} onChange={e=>updateOption(si,qi,oi,e.target.value)}
                                       placeholder={`Opção ${String.fromCharCode(65+oi)}`}
-                                      className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 transition"/>
+                                      className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-sm text-white placeholder-slate-600 focus:outline-hidden focus:border-purple-500 transition"/>
                                   </div>
                                 ))}
                               </div>
@@ -554,7 +554,7 @@ export default function TrainingPage() {
       </div>
 
       {/* Footer fixo */}
-      <div className="flex items-center gap-3 sticky bottom-0 bg-slate-950/90 backdrop-blur py-4 border-t border-slate-800 -mx-6 px-6">
+      <div className="flex items-center gap-3 sticky bottom-0 bg-slate-950/90 backdrop-blur-sm py-4 border-t border-slate-800 -mx-6 px-6">
         <button onClick={()=>setMode('list')} className="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-300 text-sm hover:bg-slate-800 transition">Cancelar</button>
         <button onClick={savePath} disabled={saving}
           className="flex-1 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold py-2.5 rounded-xl text-sm transition">

@@ -79,7 +79,7 @@ export default function FirmSwitcher() {
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   placeholder="Buscar firma..."
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
               </div>
             </div>
           )}

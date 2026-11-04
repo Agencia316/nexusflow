@@ -207,7 +207,7 @@ export default function ConfiguracoesPage() {
           <div>
             <label className="text-xs text-slate-400 block mb-1.5">Nome da empresa</label>
             <input value={firmName} onChange={e => setFirmName(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
           </div>
           <div>
             <label className="text-xs text-slate-400 block mb-1.5">Cor de destaque</label>
@@ -215,7 +215,7 @@ export default function ConfiguracoesPage() {
               <input type="color" value={brandColor} onChange={e => setBrandColor(e.target.value)}
                 className="w-10 h-10 rounded-lg border border-slate-700 bg-slate-800 cursor-pointer p-1"/>
               <input value={brandColor} onChange={e => setBrandColor(e.target.value)}
-                className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-amber-500 transition"/>
+                className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white font-mono focus:outline-hidden focus:border-amber-500 transition"/>
               <div className="w-10 h-10 rounded-lg border border-slate-700 shrink-0"
                 style={{ background: brandColor }}/>
             </div>
@@ -246,31 +246,31 @@ export default function ConfiguracoesPage() {
               <label className="text-xs text-slate-400 block mb-1.5">WhatsApp comercial</label>
               <input value={budget.whatsapp} onChange={e => setBudget(b => ({ ...b, whatsapp: e.target.value }))}
                 placeholder="(42) 99999-9999"
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
             </div>
             <div>
               <label className="text-xs text-slate-400 block mb-1.5">Telefone / fixo</label>
               <input value={budget.phone} onChange={e => setBudget(b => ({ ...b, phone: e.target.value }))}
                 placeholder="(42) 3333-3333"
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
             </div>
             <div>
               <label className="text-xs text-slate-400 block mb-1.5">CNPJ</label>
               <input value={budget.cnpj} onChange={e => setBudget(b => ({ ...b, cnpj: e.target.value }))}
                 placeholder="00.000.000/0001-00"
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
             </div>
             <div>
               <label className="text-xs text-slate-400 block mb-1.5">Site</label>
               <input value={budget.site} onChange={e => setBudget(b => ({ ...b, site: e.target.value }))}
                 placeholder="www.climadek.com.br"
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
             </div>
             <div className="col-span-2">
               <label className="text-xs text-slate-400 block mb-1.5">Endereço</label>
               <input value={budget.address} onChange={e => setBudget(b => ({ ...b, address: e.target.value }))}
                 placeholder="Rua Exemplo, 123 — Centro, Irati/PR"
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
             </div>
           </div>
         </div>
@@ -344,7 +344,7 @@ export default function ConfiguracoesPage() {
                 <input type={showKey ? 'text' : 'password'} value={apiKey}
                   onChange={e => setApiKey(e.target.value)}
                   placeholder={keySaved ? 'Chave salva — preencha para substituir' : KEY_HINT[provider]}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 pr-10 text-sm text-white placeholder-slate-500 font-mono focus:outline-none focus:border-amber-500 transition"/>
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 pr-10 text-sm text-white placeholder-slate-500 font-mono focus:outline-hidden focus:border-amber-500 transition"/>
                 <button onClick={() => setShowKey(!showKey)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
                   {showKey ? <EyeOff className="w-4 h-4"/> : <Eye className="w-4 h-4"/>}

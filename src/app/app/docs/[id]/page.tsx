@@ -289,7 +289,7 @@ export default function DocPage() {
           <div className="flex gap-2">
             <input value={videoUrl} onChange={e => setVideoUrl(e.target.value)}
               placeholder="Cole a URL do YouTube, Vimeo ou MP4..."
-              className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+              className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
             <button onClick={insertVideo} disabled={!videoUrl.trim()}
               className="px-3 py-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold rounded-lg text-sm transition">
               Inserir
@@ -343,7 +343,7 @@ export default function DocPage() {
             <div className="flex gap-3">
               <input value={signName} onChange={e => setSignName(e.target.value)}
                 placeholder="Seu nome completo"
-                className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+                className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
               <button onClick={handleSign} disabled={signing || !signName.trim()}
                 className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent font-semibold px-4 py-2 rounded-lg transition">
                 {signing ? <Loader2 className="w-4 h-4 animate-spin"/> : <PenLine className="w-4 h-4"/>}
@@ -382,7 +382,7 @@ export default function DocPage() {
               <input value={newComment} onChange={e => setNewComment(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && addComment()}
                 placeholder={replyTo ? 'Escreva sua resposta...' : 'Escreva um comentário...'}
-                className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+                className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
               <button onClick={addComment} disabled={savingComment || !newComment.trim()}
                 className="p-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-onaccent rounded-lg transition">
                 {savingComment ? <Loader2 className="w-4 h-4 animate-spin"/> : <Send className="w-4 h-4"/>}

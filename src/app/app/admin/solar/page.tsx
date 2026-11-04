@@ -55,7 +55,7 @@ export default function SolarConfigPage() {
     setSaving(false)
   }
 
-  const inp = 'bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-sm text-white focus:outline-none focus:border-amber-500 transition w-full'
+  const inp = 'bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-sm text-white focus:outline-hidden focus:border-amber-500 transition w-full'
   const th = 'text-[10px] font-semibold text-slate-500 uppercase tracking-wider text-left pb-2 px-1'
 
   if (loading) return <div className="flex items-center justify-center h-full py-20"><Loader2 className="w-5 h-5 animate-spin text-amber-400" /></div>

@@ -46,7 +46,7 @@ export default function ContaPage() {
       <div className="relative">
         <input type={show ? 'text' : 'password'} value={value} onChange={e => set(e.target.value)}
           placeholder={placeholder} autoComplete="off"
-          className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 pr-10 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"/>
+          className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 pr-10 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-amber-500 transition"/>
       </div>
     </div>
   )

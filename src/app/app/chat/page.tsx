@@ -254,7 +254,7 @@ export default function ChatPage() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-slate-800 bg-slate-900/80 backdrop-blur px-4 py-4 shrink-0">
+      <div className="border-t border-slate-800 bg-slate-900/80 backdrop-blur-sm px-4 py-4 shrink-0">
         <div className="max-w-3xl mx-auto flex gap-3 items-end">
           <div className="flex-1 bg-slate-800 border border-slate-700 focus-within:border-amber-500 rounded-2xl transition">
             <textarea
@@ -263,7 +263,7 @@ export default function ChatPage() {
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() }}}
               placeholder="Digite sua pergunta... (Enter para enviar)"
               rows={1}
-              className="w-full bg-transparent px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none resize-none max-h-32"
+              className="w-full bg-transparent px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-hidden resize-none max-h-32"
               style={{ minHeight: '44px' }}
               onInput={e => {
                 const t = e.target as HTMLTextAreaElement
